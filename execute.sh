@@ -3,7 +3,7 @@
 # Execute the generated code
 #
 # This script takes in the filename of the ORIGINAL program AFTER the codegen has been run
-#   i.e. programs/3-semantics+codegen/valid/test.min
+#   i.e. programs/3-semantics+codegen/valid/test.go
 #
 # It MUST then
 #   (a) Compile the GENERATED file
