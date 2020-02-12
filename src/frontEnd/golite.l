@@ -7,9 +7,10 @@
 #define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;
 %}
 
-/*ESCAPE [abfnrtv\\'"]
-Helper definitions */
+/*Helper definitions */
 DIGIT [0-9]
+ESCAPE [abfnrtv\\'"]
+
 
 /* Scanner options, line number generation */
 %option yylineno
@@ -135,8 +136,6 @@ DIGIT [0-9]
 
 ":" {if(g_tokens == 1)cout << ("Colon \n"); return tCOLON; }
 
-
-//identifier
 ([a-zA-Z]|"_")([a-zA-Z]|[0-9]|"_")* { 
     yylval.identifier = (yytext);
     if(g_tokens == 1)
@@ -144,7 +143,6 @@ DIGIT [0-9]
     return tIDENTIFIER;
     }
 
-//integer decimal , then octal then hex 
 0|([1-9][0-9]*) {
      yylval.intLiteral = atof(yytext);
     if(g_tokens == 1)
@@ -163,7 +161,6 @@ DIGIT [0-9]
     cout << ("Integer constant: "<< yytext << "\n");
     return tINTLITERAL;
 }
-//float
 ([0-9]*\.[0-9]+)|([0-9]+\.[0-9]*) {
     yylval.floatLiteral = atof(yytext);
     if(g_tokens == 1)
@@ -171,21 +168,18 @@ DIGIT [0-9]
     return tFLOATLITERAL;
 }
 
-//Character = rune 
 '((\\[abfnrtv\\\'])|[^\\'])'{ 
     yylval.rune = (yytext);
     if(g_tokens == 1)
     cout << ("Character: "<< yytext << "\n");
     return tRUNELITERAL;
 }
-//interpreted String 
 \"([0-9]|[a-zA-Z]|[\t]|\\{ESCAPE})*\" {
     yylval.string = (yytext);
     if(g_token == 1)
     cout << ("String variable: "<< yytext << "\n");
     return tSTRINGLITERAL;
 }
-//raw strings 
 '(\\.|[^'])*{
     yylval.string = (yytext);
     if(g_token == 1)
