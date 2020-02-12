@@ -1,3 +1,6 @@
+- run ./buildMakefile.sh to recreate the Makefile at the root whenever a new file is added
+- call ./build.sh to build the compiler
+
 # Assignment Template
 
 To organize your assignments and project for class, please follow the skeleton provided in this repository
