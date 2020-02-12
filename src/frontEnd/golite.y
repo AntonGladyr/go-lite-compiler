@@ -41,8 +41,82 @@ void yyerror(const char *s) {
  * yylval union] and an identifier. Multiple tokens can eb defined per directive by using a list
  * of identifiers separated by spaces.
  */
-%token <intval> tINTVAL
-%token <identifier> tIDENTIFIER 
+%token tBREAK
+%token tCASE
+%token tCHAN
+%token tCONST
+%token tCONTINUE
+%token tDEFAULT
+%token tDEFER
+%token tELSE
+%token tFALLTHROUGH
+%token tFOR
+%token tFUNC
+%token tGO
+%token tGOTO
+%token tIF
+%token tIMPORT
+%token tINTERFACE
+%token tMAP
+%token tPACKAGE
+%token tRANGE
+%token tRETURN
+%token tSELECT
+%token tSTRUCT
+%token tSWITCH
+%token tTYPE
+%token tVAR
+%token tPRINT
+%token tPRINTLN
+%token tAPPEND
+%token tLEN
+%token tCAP
+%token tPLUS
+%token tMINUS
+%token tDIVIDE
+%token tTIMES
+%token tMODULO
+%token tSINGLEAND
+%token tSINGLEOR
+%token tHAT
+%token tRIGHTSHIFT
+%token tLEFTSHIFT
+%token tANDHAT
+%token tPLUSASSIGN
+%token tMINUSASSIGN
+%token tTIMESASSIGN
+%token tDIVIDEASSIGN
+%token tMODULOASSIGN
+%token tANDASSIGN
+%token tORASSIGN
+%token tHATASSIGN
+%token tRIGHTSHIFTASSIGN
+%token tLEFTSHIFTASSIGN
+%token tANDHATASSIGN
+%token tAND
+%token tOR
+%token tLESSMINUS
+%token tPLUSPLUS
+%token tMINUSMINUS
+%token tEQUAL
+%token tLESS
+%token tGREATER
+%token tNOT
+%token tNOT_EQUAL
+%token tLESS_THAN_OR_EQUAL
+%token tGREATER_THAN_OR_EQUAL
+%token tSTRONGASSIGN
+%token tDOTDOTDOT
+%token tLPAREN
+%token tLCURL
+%token tLSQUARE
+%token tCOMMA
+%token tDOT
+%token tRPAREN
+%token tRCURL
+%token tRSQUARE
+%token tSEMICOLON
+%token tCOLON
 
 /* Precedence directives resolve grammar ambiguities by breaking ties between shift/reduce
  * operations. Tokens are grouped into precendence levels, with lower precedence coming first
