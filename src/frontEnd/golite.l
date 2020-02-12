@@ -39,23 +39,124 @@ DIGIT [0-9]
  *              part of the bison grammar file.
  */
 %%
-[ \t\r\n]+
 
-"+"     return '+';
-"-"     return '-';
-"*"     return '*';
-"/"     return '/';
-"("     return '(';
-")"     return ')';
+"+" {if(g_tokens == 1)cout << ("Plus\n");return tPLUS;}
+"-" {if(g_tokens == 1)cout << ("Minus \n");return tMINUS;}
+"/" {if(g_tokens == 1)cout << ("Divide \n");return tDIVIDE;}
+"*" {if(g_tokens == 1)cout << (" Times \n");return tTIMES;}
+"%" {if(g_tokens == 1)cout << ("Modulo \n");return tMODULO;}
 
-0|([1-9]{DIGIT}*) {
-	yylval.intval = atoi(yytext);
-	return tINTVAL;
+"&" {if(g_tokens == 1)cout << (" Single And\n");return tSINGLEAND;}
+"|" {if(g_tokens == 1)cout << ("Single Or\n");return tSINGLEOR;}
+"^" {if(g_tokens == 1)cout << ("Hat \n");return tHAT;}
+"<<" {if(g_tokens == 1)cout << (" Right Shift\n");return tRIGHTSHIFT;}
+">>" {if(g_tokens == 1)cout << ("Left Shift\n");return tLEFTSHIFT;}
+"&^" {if(g_tokens == 1)cout << ("And hat\n");return tANDHAT;}
+
+"+=" {if(g_tokens == 1)cout << ("Plus equal \n");return tPLUSASSIGN; }
+"-=" {if(g_tokens == 1)cout << ("Minus equal\n");return tMINUSASSIGN; }
+"*=" {if(g_tokens == 1)cout << ("Times equal\n");return tTIMESASSIGN; }
+"/=" {if(g_tokens == 1)cout << ("Divide equal\n");return tDIVIDEASSIGN; }
+"%=" {if(g_tokens == 1)cout << ("Modulo equal\n");return tMODULOASSIGN;}
+
+"&=" {if(g_tokens == 1)cout << ("And equal\n");return tANDASSIGN;}
+"|=" {if(g_tokens == 1)cout << ("Or equal\n");return tORASSIGN;}
+"^=" {if(g_tokens == 1)cout << ("Hat equal\n");return tHATASSIGN;}
+"<<=" {if(g_tokens == 1)cout << ("Right shift equal\n");return tRIGHTSHIFTASSIGN;}
+"<<=" {if(g_tokens == 1)cout << ("Left shift equal\n");return tLEFTSHIFTASSIGN;}
+"&^=" {if(g_tokens == 1)cout << ("And Hat equal\n");return tANDHATASSIGN;}
+
+"&&" {if(g_tokens == 1)cout << ("Logical and\n"); return tAND;}
+"||" {if(g_tokens == 1)cout << ("Logical or\n");return tOR;}
+"<-" {if(g_tokens == 1)cout << ("Less minus \n");return tLESSMINUS;}
+"++" {if(g_tokens == 1)cout << ("Plus Plus \n");return tPLUSPLUS;}
+"--" {if(g_tokens == 1)cout << ("Minus Minus \n");return tMINUSMINUS;}
+
+"==" {if(g_tokens == 1)cout << ("Equal\n");  return tEQUAL; }
+"<" {if(g_tokens == 1)cout << ("Less than\n");return tLESS;}
+">" {if(g_tokens == 1)cout << ("Greater than\n"); return tGREATER;}
+"=" { return tASSIGN;}
+"!" {if(g_tokens == 1)cout << ("Not \n"); return tNOT;}
+
+"!=" {if(g_tokens == 1)cout << ("Not equal\n"); return tNOT_EQUAL;}
+"<=" {if(g_tokens == 1)cout << ("Less or equal than\n"); return tLESS_THAN_OR_EQUAL; }
+">=" {if(g_tokens == 1)cout << ("Greater or equal than\n"); return tGREATER_THAN_OR_EQUAL; }
+":=" {if(g_tokens == 1)cout << ("Stong Assign\n"); return tSTRONGASSIGN; }
+"..." {if(g_tokens == 1)cout << ("DOT DOT DOT\n"); return tDOTDOTDOT; }
+
+
+
+"(" {if(g_tokens == 1)cout << ("Left parenthesis\n"); return tLPAREN; }
+"{" {if(g_tokens == 1)cout << ("Left brackets\n"); return tLCURL; }
+"[" {if(g_tokens == 1)cout << ("Left Square brackets \n"); return tLSQUARE:; }
+"," {if(g_tokens == 1)cout << ("Comma \n"); return tCOMMA; }
+"." {if(g_tokens == 1)cout << ("Dot\n"); return tDOT; }
+
+
+")" {if(g_tokens == 1)cout << ("Right parenthesis\n"); return tRPAREN; }
+"}" {if(g_tokens == 1)cout << ("right brackets\n"); return tRCURL; }
+"]" {if(g_tokens == 1)cout << ("Right parenthesis\n"); return tRSQUARE; }
+";" {if(g_tokens == 1)cout << ("Semi-Colon\n"); return tSEMICOLON; }
+
+":" {if(g_tokens == 1)cout << ("Colon \n"); return tCOLON; }
+
+
+//identifier
+([a-zA-Z]|"_")([a-zA-Z]|[0-9]|"_")* { 
+    yylval.identifier = (yytext);
+    if(g_tokens == 1)
+    cout << ("Identifier: "<< yytext << "\n");
+    return tIDENTIFIER;
+    }
+
+//integer decimal , then octal then hex 
+0|([1-9][0-9]*) {
+     yylval.intLiteral = atof(yytext);
+    if(g_tokens == 1)
+    cout << ("Integer constant: "<< yytext << "\n");
+    return tINTLITERAL;
 }
-[a-zA-Z_][a-zA-Z0-9_]* {
-	yylval.identifier = strdup(yytext);
-	return tIDENTIFIER;
+0[0-7]* {
+    yylval.intLiteral = atof(yytext);
+    if(g_tokens == 1)
+    cout << ("Integer constant: "<< yytext << "\n");
+    return tINTLITERAL;
+}
+0(x|X)[0-9a-fA-F][0-9a-fA-F]* {
+    yylval.intLiteral = atof(yytext);
+    if(g_tokens == 1)
+    cout << ("Integer constant: "<< yytext << "\n");
+    return tINTLITERAL;
+}
+//float
+([0-9]*\.[0-9]+)|([0-9]+\.[0-9]*) {
+    yylval.floatLiteral = atof(yytext);
+    if(g_tokens == 1)
+    cout << ("Float constant: "<< yytext << "\n");
+    return tFLOATLITERAL;
 }
 
-. 	{ fprintf (stderr, "Error: (line %d) unexpected character '%s'\n", yylineno, yytext); exit(1); }
+//Character = rune 
+'((\\[abfnrtv\\\'])|[^\\'])'{ 
+    yylval.rune = (yytext);
+    if(g_tokens == 1)
+    cout << ("Character: "<< yytext << "\n");
+    return tRUNELITERAL;
+}
+//interpreted String 
+\"([0-9]|[a-zA-Z]|[\t]|\\{ESCAPE})*\" {
+    yylval.string = (yytext);
+    if(g_token == 1)
+    cout << ("String variable: "<< yytext << "\n");
+    return tSTRINGLITERAL;
+}
+//raw strings 
+'(\\.|[^'])*{
+    yylval.string = (yytext);
+    if(g_token == 1)
+    cout << ("String variable: "<< yytext << "\n");
+    return tSTRINGLITERAL;
+}
+. { fprintf(stderr, "Error: (line %d) unexpected character ‘%s’\n", yylineno, yytext); exit(1); }
+
 %%
