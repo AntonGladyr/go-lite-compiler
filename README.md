@@ -1,3 +1,19 @@
+# GoLang Project
+
+* `Andy Jian`: 260741607
+* `Victor Massenet`: 260779781
+* `Anton Gladyr`: 260892882
+
+## Resources
+
+* Instructor Alex Krolik
+* Charles N. Fischer, Richard Joseph LeBlanc, Ronald Kaplan Cytron (2010). _Crafting a Compiler._ Pearson Education, Inc.: Addison-Wesley.
+* Lecture slides
+* <https://en.wikipedia.org/wiki/Quicksort>
+* <https://www.geeksforgeeks.org/quick-sort/>
+* <https://medium.com/@rgalus/sorting-algorithms-quick-sort-implementation-in-go-9ebfd91fe95f>
+
+# Notes
 - run ./buildMakefile.sh to recreate the Makefile at the root whenever a new file is added
 - call ./build.sh to build the compiler
 
