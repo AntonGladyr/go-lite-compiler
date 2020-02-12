@@ -7,7 +7,8 @@
 #define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;
 %}
 
-/* Helper definitions */
+/*ESCAPE [abfnrtv\\'"]
+Helper definitions */
 DIGIT [0-9]
 
 /* Scanner options, line number generation */
