@@ -27,6 +27,7 @@ void yyerror(const char *s) {
 }
 %}
 
+
 /* The union directive defines the yylval union used for associating (a) terminals (tokens)
  * returned by flex with additional scanning data (such as identifier/constant values); and
  * optionally (b) non-terminals (variables in productions) with AST information if any.
@@ -101,6 +102,7 @@ void yyerror(const char *s) {
 %token tEQUAL
 %token tLESS
 %token tGREATER
+%token tASSIGN
 %token tNOT
 %token tNOT_EQUAL
 %token tLESS_THAN_OR_EQUAL
@@ -117,6 +119,13 @@ void yyerror(const char *s) {
 %token tRSQUARE
 %token tSEMICOLON
 %token tCOLON
+%token tBLANKID
+%token tIDENTIFIER
+%token tINTLITERAL
+%token tFLOATLITERAL
+%token tRUNELITERAL
+%token tSTRINGLITERAL
+
 
 /* Precedence directives resolve grammar ambiguities by breaking ties between shift/reduce
  * operations. Tokens are grouped into precendence levels, with lower precedence coming first
@@ -140,13 +149,6 @@ void yyerror(const char *s) {
  */
 %% 
 
-exp : tIDENTIFIER { printf("Load %s\n", $1); }
-    | tINTVAL     { printf("Push %i\n", $1); }
-    | exp '*' exp { printf("Mult\n"); }
-    | exp '/' exp { printf("Div\n"); }
-    | exp '+' exp { printf("Plus\n"); }
-    | exp '-' exp { printf("Minus\n"); }
-    | '(' exp ')' { }
-    ;
+exp:
 
 %%

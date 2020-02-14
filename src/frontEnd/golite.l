@@ -1,19 +1,25 @@
 %{
-// #include "parser.tab.hpp" // Token definitions from the parser
+#include "GoLite_Parser.hpp" // Token definitions from the parser
 #include <string.h>
 #include <stdlib.h>
+#include <iostream>
 
 // Stores the line number with each token sent to bison
 #define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;
+
+extern int g_tokens;
+using namespace std;
 %}
+
+%x COMMENT
 
 /*Helper definitions */
 DIGIT [0-9]
 ESCAPE [abfnrtv\\'"]
 
-
 /* Scanner options, line number generation */
 %option yylineno
+%option noyywrap
 
 /* Removes warnings about input/output functions */
 %option noinput
@@ -42,8 +48,16 @@ ESCAPE [abfnrtv\\'"]
  */
 %%
 
-\/\/(.*)
-\/\*(\*(?!\/)|[^*])*\*\/
+[ \t\r\n]+
+"//"([^\n])*
+
+"/*"	BEGIN(COMMENT);
+<COMMENT>"/*"	{ fprintf(stderr, "Error: (line %d) Multiple comments opened\n", yylineno); exit(1); }
+<COMMENT>"*/"	BEGIN(INITIAL);
+<COMMENT><<EOF>> {
+	fprintf(stderr, "Error: (line %d) Reached end of file while scanning block comment\n", yylineno); exit(1);
+}
+<COMMENT>.|"\n"	;
 
 "break"		{ if (g_tokens) cout << "tBREAK" << endl; return tBREAK; }
 "case"		{ if (g_tokens) cout << "tCASE" << endl; return tCASE; }
@@ -76,117 +90,113 @@ ESCAPE [abfnrtv\\'"]
 "len"		{ if (g_tokens) cout << "tLEN"; return tLEN; }
 "cap"		{ if (g_tokens) cout << "tCAP"; return tCAP; }
 
-"+" {if(g_tokens == 1)cout << ("Plus\n");return tPLUS;}
-"-" {if(g_tokens == 1)cout << ("Minus \n");return tMINUS;}
-"/" {if(g_tokens == 1)cout << ("Divide \n");return tDIVIDE;}
-"*" {if(g_tokens == 1)cout << (" Times \n");return tTIMES;}
-"%" {if(g_tokens == 1)cout << ("Modulo \n");return tMODULO;}
+"+" 		{ if (g_tokens) cout << "tPLUS" << endl; return tPLUS; }
+"-" 		{ if (g_tokens) cout << "Minus" << endl; return tMINUS; }
+"*" 		{ if (g_tokens) cout << "Times" << endl; return tTIMES; }
+"/" 		{ if (g_tokens) cout << "Divide" << endl; return tDIVIDE; }
+"%" 		{ if (g_tokens) cout << "Modulo " << endl; return tMODULO; }
 
-"&" {if(g_tokens == 1)cout << (" Single And\n");return tSINGLEAND;}
-"|" {if(g_tokens == 1)cout << ("Single Or\n");return tSINGLEOR;}
-"^" {if(g_tokens == 1)cout << ("Hat \n");return tHAT;}
-"<<" {if(g_tokens == 1)cout << (" Right Shift\n");return tRIGHTSHIFT;}
-">>" {if(g_tokens == 1)cout << ("Left Shift\n");return tLEFTSHIFT;}
-"&^" {if(g_tokens == 1)cout << ("And hat\n");return tANDHAT;}
+"&" 		{ if (g_tokens) cout << "Single And" << endl; return tSINGLEAND; }
+"|" 		{ if (g_tokens) cout << "Single Or" << endl; return tSINGLEOR; }
+"^" 		{ if (g_tokens) cout << "Hat" << endl; return tHAT; }
+"<<" 		{ if (g_tokens) cout << "Right Shift" << endl; return tRIGHTSHIFT; }
+">>" 		{ if (g_tokens) cout << "Left Shift" << endl; return tLEFTSHIFT; }
+"&^" 		{ if (g_tokens) cout << "And hat" << endl; return tANDHAT; }
 
-"+=" {if(g_tokens == 1)cout << ("Plus equal \n");return tPLUSASSIGN; }
-"-=" {if(g_tokens == 1)cout << ("Minus equal\n");return tMINUSASSIGN; }
-"*=" {if(g_tokens == 1)cout << ("Times equal\n");return tTIMESASSIGN; }
-"/=" {if(g_tokens == 1)cout << ("Divide equal\n");return tDIVIDEASSIGN; }
-"%=" {if(g_tokens == 1)cout << ("Modulo equal\n");return tMODULOASSIGN;}
+"+=" 		{ if (g_tokens) cout << "Plus equal " << endl; return tPLUSASSIGN; }
+"-=" 		{ if (g_tokens) cout << "Minus equal" << endl; return tMINUSASSIGN; }
+"*=" 		{ if (g_tokens) cout << "Times equal" << endl; return tTIMESASSIGN; }
+"/=" 		{ if (g_tokens) cout << "Divide equal" << endl; return tDIVIDEASSIGN; }
+"%=" 		{ if (g_tokens) cout << "Modulo equal" << endl; return tMODULOASSIGN; }
 
-"&=" {if(g_tokens == 1)cout << ("And equal\n");return tANDASSIGN;}
-"|=" {if(g_tokens == 1)cout << ("Or equal\n");return tORASSIGN;}
-"^=" {if(g_tokens == 1)cout << ("Hat equal\n");return tHATASSIGN;}
-"<<=" {if(g_tokens == 1)cout << ("Right shift equal\n");return tRIGHTSHIFTASSIGN;}
-"<<=" {if(g_tokens == 1)cout << ("Left shift equal\n");return tLEFTSHIFTASSIGN;}
-"&^=" {if(g_tokens == 1)cout << ("And Hat equal\n");return tANDHATASSIGN;}
+"&=" 		{ if (g_tokens) cout << "And equal" << endl; return tANDASSIGN; }
+"|=" 		{ if (g_tokens) cout << "Or equal" << endl; return tORASSIGN; }
+"^=" 		{ if (g_tokens) cout << "Hat equal" << endl; return tHATASSIGN; }
+"<<=" 		{ if (g_tokens) cout << "Left shift equal" << endl; return tLEFTSHIFTASSIGN; }
+">>=" 		{ if (g_tokens) cout << "Right shift equal" << endl; return tRIGHTSHIFTASSIGN; }
+"&^=" 		{ if (g_tokens) cout << "And Hat equal" << endl; return tANDHATASSIGN; }
 
-"&&" {if(g_tokens == 1)cout << ("Logical and\n"); return tAND;}
-"||" {if(g_tokens == 1)cout << ("Logical or\n");return tOR;}
-"<-" {if(g_tokens == 1)cout << ("Less minus \n");return tLESSMINUS;}
-"++" {if(g_tokens == 1)cout << ("Plus Plus \n");return tPLUSPLUS;}
-"--" {if(g_tokens == 1)cout << ("Minus Minus \n");return tMINUSMINUS;}
+"&&" 		{ if (g_tokens) cout << "Logical and" << endl; return tAND; }
+"||" 		{ if (g_tokens) cout << "Logical or" << endl; return tOR; }
+"<-" 		{ if (g_tokens) cout << "Less minus " << endl; return tLESSMINUS; }
+"++" 		{ if (g_tokens) cout << "Plus Plus " << endl; return tPLUSPLUS; }
+"--" 		{ if (g_tokens) cout << "Minus Minus " << endl; return tMINUSMINUS; }
 
-"==" {if(g_tokens == 1)cout << ("Equal\n");  return tEQUAL; }
-"<" {if(g_tokens == 1)cout << ("Less than\n");return tLESS;}
-">" {if(g_tokens == 1)cout << ("Greater than\n"); return tGREATER;}
-"=" { return tASSIGN;}
-"!" {if(g_tokens == 1)cout << ("Not \n"); return tNOT;}
+"==" 		{ if (g_tokens) cout << "Equal" << endl;  return tEQUAL; }
+"<" 		{ if (g_tokens) cout << "Less than" << endl; return tLESS; }
+">" 		{ if (g_tokens) cout << "Greater than" << endl; return tGREATER; }
+"=" 		{ if (g_tokens) cout << "tASSIGN" << endl; return tASSIGN; }
+"!" 		{ if (g_tokens) cout << "Not" << endl; return tNOT; }
 
-"!=" {if(g_tokens == 1)cout << ("Not equal\n"); return tNOT_EQUAL;}
-"<=" {if(g_tokens == 1)cout << ("Less or equal than\n"); return tLESS_THAN_OR_EQUAL; }
-">=" {if(g_tokens == 1)cout << ("Greater or equal than\n"); return tGREATER_THAN_OR_EQUAL; }
-":=" {if(g_tokens == 1)cout << ("Stong Assign\n"); return tSTRONGASSIGN; }
-"..." {if(g_tokens == 1)cout << ("DOT DOT DOT\n"); return tDOTDOTDOT; }
+"!=" 		{ if (g_tokens) cout << "Not equal" << endl; return tNOT_EQUAL; }
+"<=" 		{ if (g_tokens) cout << "Less or equal than" << endl; return tLESS_THAN_OR_EQUAL; }
+">=" 		{ if (g_tokens) cout << "Greater or equal than" << endl; return tGREATER_THAN_OR_EQUAL; }
+":=" 		{ if (g_tokens) cout << "Stong Assign" << endl; return tSTRONGASSIGN; }
+"..." 		{ if (g_tokens) cout << "DOT DOT DOT" << endl; return tDOTDOTDOT; }
 
-
-
-"(" {if(g_tokens == 1)cout << ("Left parenthesis\n"); return tLPAREN; }
-"{" {if(g_tokens == 1)cout << ("Left brackets\n"); return tLCURL; }
-"[" {if(g_tokens == 1)cout << ("Left Square brackets \n"); return tLSQUARE:; }
-"," {if(g_tokens == 1)cout << ("Comma \n"); return tCOMMA; }
-"." {if(g_tokens == 1)cout << ("Dot\n"); return tDOT; }
+"(" 		{ if (g_tokens) cout << "Left parenthesis" << endl; return tLPAREN; }
+"{" 		{ if (g_tokens) cout << "Left brackets" << endl; return tLCURL; }
+"[" 		{ if (g_tokens) cout << "Left Square brackets " << endl; return tLSQUARE; }
+"," 		{ if (g_tokens) cout << "Comma " << endl; return tCOMMA; }
+"." 		{ if (g_tokens) cout << "Dot" << endl; return tDOT; }
 
 
-")" {if(g_tokens == 1)cout << ("Right parenthesis\n"); return tRPAREN; }
-"}" {if(g_tokens == 1)cout << ("right brackets\n"); return tRCURL; }
-"]" {if(g_tokens == 1)cout << ("Right parenthesis\n"); return tRSQUARE; }
-";" {if(g_tokens == 1)cout << ("Semi-Colon\n"); return tSEMICOLON; }
+")" 		{ if (g_tokens) cout << "Right parenthesis" << endl; return tRPAREN; }
+"}" 		{ if (g_tokens) cout << "right brackets" << endl; return tRCURL; }
+"]" 		{ if (g_tokens) cout << "Right parenthesis" << endl; return tRSQUARE; }
+";" 		{ if (g_tokens) cout << "Semi-Colon" << endl; return tSEMICOLON; }
 
-":" {if(g_tokens == 1)cout << ("Colon \n"); return tCOLON; }
+":" 		{ if (g_tokens) cout << "Colon " << endl; return tCOLON; }
+"_"		{ if (g_tokens) cout << "tBLANKID" << endl; return tBLANKID; }
 
 ([a-zA-Z]|"_")([a-zA-Z]|[0-9]|"_")* { 
-    yylval.identifier = (yytext);
-    if(g_tokens == 1)
-    cout << ("Identifier: "<< yytext << "\n");
+    //yylval.identifier = (yytext);
+    if (g_tokens) cout << "tIDENTIFIER" << endl;
     return tIDENTIFIER;
-    }
+}
 
 0|([1-9][0-9]*) {
-     yylval.intLiteral = atof(yytext);
-    if(g_tokens == 1)
-    cout << ("Integer constant: "<< yytext << "\n");
+     //yylval.intLiteral = atof(yytext);
+    if (g_tokens) cout << "tINTLITERAL" << endl;
     return tINTLITERAL;
 }
+
 0[0-7]* {
-    yylval.intLiteral = atof(yytext);
-    if(g_tokens == 1)
-    cout << ("Integer constant: "<< yytext << "\n");
+    //yylval.intLiteral = atof(yytext);
+    if (g_tokens) cout << "tINTLITERAL" << endl;
     return tINTLITERAL;
 }
+
 0(x|X)[0-9a-fA-F][0-9a-fA-F]* {
-    yylval.intLiteral = atof(yytext);
-    if(g_tokens == 1)
-    cout << ("Integer constant: "<< yytext << "\n");
+    //yylval.intLiteral = atof(yytext);
+    if (g_tokens) cout << "tINTLITERAL" << endl;
     return tINTLITERAL;
 }
+
 ([0-9]*\.[0-9]+)|([0-9]+\.[0-9]*) {
-    yylval.floatLiteral = atof(yytext);
-    if(g_tokens == 1)
-    cout << ("Float constant: "<< yytext << "\n");
+    //yylval.floatLiteral = atof(yytext);
+    if (g_tokens) cout << "tFLOATLITERAL" << endl;
     return tFLOATLITERAL;
 }
 
-'((\\[abfnrtv\\\'])|[^\\'])'{ 
-    yylval.rune = (yytext);
-    if(g_tokens == 1)
-    cout << ("Character: "<< yytext << "\n");
-    return tRUNELITERAL;
+'((\\[abfnrtv\\\'])|[^\\'])\' {  
+	//yylval.rune = (yytext);
+	if (g_tokens) cout << "tRUNELITERAL" << endl;
+	return tRUNELITERAL;
 }
+
 \"([0-9]|[a-zA-Z]|[\t]|\\{ESCAPE})*\" {
-    yylval.string = (yytext);
-    if(g_token == 1)
-    cout << ("String variable: "<< yytext << "\n");
-    return tSTRINGLITERAL;
-}
-'(\\.|[^'])*{
-    yylval.string = (yytext);
-    if(g_token == 1)
-    cout << ("String variable: "<< yytext << "\n");
+    //yylval.string = (yytext);
+    if (g_tokens) cout << "tSTRINGLITERAL" << endl;
     return tSTRINGLITERAL;
 }
 
-. { fprintf(stderr, "Error: (line %d) unexpected character ‘%s’\n", yylineno, yytext); exit(1); }
+'(\\.|[^'])*' {
+    //yylval.string = (yytext);
+    if (g_tokens) cout << "tSTRINGLITERAL" << endl;
+    return tSTRINGLITERAL;
+}
+
+. { fprintf(stderr, "Error: (line %d) unexpected character '%s'\n", yylineno, yytext); exit(1); }
 
 %%
