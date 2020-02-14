@@ -34,6 +34,8 @@ void yyerror(const char *s) {
 %union {
 	int intval;
 	char *identifier;
+
+    Function *function;
 }
 
 /* Token directives define the token types to be returned by the scanner (excluding character
@@ -41,6 +43,9 @@ void yyerror(const char *s) {
  * yylval union] and an identifier. Multiple tokens can eb defined per directive by using a list
  * of identifiers separated by spaces.
  */
+
+/*
+
 %token tBREAK
 %token tCASE
 %token tCHAN
@@ -105,18 +110,22 @@ void yyerror(const char *s) {
 %token tNOT_EQUAL
 %token tLESS_THAN_OR_EQUAL
 %token tGREATER_THAN_OR_EQUAL
-%token tSTRONGASSIGN
+%token tSHORTASSIGN
 %token tDOTDOTDOT
+%token tLBRACE
 %token tLPAREN
-%token tLCURL
-%token tLSQUARE
+%token tLBRACKET
 %token tCOMMA
 %token tDOT
+%token tRBRACE
 %token tRPAREN
-%token tRCURL
-%token tRSQUARE
+%token tRBRACKET
 %token tSEMICOLON
 %token tCOLON
+%token tIDENTIFIER
+
+//defined 
+%/
 
 /* Precedence directives resolve grammar ambiguities by breaking ties between shift/reduce
  * operations. Tokens are grouped into precendence levels, with lower precedence coming first
@@ -140,13 +149,57 @@ void yyerror(const char *s) {
  */
 %% 
 
-exp : tIDENTIFIER { printf("Load %s\n", $1); }
-    | tINTVAL     { printf("Push %i\n", $1); }
-    | exp '*' exp { printf("Mult\n"); }
-    | exp '/' exp { printf("Div\n"); }
-    | exp '+' exp { printf("Plus\n"); }
-    | exp '-' exp { printf("Minus\n"); }
-    | '(' exp ')' { }
+program : ins 
     ;
 
+ins :          
+    | dec ins 
+    | stmt ins 
+    ;
+
+dec : tVAR tIDENTIFIER tVARTYPE tASSIGN exp semicolon
+    | tCONST tIDENTIFIER tASSIGN exp semicolon
+    | tFUNC tIDENTIFIER tBRACE multivar tRBRACE tTYPE
+    ;
+
+shortdec : tIDENTIFIER tSHORTASSIGN exp semicolon
+    ;
+
+multdec : 
+
+factordec :
+
+global : tPACKAGE tIDENTIFIER
+    ;
+
+multivar : tIDENTIFIER 
+    | tIDENTIFIER tCOMMA multivar
+    ;
+
+multiexp : exp
+    | exp tCOMMA multiexp
+    ;
+
+stmt : tFOR ins tSEMICOLON exp tSEMICOLON assignstmt tSEMICOLON tLPAREN ins tRPAREN
+    | tFOR exp tLPAREN ins tRPAREN
+    | tFOR LPAREN ins tRPAREN
+    | assignstmt
+    | ifstmt
+    ;
+
+assignstmt : 
+    | multivar tASSIGN multiexp semicolon 
+    ;
+
+ifstmt : if exp tLBRACE ins tRBRACE
+    ; if shortdec exp tLBRACE ins tRBRACE
+
+exp : tIDENTIFIER tLBRACE multivar tRBRACE semicolon
+    ;
+
+semicolon : 
+    | tSEMICOLON
+    ;
+
+tTYPE : tINT
 %%

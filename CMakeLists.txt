@@ -14,8 +14,8 @@ set(CMAKE_SOURCE_DIR src)
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/frontEnd)
 
-bison_target(GoLiteParser ${CMAKE_SOURCE_DIR}/frontEnd/golite.y ${CMAKE_CURRENT_BINARY_DIR}/frontEnd/GoLite_Parser.cpp)
-flex_target(GoLiteScanner ${CMAKE_SOURCE_DIR}/frontEnd/golite.l ${CMAKE_CURRENT_BINARY_DIR}/frontEnd/GoLite_Scanner.cpp)
+BISON_TARGET(GoLiteParser ${CMAKE_SOURCE_DIR}/frontEnd/golite.y ${CMAKE_CURRENT_BINARY_DIR}/frontEnd/GoLite_Parser.cpp)
+FLEX_TARGET(GoLiteScanner ${CMAKE_SOURCE_DIR}/frontEnd/golite.l ${CMAKE_CURRENT_BINARY_DIR}/frontEnd/GoLite_Scanner.cpp)
 ADD_FLEX_BISON_DEPENDENCY(GoLiteScanner GoLiteParser)
 
 file(GLOB_RECURSE SOURCES "${CMAKE_SOURCE_DIR}/*.cpp")

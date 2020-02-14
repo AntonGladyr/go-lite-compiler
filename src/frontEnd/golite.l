@@ -1,8 +1,12 @@
 %{
-// #include "parser.tab.hpp" // Token definitions from the parser
+#include GoLiteParser_OUTPUT_HEADER // Token definitions from the parser
 #include <string.h>
 #include <stdlib.h>
+#include <iostream>
 
+using namespace std;
+
+extern int g_tokens;
 // Stores the line number with each token sent to bison
 #define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;
 %}
@@ -26,8 +30,8 @@ ESCAPE [abfnrtv\\'"]
  * a token is matched. A missing action is treated as a NOP.
  *
  * When building a scanner+parser combo, the parser is responsible for fetching the next token
- * from the scanner, which returns scans and returns a single token at a time. As part of the
- * action, we thus return the next token. Tokens can either be (a) a character; or (b) a token
+ * from the scanner, which //returns scans and //returns a single token at a time. As part of the
+ * action, we thus //return the next token. Tokens can either be (a) a character; or (b) a token
  * defined in bison (included in y.tab.h).
  */
 
@@ -40,151 +44,146 @@ ESCAPE [abfnrtv\\'"]
  *              to store this extra data. The definition of the yylval struct is provided as
  *              part of the bison grammar file.
  */
+
 %%
 
-\/\/(.*)
-\/\*(\*(?!\/)|[^*])*\*\/
+\/\/([^\n])*
 
-"break"		{ if (g_tokens) cout << "tBREAK" << endl; return tBREAK; }
-"case"		{ if (g_tokens) cout << "tCASE" << endl; return tCASE; }
-"chan"		{ if (g_tokens) cout << "tCHAN" << endl; return tCHAN; }
-"const" 	{ if (g_tokens) cout << "tCONST" << endl; return tCONST; }
-"continue"	{ if (g_tokens) cout << "tCONTINUE" << endl; return tCONTINUE; }
-"default"	{ if (g_tokens) cout << "tDEFAULT" << endl; return tDEFAULT; }
-"defer"		{ if (g_tokens) cout << "tDEFER" << endl; return tDEFER; }
-"else"		{ if (g_tokens) cout << "tELSE" << endl; return tELSE; }
-"fallthrough"	{ if (g_tokens) cout << "tFALLTHROUGH" << endl; return tFALLTHROUGH; }
-"for"		{ if (g_tokens) cout << "tFOR" << endl; return tFOR; }
-"func"		{ if (g_tokens) cout << "tFUNC" << endl; return tFUNC; }
-"go"		{ if (g_tokens) cout << "tGO" << endl; return tGO; }
-"goto"		{ if (g_tokens) cout << "tGOTO" << endl; return tGOTO; }
-"if"		{ if (g_tokens) cout << "tIF" << endl; return tIF; }
-"import"	{ if (g_tokens) cout << "tIMPORT" << endl; return tIMPORT; }
-"interface"	{ if (g_tokens) cout << "tINTERFACE" << endl; return tINTERFACE; }
-"map"		{ if (g_tokens) cout << "tMAP" << endl; return tMAP; }
-"package"	{ if (g_tokens) cout << "tPACKAGE" << endl; return tPACKAGE; }
-"range"		{ if (g_tokens) cout << "tRANGE" << endl; return tRANGE; }
-"return"	{ if (g_tokens) cout << "tRETURN" << endl; return tRETURN; }
-"select"	{ if (g_tokens) cout << "tSELECT" << endl; return tSELECT; }
-"struct"	{ if (g_tokens) cout << "tSTRUCT" << endl; return tSTRUCT; }
-"switch"	{ if (g_tokens) cout << "tSWITCH" << endl; return tSWITCH; }
-"type"		{ if (g_tokens) cout << "tTYPE"; return tTYPE; }
-"var"		{ if (g_tokens) cout << "tVAR" << endl; return tVAR; }
-"print"		{ if (g_tokens) cout << "tPRINT" << endl; return tPRINT;  }
-"println"	{ if (g_tokens) cout << "tPRINTLN"; return tPRINTLN; }
-"append"	{ if (g_tokens) cout << "tAPPEND"; return tAPPEND; }
-"len"		{ if (g_tokens) cout << "tLEN"; return tLEN; }
-"cap"		{ if (g_tokens) cout << "tCAP"; return tCAP; }
+"break"		{ if (g_tokens) cout << "tBREAK" << endl; //return tBREAK; }
+"case"		{ if (g_tokens) cout << "tCASE" << endl; //return tCASE; }
+"chan"		{ if (g_tokens) cout << "tCHAN" << endl; //return tCHAN; }
+"const" 	{ if (g_tokens) cout << "tCONST" << endl; //return tCONST; }
+"continue"	{ if (g_tokens) cout << "tCONTINUE" << endl; //return tCONTINUE; }
+"default"	{ if (g_tokens) cout << "tDEFAULT" << endl; //return tDEFAULT; }
+"defer"		{ if (g_tokens) cout << "tDEFER" << endl; //return tDEFER; }
+"else"		{ if (g_tokens) cout << "tELSE" << endl; //return tELSE; }
+"fallthrough"	{ if (g_tokens) cout << "tFALLTHROUGH" << endl; //return tFALLTHROUGH; }
+"for"		{ if (g_tokens) cout << "tFOR" << endl; //return tFOR; }
+"func"		{ if (g_tokens) cout << "tFUNC" << endl; //return tFUNC; }
+"go"		{ if (g_tokens) cout << "tGO" << endl; //return tGO; }
+"goto"		{ if (g_tokens) cout << "tGOTO" << endl; //return tGOTO; }
+"if"		{ if (g_tokens) cout << "tIF" << endl; //return tIF; }
+"import"	{ if (g_tokens) cout << "tIMPORT" << endl; //return tIMPORT; }
+"interface"	{ if (g_tokens) cout << "tINTERFACE" << endl; //return tINTERFACE; }
+"map"		{ if (g_tokens) cout << "tMAP" << endl; //return tMAP; }
+"package"	{ if (g_tokens) cout << "tPACKAGE" << endl; //return tPACKAGE; }
+"range"		{ if (g_tokens) cout << "tRANGE" << endl; //return tRANGE; }
+"return"	{ if (g_tokens) cout << "tRETURN" << endl; //return tRETURN; }
+"select"	{ if (g_tokens) cout << "tSELECT" << endl; //return tSELECT; }
+"struct"	{ if (g_tokens) cout << "tSTRUCT" << endl; //return tSTRUCT; }
+"switch"	{ if (g_tokens) cout << "tSWITCH" << endl; //return tSWITCH; }
+"type"		{ if (g_tokens) cout << "tTYPE"; //return tTYPE; }
+"var"		{ if (g_tokens) cout << "tVAR" << endl; //return tVAR; }
+"print"		{ if (g_tokens) cout << "tPRINT" << endl; //return tPRINT;  }
+"println"	{ if (g_tokens) cout << "tPRINTLN"; //return tPRINTLN; }
+"append"	{ if (g_tokens) cout << "tAPPEND"; //return tAPPEND; }
+"len"		{ if (g_tokens) cout << "tLEN"; //return tLEN; }
+"cap"		{ if (g_tokens) cout << "tCAP"; //return tCAP; }
 
-"+" {if(g_tokens == 1)cout << ("Plus\n");return tPLUS;}
-"-" {if(g_tokens == 1)cout << ("Minus \n");return tMINUS;}
-"/" {if(g_tokens == 1)cout << ("Divide \n");return tDIVIDE;}
-"*" {if(g_tokens == 1)cout << (" Times \n");return tTIMES;}
-"%" {if(g_tokens == 1)cout << ("Modulo \n");return tMODULO;}
+"+" {if(g_tokens == 1)cout << ("Plus\n");//return tPLUS;}
+"-" {if(g_tokens == 1)cout << ("Minus \n");//return tMINUS;}
+"/" {if(g_tokens == 1)cout << ("Divide \n");//return tDIVIDE;}
+"*" {if(g_tokens == 1)cout << (" Times \n");//return tTIMES;}
+"%" {if(g_tokens == 1)cout << ("Modulo \n");//return tMODULO;}
 
-"&" {if(g_tokens == 1)cout << (" Single And\n");return tSINGLEAND;}
-"|" {if(g_tokens == 1)cout << ("Single Or\n");return tSINGLEOR;}
-"^" {if(g_tokens == 1)cout << ("Hat \n");return tHAT;}
-"<<" {if(g_tokens == 1)cout << (" Right Shift\n");return tRIGHTSHIFT;}
-">>" {if(g_tokens == 1)cout << ("Left Shift\n");return tLEFTSHIFT;}
-"&^" {if(g_tokens == 1)cout << ("And hat\n");return tANDHAT;}
+"&" {if(g_tokens == 1)cout << (" Single And\n");//return tSINGLEAND;}
+"|" {if(g_tokens == 1)cout << ("Single Or\n");//return tSINGLEOR;}
+"^" {if(g_tokens == 1)cout << ("Hat \n");//return tHAT;}
+"<<" {if(g_tokens == 1)cout << (" Right Shift\n");//return tRIGHTSHIFT;}
+">>" {if(g_tokens == 1)cout << ("Left Shift\n");//return tLEFTSHIFT;}
+"&^" {if(g_tokens == 1)cout << ("And hat\n");//return tANDHAT;}
 
-"+=" {if(g_tokens == 1)cout << ("Plus equal \n");return tPLUSASSIGN; }
-"-=" {if(g_tokens == 1)cout << ("Minus equal\n");return tMINUSASSIGN; }
-"*=" {if(g_tokens == 1)cout << ("Times equal\n");return tTIMESASSIGN; }
-"/=" {if(g_tokens == 1)cout << ("Divide equal\n");return tDIVIDEASSIGN; }
-"%=" {if(g_tokens == 1)cout << ("Modulo equal\n");return tMODULOASSIGN;}
+"+=" {if(g_tokens == 1)cout << ("Plus equal \n");//return tPLUSASSIGN; }
+"-=" {if(g_tokens == 1)cout << ("Minus equal\n");//return tMINUSASSIGN; }
+"*=" {if(g_tokens == 1)cout << ("Times equal\n");//return tTIMESASSIGN; }
+"/=" {if(g_tokens == 1)cout << ("Divide equal\n");//return tDIVIDEASSIGN; }
+"%=" {if(g_tokens == 1)cout << ("Modulo equal\n");//return tMODULOASSIGN;}
 
-"&=" {if(g_tokens == 1)cout << ("And equal\n");return tANDASSIGN;}
-"|=" {if(g_tokens == 1)cout << ("Or equal\n");return tORASSIGN;}
-"^=" {if(g_tokens == 1)cout << ("Hat equal\n");return tHATASSIGN;}
-"<<=" {if(g_tokens == 1)cout << ("Right shift equal\n");return tRIGHTSHIFTASSIGN;}
-"<<=" {if(g_tokens == 1)cout << ("Left shift equal\n");return tLEFTSHIFTASSIGN;}
-"&^=" {if(g_tokens == 1)cout << ("And Hat equal\n");return tANDHATASSIGN;}
+"&=" {if(g_tokens == 1)cout << ("And equal\n");//return tANDASSIGN;}
+"|=" {if(g_tokens == 1)cout << ("Or equal\n");//return tORASSIGN;}
+"^=" {if(g_tokens == 1)cout << ("Hat equal\n");//return tHATASSIGN;}
+"<<=" {if(g_tokens == 1)cout << ("Right shift equal\n");//return tRIGHTSHIFTASSIGN;}
+"<<=" {if(g_tokens == 1)cout << ("Left shift equal\n");//return tLEFTSHIFTASSIGN;}
+"&^=" {if(g_tokens == 1)cout << ("And Hat equal\n");//return tANDHATASSIGN;}
 
-"&&" {if(g_tokens == 1)cout << ("Logical and\n"); return tAND;}
-"||" {if(g_tokens == 1)cout << ("Logical or\n");return tOR;}
-"<-" {if(g_tokens == 1)cout << ("Less minus \n");return tLESSMINUS;}
-"++" {if(g_tokens == 1)cout << ("Plus Plus \n");return tPLUSPLUS;}
-"--" {if(g_tokens == 1)cout << ("Minus Minus \n");return tMINUSMINUS;}
+"&&" {if(g_tokens == 1)cout << ("Logical and\n"); //return tAND;}
+"||" {if(g_tokens == 1)cout << ("Logical or\n");//return tOR;}
+"<-" {if(g_tokens == 1)cout << ("Less minus \n");//return tLESSMINUS;}
+"++" {if(g_tokens == 1)cout << ("Plus Plus \n");//return tPLUSPLUS;}
+"--" {if(g_tokens == 1)cout << ("Minus Minus \n");//return tMINUSMINUS;}
 
-"==" {if(g_tokens == 1)cout << ("Equal\n");  return tEQUAL; }
-"<" {if(g_tokens == 1)cout << ("Less than\n");return tLESS;}
-">" {if(g_tokens == 1)cout << ("Greater than\n"); return tGREATER;}
-"=" { return tASSIGN;}
-"!" {if(g_tokens == 1)cout << ("Not \n"); return tNOT;}
+"==" {if(g_tokens == 1)cout << ("Equal\n");  //return tEQUAL; }
+"<" {if(g_tokens == 1)cout << ("Less than\n");//return tLESS;}
+">" {if(g_tokens == 1)cout << "Greater than\n"; //return tGREATER;}
+"=" {if(g_tokens == 1)cout << "assign\n"; //return tASSIGN;}
+"!" {if(g_tokens == 1)cout << "Not \n"; //return tNOT;}
 
-"!=" {if(g_tokens == 1)cout << ("Not equal\n"); return tNOT_EQUAL;}
-"<=" {if(g_tokens == 1)cout << ("Less or equal than\n"); return tLESS_THAN_OR_EQUAL; }
-">=" {if(g_tokens == 1)cout << ("Greater or equal than\n"); return tGREATER_THAN_OR_EQUAL; }
-":=" {if(g_tokens == 1)cout << ("Stong Assign\n"); return tSTRONGASSIGN; }
-"..." {if(g_tokens == 1)cout << ("DOT DOT DOT\n"); return tDOTDOTDOT; }
-
+"!=" {if(g_tokens == 1)cout << ("Not equal\n"); //return tNOT_EQUAL;}
+"<=" {if(g_tokens == 1)cout << ("Less or equal than\n"); //return tLESS_THAN_OR_EQUAL; }
+">=" {if(g_tokens == 1)cout << ("Greater or equal than\n"); //return tGREATER_THAN_OR_EQUAL; }
+":=" {if(g_tokens == 1)cout << ("Short Assign\n"); //return tSHORTASSIGN; }
+"..." {if(g_tokens == 1)cout << ("DOT DOT DOT\n"); //return tDOTDOTDOT; }
 
 
-"(" {if(g_tokens == 1)cout << ("Left parenthesis\n"); return tLPAREN; }
-"{" {if(g_tokens == 1)cout << ("Left brackets\n"); return tLCURL; }
-"[" {if(g_tokens == 1)cout << ("Left Square brackets \n"); return tLSQUARE:; }
-"," {if(g_tokens == 1)cout << ("Comma \n"); return tCOMMA; }
-"." {if(g_tokens == 1)cout << ("Dot\n"); return tDOT; }
+
+"(" {if(g_tokens == 1)cout << ("TLBRACE\n"); //return tLBRACE; }
+"{" {if(g_tokens == 1)cout << ("TLPAREN\n"); //return tLPAREN; }
+"[" {if(g_tokens == 1)cout << ("TLBRACKET\n"); //return tLBRACKET:; }
+"," {if(g_tokens == 1)cout << ("Comma \n"); //return tCOMMA; }
+"." {if(g_tokens == 1)cout << ("Dot\n"); //return tDOT; }
 
 
-")" {if(g_tokens == 1)cout << ("Right parenthesis\n"); return tRPAREN; }
-"}" {if(g_tokens == 1)cout << ("right brackets\n"); return tRCURL; }
-"]" {if(g_tokens == 1)cout << ("Right parenthesis\n"); return tRSQUARE; }
-";" {if(g_tokens == 1)cout << ("Semi-Colon\n"); return tSEMICOLON; }
+")" {if(g_tokens == 1)cout << ("tLBRACE\n"); //return tRBRACE; }
+"}" {if(g_tokens == 1)cout << ("tRPAREN\n"); //return tRPAREN; }
+"]" {if(g_tokens == 1)cout << ("tRBRACKET\n"); //return tRBRACKET; }
+";" {if(g_tokens == 1)cout << ("Semi-Colon\n"); //return tSEMICOLON; }
 
-":" {if(g_tokens == 1)cout << ("Colon \n"); return tCOLON; }
+":" {if(g_tokens == 1)cout << ("Colon \n"); //return tCOLON; }
 
 ([a-zA-Z]|"_")([a-zA-Z]|[0-9]|"_")* { 
     yylval.identifier = (yytext);
-    if(g_tokens == 1)
-    cout << ("Identifier: "<< yytext << "\n");
-    return tIDENTIFIER;
+    if(g_tokens == 1) {
+        cout << ("Identifier: "<< yytext << "\n");
+    }
+
+    //return tIDENTIFIER;
     }
 
 0|([1-9][0-9]*) {
-     yylval.intLiteral = atof(yytext);
-    if(g_tokens == 1)
-    cout << ("Integer constant: "<< yytext << "\n");
-    return tINTLITERAL;
+    yylval.intLiteral = atof(yytext);
+    if(g_tokens == 1) { 
+        cout << ("Integer constant: "<< yytext << "\n");
+    }
+    //return tINTLITERAL;
 }
 0[0-7]* {
     yylval.intLiteral = atof(yytext);
-    if(g_tokens == 1)
-    cout << ("Integer constant: "<< yytext << "\n");
-    return tINTLITERAL;
+    if(g_tokens == 1) {
+        cout << ("Integer constant: "<< yytext << "\n");
+    }
+    //return tINTLITERAL;
 }
 0(x|X)[0-9a-fA-F][0-9a-fA-F]* {
     yylval.intLiteral = atof(yytext);
-    if(g_tokens == 1)
-    cout << ("Integer constant: "<< yytext << "\n");
-    return tINTLITERAL;
+    if(g_tokens == 1) {
+        cout << ("Integer constant: "<< yytext << "\n");
+    }
+    //return tINTLITERAL;
 }
 ([0-9]*\.[0-9]+)|([0-9]+\.[0-9]*) {
     yylval.floatLiteral = atof(yytext);
-    if(g_tokens == 1)
-    cout << ("Float constant: "<< yytext << "\n");
-    return tFLOATLITERAL;
+    if(g_tokens == 1) {
+        cout << ("Float constant: "<< yytext << "\n");
+    }
+    //return tFLOATLITERAL;
 }
 
-'((\\[abfnrtv\\\'])|[^\\'])'{ 
-    yylval.rune = (yytext);
-    if(g_tokens == 1)
-    cout << ("Character: "<< yytext << "\n");
-    return tRUNELITERAL;
-}
 \"([0-9]|[a-zA-Z]|[\t]|\\{ESCAPE})*\" {
     yylval.string = (yytext);
-    if(g_token == 1)
-    cout << ("String variable: "<< yytext << "\n");
-    return tSTRINGLITERAL;
-}
-'(\\.|[^'])*{
-    yylval.string = (yytext);
-    if(g_token == 1)
-    cout << ("String variable: "<< yytext << "\n");
-    return tSTRINGLITERAL;
+    if(g_token == 1) {
+        cout << ("String variable: "<< yytext << "\n");
+    }
+    //return tSTRINGLITERAL;
 }
 
 . { fprintf(stderr, "Error: (line %d) unexpected character ‘%s’\n", yylineno, yytext); exit(1); }

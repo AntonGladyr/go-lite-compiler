@@ -5,6 +5,7 @@
 using namespace std;
 int main(int argc, char *argv[]){
        if(!strcmp(argv[1], "scan")) {
+        g_tokens = 1;
         while(yylex());
         cout << "OK" << endl;
         return 0;
