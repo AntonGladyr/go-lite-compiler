@@ -148,7 +148,6 @@ ESCAPE [abfnrtv\\'"]
 ";" 		{ if (g_tokens) cout << "tSEMICOLON" << endl; return tSEMICOLON; }
 
 ":" 		{ if (g_tokens) cout << "tCOLON" << endl; return tCOLON; }
-"_"		{ if (g_tokens) cout << "tBLANKID" << endl; return tBLANKID; }
 \n		{ 	int token = insert_semicolon(tNEWLINE);
 			if (token != tNEWLINE ) {
 				cout << "tSEMICOLON" << endl;

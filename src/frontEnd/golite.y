@@ -119,7 +119,6 @@ void yyerror(const char *s) {
 %token tRBRACKET
 %token tSEMICOLON
 %token tCOLON
-%token tBLANKID
 %token tIDENTIFIER
 %token tINTVAL
 %token tFLOATVAL
