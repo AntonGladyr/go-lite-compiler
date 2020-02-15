@@ -97,8 +97,8 @@ void yyerror(const char *s) {
 %token tAND
 %token tOR
 %token tLESSMINUS
-%token tPLUSPLUS
-%token tMINUSMINUS
+%token tINC
+%token tDEC
 %token tEQUAL
 %token tLESS
 %token tGREATER
@@ -110,22 +110,22 @@ void yyerror(const char *s) {
 %token tSTRONGASSIGN
 %token tDOTDOTDOT
 %token tLPAREN
-%token tLCURL
-%token tLSQUARE
+%token tLBRACE
+%token tLBRACKET
 %token tCOMMA
 %token tDOT
 %token tRPAREN
-%token tRCURL
-%token tRSQUARE
+%token tRBRACE
+%token tRBRACKET
 %token tSEMICOLON
 %token tCOLON
 %token tBLANKID
 %token tIDENTIFIER
-%token tINTLITERAL
-%token tFLOATLITERAL
-%token tRUNELITERAL
-%token tSTRINGLITERAL
-
+%token tINTVAL
+%token tFLOATVAL
+%token tRUNEVAL
+%token tSTRINGVAL
+%token tNEWLINE
 
 /* Precedence directives resolve grammar ambiguities by breaking ties between shift/reduce
  * operations. Tokens are grouped into precendence levels, with lower precedence coming first

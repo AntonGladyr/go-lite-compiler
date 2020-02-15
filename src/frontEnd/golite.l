@@ -8,6 +8,7 @@
 #define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;
 
 extern int g_tokens;
+int insert_semicolon(int token);
 using namespace std;
 %}
 
@@ -23,7 +24,7 @@ ESCAPE [abfnrtv\\'"]
 
 /* Removes warnings about input/output functions */
 %option noinput
-%option nounput
+/*%option nounput*/
 
 /* The second section of a flex file contains the regular expressions, using helper definitions
  * where appropriate ({<helper name>}). Sections in flex are divided by %%.
@@ -48,7 +49,7 @@ ESCAPE [abfnrtv\\'"]
  */
 %%
 
-[ \t\r\n]+
+[ \t\r]+
 "//"([^\n])*
 
 "/*"	BEGIN(COMMENT);
@@ -59,15 +60,15 @@ ESCAPE [abfnrtv\\'"]
 }
 <COMMENT>.|"\n"	;
 
-"break"		{ if (g_tokens) cout << "tBREAK" << endl; return tBREAK; }
-"case"		{ if (g_tokens) cout << "tCASE" << endl; return tCASE; }
+"break"		{ if (g_tokens) cout << "tBREAK" << endl; return insert_semicolon(tBREAK); }
+"case"		{ if (g_tokens) cout << "tCASE" << endl; return insert_semicolon(tCASE); }
 "chan"		{ if (g_tokens) cout << "tCHAN" << endl; return tCHAN; }
 "const" 	{ if (g_tokens) cout << "tCONST" << endl; return tCONST; }
 "continue"	{ if (g_tokens) cout << "tCONTINUE" << endl; return tCONTINUE; }
 "default"	{ if (g_tokens) cout << "tDEFAULT" << endl; return tDEFAULT; }
 "defer"		{ if (g_tokens) cout << "tDEFER" << endl; return tDEFER; }
 "else"		{ if (g_tokens) cout << "tELSE" << endl; return tELSE; }
-"fallthrough"	{ if (g_tokens) cout << "tFALLTHROUGH" << endl; return tFALLTHROUGH; }
+"fallthrough"	{ if (g_tokens) cout << "tFALLTHROUGH" << endl; return insert_semicolon(tFALLTHROUGH); }
 "for"		{ if (g_tokens) cout << "tFOR" << endl; return tFOR; }
 "func"		{ if (g_tokens) cout << "tFUNC" << endl; return tFUNC; }
 "go"		{ if (g_tokens) cout << "tGO" << endl; return tGO; }
@@ -78,7 +79,7 @@ ESCAPE [abfnrtv\\'"]
 "map"		{ if (g_tokens) cout << "tMAP" << endl; return tMAP; }
 "package"	{ if (g_tokens) cout << "tPACKAGE" << endl; return tPACKAGE; }
 "range"		{ if (g_tokens) cout << "tRANGE" << endl; return tRANGE; }
-"return"	{ if (g_tokens) cout << "tRETURN" << endl; return tRETURN; }
+"return"	{ if (g_tokens) cout << "tRETURN" << endl; return insert_semicolon(tRETURN); }
 "select"	{ if (g_tokens) cout << "tSELECT" << endl; return tSELECT; }
 "struct"	{ if (g_tokens) cout << "tSTRUCT" << endl; return tSTRUCT; }
 "switch"	{ if (g_tokens) cout << "tSWITCH" << endl; return tSWITCH; }
@@ -91,10 +92,10 @@ ESCAPE [abfnrtv\\'"]
 "cap"		{ if (g_tokens) cout << "tCAP"; return tCAP; }
 
 "+" 		{ if (g_tokens) cout << "tPLUS" << endl; return tPLUS; }
-"-" 		{ if (g_tokens) cout << "Minus" << endl; return tMINUS; }
-"*" 		{ if (g_tokens) cout << "Times" << endl; return tTIMES; }
-"/" 		{ if (g_tokens) cout << "Divide" << endl; return tDIVIDE; }
-"%" 		{ if (g_tokens) cout << "Modulo " << endl; return tMODULO; }
+"-" 		{ if (g_tokens) cout << "tMINUS" << endl; return tMINUS; }
+"*" 		{ if (g_tokens) cout << "tTIMES" << endl; return tTIMES; }
+"/" 		{ if (g_tokens) cout << "tDIVIDE" << endl; return tDIVIDE; }
+"%" 		{ if (g_tokens) cout << "tMODULO" << endl; return tMODULO; }
 
 "&" 		{ if (g_tokens) cout << "Single And" << endl; return tSINGLEAND; }
 "|" 		{ if (g_tokens) cout << "Single Or" << endl; return tSINGLEOR; }
@@ -119,11 +120,11 @@ ESCAPE [abfnrtv\\'"]
 "&&" 		{ if (g_tokens) cout << "Logical and" << endl; return tAND; }
 "||" 		{ if (g_tokens) cout << "Logical or" << endl; return tOR; }
 "<-" 		{ if (g_tokens) cout << "Less minus " << endl; return tLESSMINUS; }
-"++" 		{ if (g_tokens) cout << "Plus Plus " << endl; return tPLUSPLUS; }
-"--" 		{ if (g_tokens) cout << "Minus Minus " << endl; return tMINUSMINUS; }
+"++" 		{ if (g_tokens) cout << "tINC" << endl; return insert_semicolon(tINC); }
+"--" 		{ if (g_tokens) cout << "tDEC" << endl; return insert_semicolon(tDEC); }
 
-"==" 		{ if (g_tokens) cout << "Equal" << endl;  return tEQUAL; }
-"<" 		{ if (g_tokens) cout << "Less than" << endl; return tLESS; }
+"==" 		{ if (g_tokens) cout << "tEQUAL" << endl;  return tEQUAL; }
+"<" 		{ if (g_tokens) cout << "tLESS" << endl; return tLESS; }
 ">" 		{ if (g_tokens) cout << "Greater than" << endl; return tGREATER; }
 "=" 		{ if (g_tokens) cout << "tASSIGN" << endl; return tASSIGN; }
 "!" 		{ if (g_tokens) cout << "Not" << endl; return tNOT; }
@@ -134,69 +135,104 @@ ESCAPE [abfnrtv\\'"]
 ":=" 		{ if (g_tokens) cout << "Stong Assign" << endl; return tSTRONGASSIGN; }
 "..." 		{ if (g_tokens) cout << "DOT DOT DOT" << endl; return tDOTDOTDOT; }
 
-"(" 		{ if (g_tokens) cout << "Left parenthesis" << endl; return tLPAREN; }
-"{" 		{ if (g_tokens) cout << "Left brackets" << endl; return tLCURL; }
-"[" 		{ if (g_tokens) cout << "Left Square brackets " << endl; return tLSQUARE; }
-"," 		{ if (g_tokens) cout << "Comma " << endl; return tCOMMA; }
-"." 		{ if (g_tokens) cout << "Dot" << endl; return tDOT; }
+"(" 		{ if (g_tokens) cout << "tLPAREN" << endl; return tLPAREN; }
+"{" 		{ if (g_tokens) cout << "tLBRACE" << endl; return tLBRACE; }
+"[" 		{ if (g_tokens) cout << "tLBRACKET" << endl; return tLBRACKET; }
+"," 		{ if (g_tokens) cout << "tCOMMA" << endl; return tCOMMA; }
+"." 		{ if (g_tokens) cout << "tDOT" << endl; return tDOT; }
 
 
-")" 		{ if (g_tokens) cout << "Right parenthesis" << endl; return tRPAREN; }
-"}" 		{ if (g_tokens) cout << "right brackets" << endl; return tRCURL; }
-"]" 		{ if (g_tokens) cout << "Right parenthesis" << endl; return tRSQUARE; }
-";" 		{ if (g_tokens) cout << "Semi-Colon" << endl; return tSEMICOLON; }
+")" 		{ if (g_tokens) cout << "tRPAREN" << endl; return insert_semicolon(tRPAREN); }
+"}" 		{ if (g_tokens) cout << "tRBRACE" << endl; return insert_semicolon(tRBRACE); }
+"]" 		{ if (g_tokens) cout << "tRBRACKET" << endl; return insert_semicolon(tRBRACKET); }
+";" 		{ if (g_tokens) cout << "tSEMICOLON" << endl; return tSEMICOLON; }
 
-":" 		{ if (g_tokens) cout << "Colon " << endl; return tCOLON; }
+":" 		{ if (g_tokens) cout << "tCOLON" << endl; return tCOLON; }
 "_"		{ if (g_tokens) cout << "tBLANKID" << endl; return tBLANKID; }
+\n		{ 	int token = insert_semicolon(tNEWLINE);
+			if (token != tNEWLINE ) {
+				cout << "tSEMICOLON" << endl;
+				return token;
+			}
+		}
+
 
 ([a-zA-Z]|"_")([a-zA-Z]|[0-9]|"_")* { 
     //yylval.identifier = (yytext);
-    if (g_tokens) cout << "tIDENTIFIER" << endl;
-    return tIDENTIFIER;
+    if (g_tokens) cout << "tIDENTIFIER(" << yytext << ")" << endl;
+    return insert_semicolon(tIDENTIFIER);
 }
 
 0|([1-9][0-9]*) {
      //yylval.intLiteral = atof(yytext);
-    if (g_tokens) cout << "tINTLITERAL" << endl;
-    return tINTLITERAL;
+    if (g_tokens) cout << "tINTVAL(" << yytext << ")" << endl;
+    return insert_semicolon(tINTVAL);
 }
 
 0[0-7]* {
     //yylval.intLiteral = atof(yytext);
-    if (g_tokens) cout << "tINTLITERAL" << endl;
-    return tINTLITERAL;
+    if (g_tokens) cout << "tINTVAL(" << yytext << ")" << endl;
+    return insert_semicolon(tINTVAL);
 }
 
 0(x|X)[0-9a-fA-F][0-9a-fA-F]* {
     //yylval.intLiteral = atof(yytext);
-    if (g_tokens) cout << "tINTLITERAL" << endl;
-    return tINTLITERAL;
+    if (g_tokens) cout << "tINTVAL(" << yytext << ")" << endl;
+    return insert_semicolon(tINTVAL);
 }
 
 ([0-9]*\.[0-9]+)|([0-9]+\.[0-9]*) {
     //yylval.floatLiteral = atof(yytext);
-    if (g_tokens) cout << "tFLOATLITERAL" << endl;
-    return tFLOATLITERAL;
+    if (g_tokens) cout << "tFLOATVAL(" << yytext << ")" << endl;
+    return insert_semicolon(tFLOATVAL);
 }
 
 '((\\[abfnrtv\\\'])|[^\\'])\' {  
 	//yylval.rune = (yytext);
-	if (g_tokens) cout << "tRUNELITERAL" << endl;
-	return tRUNELITERAL;
+	if (g_tokens) cout << "tRUNEVAL(" << yytext << ")" << endl;
+	return insert_semicolon(tRUNEVAL);
 }
 
 \"([0-9]|[a-zA-Z]|[\t]|\\{ESCAPE})*\" {
     //yylval.string = (yytext);
-    if (g_tokens) cout << "tSTRINGLITERAL" << endl;
-    return tSTRINGLITERAL;
+    if (g_tokens) cout << "tSTRINGVAL(" << yytext << ")" << endl;
+    return insert_semicolon(tSTRINGVAL);
 }
 
-'(\\.|[^'])*' {
+`(\\.|[^'])*` {
     //yylval.string = (yytext);
-    if (g_tokens) cout << "tSTRINGLITERAL" << endl;
-    return tSTRINGLITERAL;
+    if (g_tokens) cout << "tSTRINGVAL(" << yytext << ")" << endl;
+    return insert_semicolon(tSTRINGVAL);
 }
 
 . { fprintf(stderr, "Error: (line %d) unexpected character '%s'\n", yylineno, yytext); exit(1); }
 
 %%
+
+int semicolon = 0;
+
+int insert_semicolon(int token) {
+	if (semicolon && token == tNEWLINE) {
+		unput('\n');
+		semicolon = 0;
+		return tSEMICOLON;
+	} else {
+		semicolon = 0;
+		semicolon = (	token == tIDENTIFIER || 
+				token == tINTVAL || 
+				token == tFLOATVAL ||
+				token == tRUNEVAL ||
+				token == tSTRINGVAL ||
+				token == tBREAK ||
+				token == tCONTINUE ||
+				token == tFALLTHROUGH ||
+				token == tRETURN ||
+				token == tINC ||
+				token == tDEC ||
+				token == tRPAREN ||
+				token == tRBRACKET ||
+				token == tRBRACE
+		);
+		return token;
+	}
+}
