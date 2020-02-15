@@ -94,52 +94,52 @@ ESCAPE [abfnrtv\\'"]
 "+" 		{ if (g_tokens) cout << "tPLUS" << endl; return tPLUS; }
 "-" 		{ if (g_tokens) cout << "tMINUS" << endl; return tMINUS; }
 "*" 		{ if (g_tokens) cout << "tTIMES" << endl; return tTIMES; }
-"/" 		{ if (g_tokens) cout << "tDIVIDE" << endl; return tDIVIDE; }
-"%" 		{ if (g_tokens) cout << "tMODULO" << endl; return tMODULO; }
+"/" 		{ if (g_tokens) cout << "tDIV" << endl; return tDIV; }
+"%" 		{ if (g_tokens) cout << "tREM" << endl; return tREM; }
 
-"&" 		{ if (g_tokens) cout << "Single And" << endl; return tSINGLEAND; }
-"|" 		{ if (g_tokens) cout << "Single Or" << endl; return tSINGLEOR; }
-"^" 		{ if (g_tokens) cout << "Hat" << endl; return tHAT; }
-"<<" 		{ if (g_tokens) cout << "Right Shift" << endl; return tRIGHTSHIFT; }
-">>" 		{ if (g_tokens) cout << "Left Shift" << endl; return tLEFTSHIFT; }
-"&^" 		{ if (g_tokens) cout << "And hat" << endl; return tANDHAT; }
+"&" 		{ if (g_tokens) cout << "tBWAND" << endl; return tBWAND; }
+"|" 		{ if (g_tokens) cout << "tBWOR" << endl; return tBWOR; }
+"^" 		{ if (g_tokens) cout << "tBWXOR" << endl; return tBWXOR; }
+"<<" 		{ if (g_tokens) cout << "tLEFTSHIFT" << endl; return tLEFTSHIFT; }
+">>" 		{ if (g_tokens) cout << "tRIGHTSHIFT" << endl; return tRIGHTSHIFT; }
+"&^" 		{ if (g_tokens) cout << "tBWANDNOT" << endl; return tBWANDNOT; }
 
-"+=" 		{ if (g_tokens) cout << "Plus equal " << endl; return tPLUSASSIGN; }
-"-=" 		{ if (g_tokens) cout << "Minus equal" << endl; return tMINUSASSIGN; }
-"*=" 		{ if (g_tokens) cout << "Times equal" << endl; return tTIMESASSIGN; }
-"/=" 		{ if (g_tokens) cout << "Divide equal" << endl; return tDIVIDEASSIGN; }
-"%=" 		{ if (g_tokens) cout << "Modulo equal" << endl; return tMODULOASSIGN; }
+"+=" 		{ if (g_tokens) cout << "tPLUSASSIGN" << endl; return tPLUSASSIGN; }
+"-=" 		{ if (g_tokens) cout << "tMINUSASSIGN" << endl; return tMINUSASSIGN; }
+"*=" 		{ if (g_tokens) cout << "tTIMESASSIGN" << endl; return tTIMESASSIGN; }
+"/=" 		{ if (g_tokens) cout << "tDIVASSIGN" << endl; return tDIVASSIGN; }
+"%=" 		{ if (g_tokens) cout << "tREMASSIGN" << endl; return tREMASSIGN; }
 
-"&=" 		{ if (g_tokens) cout << "And equal" << endl; return tANDASSIGN; }
-"|=" 		{ if (g_tokens) cout << "Or equal" << endl; return tORASSIGN; }
-"^=" 		{ if (g_tokens) cout << "Hat equal" << endl; return tHATASSIGN; }
-"<<=" 		{ if (g_tokens) cout << "Left shift equal" << endl; return tLEFTSHIFTASSIGN; }
-">>=" 		{ if (g_tokens) cout << "Right shift equal" << endl; return tRIGHTSHIFTASSIGN; }
-"&^=" 		{ if (g_tokens) cout << "And Hat equal" << endl; return tANDHATASSIGN; }
+"&=" 		{ if (g_tokens) cout << "tBWANDASSIGN" << endl; return tBWANDASSIGN; }
+"|=" 		{ if (g_tokens) cout << "tBWORASSIGN" << endl; return tBWORASSIGN; }
+"^=" 		{ if (g_tokens) cout << "tBWXORASSIGN" << endl; return tBWXORASSIGN; }
+"<<=" 		{ if (g_tokens) cout << "tLSHIFTASSIGN" << endl; return tLSHIFTASSIGN; }
+">>=" 		{ if (g_tokens) cout << "tRSHIFTASSIGN" << endl; return tRSHIFTASSIGN; }
+"&^=" 		{ if (g_tokens) cout << "tBWANDNOTASSIGN" << endl; return tBWANDNOTASSIGN; }
 
-"&&" 		{ if (g_tokens) cout << "Logical and" << endl; return tAND; }
-"||" 		{ if (g_tokens) cout << "Logical or" << endl; return tOR; }
-"<-" 		{ if (g_tokens) cout << "Less minus " << endl; return tLESSMINUS; }
+"&&" 		{ if (g_tokens) cout << "tAND" << endl; return tAND; }
+"||" 		{ if (g_tokens) cout << "tOR" << endl; return tOR; }
+"<-" 		{ if (g_tokens) cout << "tARROW" << endl; return tARROW; }
 "++" 		{ if (g_tokens) cout << "tINC" << endl; return insert_semicolon(tINC); }
 "--" 		{ if (g_tokens) cout << "tDEC" << endl; return insert_semicolon(tDEC); }
 
 "==" 		{ if (g_tokens) cout << "tEQUAL" << endl;  return tEQUAL; }
 "<" 		{ if (g_tokens) cout << "tLESS" << endl; return tLESS; }
-">" 		{ if (g_tokens) cout << "Greater than" << endl; return tGREATER; }
+">" 		{ if (g_tokens) cout << "tGREATER" << endl; return tGREATER; }
 "=" 		{ if (g_tokens) cout << "tASSIGN" << endl; return tASSIGN; }
-"!" 		{ if (g_tokens) cout << "Not" << endl; return tNOT; }
+"!" 		{ if (g_tokens) cout << "tBANG" << endl; return tBANG; }
 
-"!=" 		{ if (g_tokens) cout << "Not equal" << endl; return tNOT_EQUAL; }
-"<=" 		{ if (g_tokens) cout << "Less or equal than" << endl; return tLESS_THAN_OR_EQUAL; }
-">=" 		{ if (g_tokens) cout << "Greater or equal than" << endl; return tGREATER_THAN_OR_EQUAL; }
-":=" 		{ if (g_tokens) cout << "Stong Assign" << endl; return tSTRONGASSIGN; }
-"..." 		{ if (g_tokens) cout << "DOT DOT DOT" << endl; return tDOTDOTDOT; }
+"!=" 		{ if (g_tokens) cout << "tNOTEQUAL" << endl; return tNOTEQUAL; }
+"<=" 		{ if (g_tokens) cout << "tLESSEQUAL" << endl; return tLESSEQUAL; }
+">=" 		{ if (g_tokens) cout << "tGREATEREQUAL" << endl; return tGREATEREQUAL; }
+":=" 		{ if (g_tokens) cout << "tSHORTDEFINE" << endl; return tSHORTDEFINE; }
+"..." 		{ if (g_tokens) cout << "tELLIPSIS" << endl; return tELLIPSIS; }
 
 "(" 		{ if (g_tokens) cout << "tLPAREN" << endl; return tLPAREN; }
 "{" 		{ if (g_tokens) cout << "tLBRACE" << endl; return tLBRACE; }
 "[" 		{ if (g_tokens) cout << "tLBRACKET" << endl; return tLBRACKET; }
 "," 		{ if (g_tokens) cout << "tCOMMA" << endl; return tCOMMA; }
-"." 		{ if (g_tokens) cout << "tDOT" << endl; return tDOT; }
+"." 		{ if (g_tokens) cout << "tELLIPSIS" << endl; return tELLIPSIS; }
 
 
 ")" 		{ if (g_tokens) cout << "tRPAREN" << endl; return insert_semicolon(tRPAREN); }
