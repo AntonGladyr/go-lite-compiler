@@ -11,6 +11,7 @@ int main(int argc, char *argv[]){
         return 0;
     }
     else if(!strcmp(argv[1], "tokens")) {
+	g_tokens = 1;
         while(yylex());
         return 0;
     }

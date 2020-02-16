@@ -27,6 +27,7 @@ void yyerror(const char *s) {
 }
 %}
 
+
 /* The union directive defines the yylval union used for associating (a) terminals (tokens)
  * returned by flex with additional scanning data (such as identifier/constant values); and
  * optionally (b) non-terminals (variables in productions) with AST information if any.
@@ -78,40 +79,41 @@ void yyerror(const char *s) {
 %token tCAP
 %token tPLUS
 %token tMINUS
-%token tDIVIDE
+%token tDIV
 %token tTIMES
-%token tMODULO
-%token tSINGLEAND
-%token tSINGLEOR
-%token tHAT
+%token tREM
+%token tBWAND
+%token tBWOR
+%token tBWXOR
 %token tRIGHTSHIFT
 %token tLEFTSHIFT
-%token tANDHAT
+%token tBWANDNOT
 %token tPLUSASSIGN
 %token tMINUSASSIGN
-%token tTIMESASSIGN
-%token tDIVIDEASSIGN
-%token tMODULOASSIGN
-%token tANDASSIGN
-%token tORASSIGN
-%token tHATASSIGN
-%token tRIGHTSHIFTASSIGN
-%token tLEFTSHIFTASSIGN
-%token tANDHATASSIGN
+%token tMULTASSIGN
+%token tDIVASSIGN
+%token tREMASSIGN
+%token tBWANDASSIGN
+%token tBWORASSIGN
+%token tBWXORASSIGN
+%token tRSHIFTASSIGN
+%token tLSHIFTASSIGN
+%token tBWANDNOTASSIGN
 %token tAND
 %token tOR
-%token tLESSMINUS
-%token tPLUSPLUS
-%token tMINUSMINUS
+%token tARROW
+%token tINC
+%token tDEC
 %token tEQUAL
 %token tLESS
 %token tGREATER
-%token tNOT
-%token tNOT_EQUAL
-%token tLESS_THAN_OR_EQUAL
-%token tGREATER_THAN_OR_EQUAL
-%token tSHORTASSIGN
-%token tDOTDOTDOT
+%token tASSIGN
+%token tBANG
+%token tNOTEQ
+%token tLESSEQ
+%token tGREATEREQ
+%token tSHORTDECLARE
+%token tELLIPSIS
 %token tLBRACE
 %token tLPAREN
 %token tLBRACKET
@@ -123,9 +125,11 @@ void yyerror(const char *s) {
 %token tSEMICOLON
 %token tCOLON
 %token tIDENTIFIER
-
-//defined 
-%/
+%token tINTVAL
+%token tFLOATVAL
+%token tRUNEVAL
+%token tSTRINGVAL
+%token tNEWLINE
 
 /* Precedence directives resolve grammar ambiguities by breaking ties between shift/reduce
  * operations. Tokens are grouped into precendence levels, with lower precedence coming first
