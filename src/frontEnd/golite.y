@@ -154,7 +154,7 @@ void yyerror(const char *s) {
  //todo: unary binary literals expressions,
 %% 
 
-program : ins 
+program : inss
     ;
 
 inss : ins inss
@@ -182,11 +182,13 @@ varspecs : varspec
 varspec : var_list vartype
     | var_list tASSIGN multiexp tSEMICOLON
     | var_list tVARTYPE tASSIGN multiexp tSEMICOLON
+    ;
 
 shortdec : tIDENTIFIER tSHORTASSIGN exp tSEMICOLON
     ;
 
 structdec : tTYPE tIDENTIFIER tSTRUCT tLPAREN structdec_list tRPAREN
+    ;
 
 global : tPACKAGE tIDENTIFIER
     | tIMPORT tIDENTIFIER
@@ -224,12 +226,12 @@ stmt : loopstmt
     | printstmt
     | returnstmt
     | switchstmt
-    | tBREAK tCOMMA
-    | tCONTINUE tCOMMA
+    | tBREAK tSEMICOLON
+    | tCONTINUE tSEMICOLON
     ;
 
-returnstmt : tRETURN
-    | tRETURN exp
+returnstmt : tRETURN tSEMICOLON
+    | tRETURN exp tSEMICOLON
     ;
 
 loopstmt : tFOR ins tSEMICOLON exp tSEMICOLON assignstmt tSEMICOLON tLPAREN inss tRPAREN
@@ -251,10 +253,10 @@ ifstmt : tIF exp tLPAREN inss tRPAREN
     | tIF shortdec exp tLPAREN inss tRPAREN tELSE tLPAREN inss tRPAREN
     ;
 
-incdecstmt : tIDENTIFIER tPLUSPLUS
-    | tIDENTIFIER tMINUSMINUS
-    | tIDENTIFIER tPLUSASSIGN exp
-    | tIDENTIFIER tMINUSASSIGN exp
+incdecstmt : tIDENTIFIER tPLUSPLUS tSEMICOLON
+    | tIDENTIFIER tMINUSMINUS tSEMICOLON
+    | tIDENTIFIER tPLUSASSIGN exp tSEMICOLON
+    | tIDENTIFIER tMINUSASSIGN exp tSEMICOLON
     ;
 
 printstmt : tPRINT tLBRACE exp_list tRBRACE
@@ -269,13 +271,13 @@ switchstmt : tSWITCH tLPAREN case_list tRPAREN
 exp : tIDENTIFIER
     | tIDENTIFIER tPERIOD tIDENTIFIER
     | tIDENTIFIER tLBRACKET exp tRBRACKET
-    | tIDENTIFIER tLBRACE var_list tRBRACE tSEMICOLON
-    | tVARTYPE tLBRACE exp tRBRACE tSEMICOLON
+    | tIDENTIFIER tLBRACE var_list tRBRACE
+    | tVARTYPE tLBRACE exp tRBRACE 
     | tIDENTIFIER tLPAREN exp_list tRPAREN
     | tIDENTIFIER tLPAREN namedexp_list tRPAREN
-    | tAPPEND tLBRACE exp tCOMMA exp tRBRACE tSEMICOLON
-    | tLEN tLBRACE exp tRBRACE tSEMICOLON
-    | tCAP tLBRACE exp tRBRACE tSEMICOLON
+    | tAPPEND tLBRACE exp tCOMMA exp tRBRACE
+    | tLEN tLBRACE exp tRBRACE
+    | tCAP tLBRACE exp tRBRACE
     ;
 
 vartype : tINT
