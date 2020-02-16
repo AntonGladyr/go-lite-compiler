@@ -141,7 +141,7 @@ void yyerror(const char *s) {
 %left '*' '/'
 
 /* Start token (by default if this is missing it takes the first production */
-%start exp
+%start program
 
 /* Generate the yylloc structure used for storing line numbers with tokens */
 %locations
@@ -152,14 +152,13 @@ void yyerror(const char *s) {
  * same LHS may be joined together and separated with a pipe.
  */
  //todo: unary binary literals expressions,
-// unfinished: structs (new line issue), block statements (can they nest?)
 %% 
 
 program : ins 
     ;
 
 inss : ins inss
-    | ins inss
+    | tLPAREN inss tRPAREN
     ;
 
 ins : 
@@ -205,6 +204,7 @@ exp_list :
 
 type_list : vartype
     | vartype tCOMMA type_list
+    ;
 
 structdec_list : var_list 
     ;
@@ -214,7 +214,7 @@ case_list : tCASE exp tCOLON inss case_list
     ;
 
 namedexp_list : tIDENTIFIER tCOLON exp
-    | tIDENTIFIER tCOLON exp tCOMMA namedexp_list
+    | tIDENTIFIER tCOLON exp tCOMMA tNEWLINE namedexp_list
     ;
 
 stmt : loopstmt
@@ -253,8 +253,8 @@ ifstmt : tIF exp tLPAREN inss tRPAREN
 
 incdecstmt : tIDENTIFIER tPLUSPLUS
     | tIDENTIFIER tMINUSMINUS
-    | tIDENTIFIER tPLUSASSIGN
-    | tIDENTIFIER tMINUSASSIGN
+    | tIDENTIFIER tPLUSASSIGN exp
+    | tIDENTIFIER tMINUSASSIGN exp
     ;
 
 printstmt : tPRINT tLBRACE exp_list tRBRACE
@@ -265,8 +265,6 @@ switchstmt : tSWITCH tLPAREN case_list tRPAREN
     | tSWITCH shortdec exp tLPAREN case_list tRPAREN
     | tSWITCH exp tLPAREN case_list tRPAREN
     ;
-
-
 
 exp : tIDENTIFIER
     | tIDENTIFIER tPERIOD tIDENTIFIER
