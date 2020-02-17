@@ -36,7 +36,7 @@ void yyerror(const char *s) {
 	int intval;
 	char *identifier;
 
-    Function *function;
+    	//Function *function;
 }
 
 /* Token directives define the token types to be returned by the scanner (excluding character
@@ -45,7 +45,6 @@ void yyerror(const char *s) {
  * of identifiers separated by spaces.
  */
 
-/*
 
 %token tBREAK
 %token tCASE
@@ -112,7 +111,7 @@ void yyerror(const char *s) {
 %token tNOTEQ
 %token tLESSEQ
 %token tGREATEREQ
-%token tSHORTDECLARE
+%token tSHORTDEFINE
 %token tELLIPSIS
 %token tLBRACE
 %token tLPAREN
@@ -154,137 +153,7 @@ void yyerror(const char *s) {
  //todo: unary binary literals expressions,
 %% 
 
-program : inss
+program : 
     ;
 
-inss : ins inss
-    | tLPAREN inss tRPAREN
-    ;
-
-ins : 
-    | dec 
-    | stmt
-    ;
-
-dec : tVAR varspec
-    | tVAR tLBRACE varspecs tRBRACE
-    | tCONST tIDENTIFIER tASSIGN exp tSEMICOLON
-    | tFUNC tIDENTIFIER tBRACE var_list tRBRACE vartype tLPAREN inss returnstmt tRPAREN
-    | shortdec
-    | tTYPE tIDENTIFIER vartype
-    | structdec
-    ;
-
-varspecs : varspec
-    | varspec tCOMMA varspecs
-    ;
-
-varspec : var_list vartype
-    | var_list tASSIGN multiexp tSEMICOLON
-    | var_list tVARTYPE tASSIGN multiexp tSEMICOLON
-    ;
-
-shortdec : tIDENTIFIER tSHORTASSIGN exp tSEMICOLON
-    ;
-
-structdec : tTYPE tIDENTIFIER tSTRUCT tLPAREN structdec_list tRPAREN
-    ;
-
-global : tPACKAGE tIDENTIFIER
-    | tIMPORT tIDENTIFIER
-    | tIMPORT tLBRACE multiexp tRBRACE
-    ;
-
-var_list : tIDENTIFIER 
-    | tIDENTIFIER tCOMMA var_list
-    ;
-
-exp_list : 
-    | exp
-    | exp tCOMMA exp_list
-    ;
-
-type_list : vartype
-    | vartype tCOMMA type_list
-    ;
-
-structdec_list : var_list 
-    ;
-
-case_list : tCASE exp tCOLON inss case_list
-    | default tCOLON inss case_list
-    ;
-
-namedexp_list : tIDENTIFIER tCOLON exp
-    | tIDENTIFIER tCOLON exp tCOMMA tNEWLINE namedexp_list
-    ;
-
-stmt : loopstmt
-    | assignstmt
-    | ifstmt
-    | incdecstmt
-    | printstmt
-    | returnstmt
-    | switchstmt
-    | tBREAK tSEMICOLON
-    | tCONTINUE tSEMICOLON
-    ;
-
-returnstmt : tRETURN tSEMICOLON
-    | tRETURN exp tSEMICOLON
-    ;
-
-loopstmt : tFOR ins tSEMICOLON exp tSEMICOLON assignstmt tSEMICOLON tLPAREN inss tRPAREN
-    | tFOR exp tLPAREN inss tRPAREN
-    | tFOR LPAREN inss tRPAREN
-    ;
-
-assignstmt : 
-    | var_list tASSIGN exp_list tSEMICOLON
-    | tIDENTIFIER tPERIOD tIDENTIFIER tASSIGN exp tSEMICOLON
-    | tIDENTIFIER tLBRACKET exp tRBRACKET tASSIGN exp tSEMICOLON
-    ;
-
-ifstmt : tIF exp tLPAREN inss tRPAREN
-    | tIF shortdec exp tLPAREN inss tRPAREN
-    | tIF exp tLPAREN inss tRPAREN tELSE ifstmt
-    | tIF shortdec exp tLPAREN inss tRPAREN tELSE ifstmt
-    | tIF exp tLPAREN inss tRPAREN tELSE tLPAREN inss tRPAREN
-    | tIF shortdec exp tLPAREN inss tRPAREN tELSE tLPAREN inss tRPAREN
-    ;
-
-incdecstmt : tIDENTIFIER tPLUSPLUS tSEMICOLON
-    | tIDENTIFIER tMINUSMINUS tSEMICOLON
-    | tIDENTIFIER tPLUSASSIGN exp tSEMICOLON
-    | tIDENTIFIER tMINUSASSIGN exp tSEMICOLON
-    ;
-
-printstmt : tPRINT tLBRACE exp_list tRBRACE
-    | tPRINTLN tLBRACE exp_list tRBRACE
-    ;
-
-switchstmt : tSWITCH tLPAREN case_list tRPAREN
-    | tSWITCH shortdec exp tLPAREN case_list tRPAREN
-    | tSWITCH exp tLPAREN case_list tRPAREN
-    ;
-
-exp : tIDENTIFIER
-    | tIDENTIFIER tPERIOD tIDENTIFIER
-    | tIDENTIFIER tLBRACKET exp tRBRACKET
-    | tIDENTIFIER tLBRACE var_list tRBRACE
-    | tVARTYPE tLBRACE exp tRBRACE 
-    | tIDENTIFIER tLPAREN exp_list tRPAREN
-    | tIDENTIFIER tLPAREN namedexp_list tRPAREN
-    | tAPPEND tLBRACE exp tCOMMA exp tRBRACE
-    | tLEN tLBRACE exp tRBRACE
-    | tCAP tLBRACE exp tRBRACE
-    ;
-
-vartype : tINT
-    | tFLOAT64
-    | tBOOL
-    | tRUNE
-    | tSTRING
-    | tLBRACKET exp tRBRACKET tIDENTIFIER
-    ;
 %%

@@ -26,7 +26,7 @@ ESCAPE [abfnrtv\\'"]
 %option noyywrap
 
 /* Removes warnings about input/output functions */
-%option noinput
+/*%option noinput*/
 /*%option nounput*/
 
 /* The second section of a flex file contains the regular expressions, using helper definitions
@@ -110,7 +110,7 @@ ESCAPE [abfnrtv\\'"]
 
 "+=" 		{ if (g_tokens) cout << "tPLUSASSIGN" << endl; return tPLUSASSIGN; }
 "-=" 		{ if (g_tokens) cout << "tMINUSASSIGN" << endl; return tMINUSASSIGN; }
-"*=" 		{ if (g_tokens) cout << "tTIMESASSIGN" << endl; return tTIMESASSIGN; }
+"*=" 		{ if (g_tokens) cout << "tMULTASSIGN" << endl; return tMULTASSIGN; }
 "/=" 		{ if (g_tokens) cout << "tDIVASSIGN" << endl; return tDIVASSIGN; }
 "%=" 		{ if (g_tokens) cout << "tREMASSIGN" << endl; return tREMASSIGN; }
 
@@ -133,9 +133,9 @@ ESCAPE [abfnrtv\\'"]
 "=" 		{ if (g_tokens) cout << "tASSIGN" << endl; return tASSIGN; }
 "!" 		{ if (g_tokens) cout << "tBANG" << endl; return tBANG; }
 
-"!=" 		{ if (g_tokens) cout << "tNOTEQUAL" << endl; return tNOTEQUAL; }
-"<=" 		{ if (g_tokens) cout << "tLESSEQUAL" << endl; return tLESSEQUAL; }
-">=" 		{ if (g_tokens) cout << "tGREATEREQUAL" << endl; return tGREATEREQUAL; }
+"!=" 		{ if (g_tokens) cout << "tNOTEQ" << endl; return tNOTEQ; }
+"<=" 		{ if (g_tokens) cout << "tLESSEQ" << endl; return tLESSEQ; }
+">=" 		{ if (g_tokens) cout << "tGREATEREQ" << endl; return tGREATEREQ; }
 ":=" 		{ if (g_tokens) cout << "tSHORTDEFINE" << endl; return tSHORTDEFINE; }
 "..." 		{ if (g_tokens) cout << "tELLIPSIS" << endl; return tELLIPSIS; }
 
@@ -153,12 +153,11 @@ ESCAPE [abfnrtv\\'"]
 
 ":" 		{ if (g_tokens) cout << "tCOLON" << endl; return tCOLON; }
 \n		{ 	int token = insert_semicolon(tNEWLINE);
-			if (token != tNEWLINE ) {
+			if (token != tNEWLINE) {
 				cout << "tSEMICOLON" << endl;
 				return token;
 			}
 		}
-
 
 ([a-zA-Z]|"_")([a-zA-Z]|[0-9]|"_")* { 
     //yylval.identifier = (yytext);
@@ -220,22 +219,25 @@ int insert_semicolon(int token) {
 		semicolon = 0;
 		return tSEMICOLON;
 	} else {
-		semicolon = 0;
-		semicolon = (	token == tIDENTIFIER || 
-				token == tINTVAL || 
-				token == tFLOATVAL ||
-				token == tRUNEVAL ||
-				token == tSTRINGVAL ||
-				token == tBREAK ||
-				token == tCONTINUE ||
-				token == tFALLTHROUGH ||
-				token == tRETURN ||
-				token == tINC ||
-				token == tDEC ||
-				token == tRPAREN ||
-				token == tRBRACKET ||
-				token == tRBRACE
+		int next_symbol = yyinput();
+		if (next_symbol == 0) return token;
+		
+		semicolon = (	(token == tIDENTIFIER && next_symbol == int('\n')) ||
+				(token == tINTVAL && next_symbol == int('\n'))||
+				(token == tFLOATVAL  && next_symbol == int('\n')) ||
+				(token == tRUNEVAL  && next_symbol == int('\n')) ||
+				(token == tSTRINGVAL  && next_symbol == int('\n')) ||
+				(token == tBREAK  && next_symbol == int('\n')) ||
+				(token == tCONTINUE  && next_symbol == int('\n')) ||
+				(token == tFALLTHROUGH  && next_symbol == int('\n')) ||
+				(token == tRETURN  && next_symbol == int('\n')) ||
+				(token == tINC  && next_symbol == int('\n')) ||
+				(token == tDEC  && next_symbol == int('\n')) ||
+				(token == tRPAREN && next_symbol == int('\n')) ||
+				(token == tRBRACKET && next_symbol == int('\n')) ||
+				(token == tRBRACE && next_symbol == int('\n'))
 		);
+		unput(char(next_symbol));
 		return token;
 	}
 }

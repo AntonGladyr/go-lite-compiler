@@ -5,6 +5,4 @@ void yyparse();
 int yylex();
 int g_tokens;
 
-int g_tokens;
-
 #endif /* !MAIN_H */
