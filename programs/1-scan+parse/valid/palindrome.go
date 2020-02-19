@@ -12,10 +12,10 @@ funct main (){
             sum = (sum*10)+r;
     }
     if(number ==sum){
-        fmt.Print("It is a palindrome")
+        print("It is a palindrome")
 
     }else{
-        fmt.Print("Not a palindrome")
+        print("Not a palindrome")
     }
 
 }
