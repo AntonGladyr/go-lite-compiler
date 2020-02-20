@@ -1,0 +1,6 @@
+class AssignStatement {
+    public:
+        AssignStatement() {
+            
+        }
+}

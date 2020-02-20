@@ -209,14 +209,15 @@ id_list : tIDENTIFIER { $$.ids.push_back($1); }
 
 exp_list : %empty { $$ = NULL; }
     | exp { $$.list.push_back($1); }
-    | exp tCOMMA exp_list { $$.list.push_back($1); }
+    | exp tCOMMA exp_list { $$.list.push_back($1); $$.list.push_back($3); }
     ;
 
 structdecl_list : id_list 
     | id_list tNEWLINE id_list
     ;
 
-case_list : tCASE exp tCOLON ins case_list { $$.list.emplace_back($2, $4); $$.list.push_back($5); }
+case_list : %empty { $$ = NULL; }
+    | tCASE exp tCOLON ins case_list { $$.list.emplace_back($2, $4); $$.list.push_back($5); }
     | tDEFAULT tCOLON ins case_list { $$.list.emplace_back(NULL, $4); $$.list.push_back($4); }
     ;
 
@@ -235,22 +236,22 @@ returnstmt : tRETURN tSEMICOLON { $$ = new Statement(k_stmtKindReturn); }
     | tRETURN exp tSEMICOLON { $$ = new Statement(k_stmtKindReturn, exp); }
     ;
 
-loopstmt : tFOR ins tSEMICOLON exp tSEMICOLON assignstmt tSEMICOLON tLPAREN ins tRPAREN { $$ = new Statement(k_stmtKindFor, $2, $4, $6, $9); }
-    | tFOR exp tLPAREN ins tRPAREN { $$ = new Statement(k_stmtKindFor, $2, $4); }
-    | tFOR tLPAREN ins tRPAREN { $$ = new Statement(k_stmtKindFor, $3); }
+loopstmt : tFOR ins tSEMICOLON exp tSEMICOLON assignstmt tSEMICOLON tLPAREN ins tRPAREN { $$ = new ForStatement($2, $4, $6, $9); }
+    | tFOR exp tLPAREN ins tRPAREN { $$ = new ForStatement($2, $4); }
+    | tFOR tLPAREN ins tRPAREN { $$ = new ForStatement($3); }
     ;
 
-assignstmt : id_list tASSIGN exp_list tSEMICOLON { $$ = new Statement(k_stmtKindAssign, $1, $3); }
-    | tIDENTIFIER tPERIOD tIDENTIFIER tASSIGN exp tSEMICOLON { $$ = new Statement(k_stmtKindAssign, $1, $3, $5); }
-    | tIDENTIFIER tLBRACKET exp tRBRACKET tASSIGN exp tSEMICOLON { $$ = new Statement(k_stmtKindAssign, $1, $3, $6); }
+assignstmt : id_list tASSIGN exp_list tSEMICOLON { $$ = new AssignStatement($1, $3); }
+    | tIDENTIFIER tPERIOD tIDENTIFIER tASSIGN exp tSEMICOLON { $$ = new AssignStatement($1, $3, $5); }
+    | tIDENTIFIER tLBRACKET exp tRBRACKET tASSIGN exp tSEMICOLON { $$ = new AssignStatement($1, $3, $6); }
     ;
 
-ifstmt : tIF exp tLPAREN ins tRPAREN { $$ = new Statement(k_stmtKindIf, $2, $4); }
-    | tIF shortdecl exp tLPAREN ins tRPAREN { $$ = new Statement(k_stmtKindIf, $3, $5, $2); }
-    | tIF exp tLPAREN ins tRPAREN tELSE ifstmt { $$ = new Statement(k_stmtKindIfElseIf, $2, $4, $7); }
-    | tIF shortdecl exp tLPAREN ins tRPAREN tELSE ifstmt { $$ = new Statement(k_stmtKindIfElseIf, $3, $5, $8, $2); }
-    | tIF exp tLPAREN ins tRPAREN tELSE tLPAREN ins tRPAREN { $$ = new Statement(k_stmtKindIfElse, $2, $4, $8); }
-    | tIF shortdecl exp tLPAREN ins tRPAREN tELSE tLPAREN ins tRPAREN { $$ = new Statement(k_stmtKindIfElse, $3, $5, $9, $2); }
+ifstmt : tIF exp tLPAREN ins tRPAREN { $$ = new IfStatement($2, $4); }
+    | tIF shortdecl exp tLPAREN ins tRPAREN { $$ = new IfStatement($3, $5, $2); }
+    | tIF exp tLPAREN ins tRPAREN tELSE ifstmt { $$ = new IfElseStatement($2, $4, $7); }
+    | tIF shortdecl exp tLPAREN ins tRPAREN tELSE ifstmt { $$ = new IfElseStatement($3, $5, $8, $2); }
+    | tIF exp tLPAREN ins tRPAREN tELSE tLPAREN ins tRPAREN { $$ = new IfElseStatement($2, $4, $8); }
+    | tIF shortdecl exp tLPAREN ins tRPAREN tELSE tLPAREN ins tRPAREN { $$ = new IfElseStatement($3, $5, $9, $2); }
     ;
 
 incdecstmt : tIDENTIFIER tINC tSEMICOLON { $$ = new Statement(k_stmtKindInc, 1); }
