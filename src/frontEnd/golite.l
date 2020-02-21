@@ -11,8 +11,28 @@ extern int g_tokens;
 #define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;
 
 extern int g_tokens;
-int insert_semicolon(int token);
 using namespace std;
+
+int lastToken = -1;
+#define RETURN(token) lastToken = token; return token;
+
+int insertSemicolon() {
+		return lastToken == tIDENTIFIER ||
+			lastToken == tINTVAL ||
+			lastToken == tFLOATVAL ||
+			lastToken == tRUNEVAL ||
+			lastToken == tSTRINGVAL ||
+			lastToken == tBREAK ||
+			lastToken == tCONTINUE ||
+			lastToken == tFALLTHROUGH ||
+			lastToken == tRETURN ||
+			lastToken == tINC ||
+			lastToken == tDEC ||
+			lastToken == tRPAREN ||
+			lastToken == tRBRACKET ||
+			lastToken == tRBRACE
+			;
+}
 %}
 
 %x COMMENT
@@ -26,8 +46,13 @@ ESCAPE [abfnrtv\\'"]
 %option noyywrap
 
 /* Removes warnings about input/output functions */
+<<<<<<< HEAD
 /*%option noinput*/
 /*%option nounput*/
+=======
+%option noinput
+%option nounput
+>>>>>>> 526ae45f9ca2edb4e14c93ce13f9f5a35c696cb5
 
 /* The second section of a flex file contains the regular expressions, using helper definitions
  * where appropriate ({<helper name>}). Sections in flex are divided by %%.
@@ -64,6 +89,7 @@ ESCAPE [abfnrtv\\'"]
 }
 <COMMENT>.|"\n"	;
 
+<<<<<<< HEAD
 "break"		{ if (g_tokens) cout << "tBREAK" << endl; return insert_semicolon(tBREAK); }
 "case"		{ if (g_tokens) cout << "tCASE" << endl; return insert_semicolon(tCASE); }
 "chan"		{ if (g_tokens) cout << "tCHAN" << endl; return tCHAN; }
@@ -154,61 +180,154 @@ ESCAPE [abfnrtv\\'"]
 ":" 		{ if (g_tokens) cout << "tCOLON" << endl; return tCOLON; }
 \n		{ 	int token = insert_semicolon(tNEWLINE);
 			if (token != tNEWLINE) {
+=======
+"break"		{ if (g_tokens) cout << "tBREAK" << endl; RETURN(tBREAK); }
+"case"		{ if (g_tokens) cout << "tCASE" << endl; RETURN(tCASE); }
+"chan"		{ if (g_tokens) cout << "tCHAN" << endl; RETURN(tCHAN); }
+"const" 	{ if (g_tokens) cout << "tCONST" << endl; RETURN(tCONST); }
+"continue"	{ if (g_tokens) cout << "tCONTINUE" << endl; RETURN(tCONTINUE); }
+"default"	{ if (g_tokens) cout << "tDEFAULT" << endl; RETURN(tDEFAULT); }
+"defer"		{ if (g_tokens) cout << "tDEFER" << endl; RETURN(tDEFER); }
+"else"		{ if (g_tokens) cout << "tELSE" << endl; RETURN(tELSE); }
+"fallthrough"	{ if (g_tokens) cout << "tFALLTHROUGH" << endl; RETURN(tFALLTHROUGH); }
+"for"		{ if (g_tokens) cout << "tFOR" << endl; RETURN(tFOR); }
+"func"		{ if (g_tokens) cout << "tFUNC" << endl; RETURN(tFUNC); }
+"go"		{ if (g_tokens) cout << "tGO" << endl; RETURN(tGO); }
+"goto"		{ if (g_tokens) cout << "tGOTO" << endl; RETURN(tGOTO); }
+"if"		{ if (g_tokens) cout << "tIF" << endl; RETURN(tIF); }
+"import"	{ if (g_tokens) cout << "tIMPORT" << endl; RETURN(tIMPORT); }
+"interface"	{ if (g_tokens) cout << "tINTERFACE" << endl; RETURN(tINTERFACE); }
+"map"		{ if (g_tokens) cout << "tMAP" << endl; RETURN(tMAP); }
+"package"	{ if (g_tokens) cout << "tPACKAGE" << endl; RETURN(tPACKAGE); }
+"range"		{ if (g_tokens) cout << "tRANGE" << endl; RETURN(tRANGE); }
+"return"	{ if (g_tokens) cout << "tRETURN" << endl; RETURN(tRETURN); }
+"select"	{ if (g_tokens) cout << "tSELECT" << endl; RETURN(tSELECT); }
+"struct"	{ if (g_tokens) cout << "tSTRUCT" << endl; RETURN(tSTRUCT); }
+"switch"	{ if (g_tokens) cout << "tSWITCH" << endl; RETURN(tSWITCH); }
+"type"		{ if (g_tokens) cout << "tTYPE" << endl; RETURN(tTYPE); }
+"var"		{ if (g_tokens) cout << "tVAR" << endl; RETURN(tVAR); }
+"print"		{ if (g_tokens) cout << "tPRINT" << endl; RETURN(tPRINT);  }
+"println"	{ if (g_tokens) cout << "tPRINTLN" << endl; RETURN(tPRINTLN); }
+"append"	{ if (g_tokens) cout << "tAPPEND" << endl; RETURN(tAPPEND); }
+"len"		{ if (g_tokens) cout << "tLEN" << endl; RETURN(tLEN); }
+"cap"		{ if (g_tokens) cout << "tCAP" << endl; RETURN(tCAP); }
+
+"+" 		{ if (g_tokens) cout << "tPLUS" << endl; RETURN(tPLUS); }
+"-" 		{ if (g_tokens) cout << "tMINUS" << endl; RETURN(tMINUS); }
+"*" 		{ if (g_tokens) cout << "tTIMES" << endl; RETURN(tTIMES); }
+"/" 		{ if (g_tokens) cout << "tDIV" << endl; RETURN(tDIV); }
+"%" 		{ if (g_tokens) cout << "tREM" << endl; RETURN(tREM); }
+
+"&" 		{ if (g_tokens) cout << "tBWAND" << endl; RETURN(tBWAND); }
+"|" 		{ if (g_tokens) cout << "tBWOR" << endl; RETURN(tBWOR); }
+"^" 		{ if (g_tokens) cout << "tBWXOR" << endl; RETURN(tBWXOR); }
+"<<" 		{ if (g_tokens) cout << "tLEFTSHIFT" << endl; RETURN(tLEFTSHIFT); }
+">>" 		{ if (g_tokens) cout << "tRIGHTSHIFT" << endl; RETURN(tRIGHTSHIFT); }
+"&^" 		{ if (g_tokens) cout << "tBWANDNOT" << endl; RETURN(tBWANDNOT); }
+
+"+=" 		{ if (g_tokens) cout << "tPLUSASSIGN" << endl; RETURN(tPLUSASSIGN); }
+"-=" 		{ if (g_tokens) cout << "tMINUSASSIGN" << endl; RETURN(tMINUSASSIGN); }
+"*=" 		{ if (g_tokens) cout << "tMULTASSIGN" << endl; RETURN(tMULTASSIGN); }
+"/=" 		{ if (g_tokens) cout << "tDIVASSIGN" << endl; RETURN(tDIVASSIGN); }
+"%=" 		{ if (g_tokens) cout << "tREMASSIGN" << endl; RETURN(tREMASSIGN); }
+
+"&=" 		{ if (g_tokens) cout << "tBWANDASSIGN" << endl; RETURN(tBWANDASSIGN); }
+"|=" 		{ if (g_tokens) cout << "tBWORASSIGN" << endl; RETURN(tBWORASSIGN); }
+"^=" 		{ if (g_tokens) cout << "tBWXORASSIGN" << endl; RETURN(tBWXORASSIGN); }
+"<<=" 		{ if (g_tokens) cout << "tLSHIFTASSIGN" << endl; RETURN(tLSHIFTASSIGN); }
+">>=" 		{ if (g_tokens) cout << "tRSHIFTASSIGN" << endl; RETURN(tRSHIFTASSIGN); }
+"&^=" 		{ if (g_tokens) cout << "tBWANDNOTASSIGN" << endl; RETURN(tBWANDNOTASSIGN); }
+
+"&&" 		{ if (g_tokens) cout << "tAND" << endl; RETURN(tAND); }
+"||" 		{ if (g_tokens) cout << "tOR" << endl; RETURN(tOR); }
+"<-" 		{ if (g_tokens) cout << "tARROW" << endl; RETURN(tARROW); }
+"++" 		{ if (g_tokens) cout << "tINC" << endl; RETURN(tINC); }
+"--" 		{ if (g_tokens) cout << "tDEC" << endl; RETURN(tDEC); }
+
+"==" 		{ if (g_tokens) cout << "tEQUAL" << endl; RETURN(tEQUAL); }
+"<" 		{ if (g_tokens) cout << "tLESS" << endl; RETURN(tLESS); }
+">" 		{ if (g_tokens) cout << "tGREATER" << endl; RETURN(tGREATER); }
+"=" 		{ if (g_tokens) cout << "tASSIGN" << endl; RETURN(tASSIGN); }
+"!" 		{ if (g_tokens) cout << "tBANG" << endl; RETURN(tBANG); }
+
+"!=" 		{ if (g_tokens) cout << "tNOTEQ" << endl; RETURN(tNOTEQ); }
+"<=" 		{ if (g_tokens) cout << "tLESSEQ" << endl; RETURN(tLESSEQ); }
+">=" 		{ if (g_tokens) cout << "tGREATEREQ" << endl; RETURN(tGREATEREQ); }
+":=" 		{ if (g_tokens) cout << "tSHORTDEFINE" << endl; RETURN(tSHORTDEFINE); }
+"..." 		{ if (g_tokens) cout << "tELLIPSIS" << endl; RETURN(tELLIPSIS); }
+
+"(" 		{ if (g_tokens) cout << "tLPAREN" << endl; RETURN(tLPAREN); }
+"{" 		{ if (g_tokens) cout << "tLBRACE" << endl; RETURN(tLBRACE); }
+"[" 		{ if (g_tokens) cout << "tLBRACKET" << endl; RETURN(tLBRACKET); }
+"," 		{ if (g_tokens) cout << "tCOMMA" << endl; RETURN(tCOMMA); }
+"." 		{ if (g_tokens) cout << "tPERIOD" << endl; RETURN(tPERIOD); }
+
+
+")" 		{ if (g_tokens) cout << "tRPAREN" << endl; RETURN(tRPAREN); }
+"}" 		{ if (g_tokens) cout << "tRBRACE" << endl; RETURN(tRBRACE); }
+"]" 		{ if (g_tokens) cout << "tRBRACKET" << endl; RETURN(tRBRACKET); }
+";" 		{ if (g_tokens) cout << "tSEMICOLON" << endl; RETURN(tSEMICOLON); }
+
+":" 		{ if (g_tokens) cout << "tCOLON" << endl; RETURN(tCOLON); }
+\n		{	
+			if (insertSemicolon()) {
+>>>>>>> 526ae45f9ca2edb4e14c93ce13f9f5a35c696cb5
 				cout << "tSEMICOLON" << endl;
-				return token;
+				RETURN(tSEMICOLON);
 			}
 		}
 
 ([a-zA-Z]|"_")([a-zA-Z]|[0-9]|"_")* { 
-    //yylval.identifier = (yytext);
+    yylval.identifier = strdup(yytext);
     if (g_tokens) cout << "tIDENTIFIER(" << yytext << ")" << endl;
-    return insert_semicolon(tIDENTIFIER);
+    RETURN(tIDENTIFIER);
 }
 
 0|([1-9][0-9]*) {
      //yylval.intLiteral = atof(yytext);
     if (g_tokens) cout << "tINTVAL(" << yytext << ")" << endl;
-    return insert_semicolon(tINTVAL);
+    RETURN(tINTVAL);
 }
 
 0[0-7]* {
     //yylval.intLiteral = atof(yytext);
     if (g_tokens) cout << "tINTVAL(" << yytext << ")" << endl;
-    return insert_semicolon(tINTVAL);
+    RETURN(tINTVAL);
 }
 
 0(x|X)[0-9a-fA-F][0-9a-fA-F]* {
     //yylval.intLiteral = atof(yytext);
     if (g_tokens) cout << "tINTVAL(" << yytext << ")" << endl;
-    return insert_semicolon(tINTVAL);
+    RETURN(tINTVAL);
 }
 
 ([0-9]*\.[0-9]+)|([0-9]+\.[0-9]*) {
     //yylval.floatLiteral = atof(yytext);
     if (g_tokens) cout << "tFLOATVAL(" << yytext << ")" << endl;
-    return insert_semicolon(tFLOATVAL);
+    RETURN(tFLOATVAL);
 }
 
 '((\\[abfnrtv\\\'])|[^\\'])\' {  
 	//yylval.rune = (yytext);
 	if (g_tokens) cout << "tRUNEVAL(" << yytext << ")" << endl;
-	return insert_semicolon(tRUNEVAL);
+	RETURN(tRUNEVAL);
 }
 
 \"([0-9]|[a-zA-Z]|[\t]|\\{ESCAPE})*\" {
     //yylval.string = (yytext);
     if (g_tokens) cout << "tSTRINGVAL(" << yytext << ")" << endl;
-    return insert_semicolon(tSTRINGVAL);
+    RETURN(tSTRINGVAL);
 }
 
 `(\\.|[^'])*` {
     //yylval.string = (yytext);
     if (g_tokens) cout << "tSTRINGVAL(" << yytext << ")" << endl;
-    return insert_semicolon(tSTRINGVAL);
+    RETURN(tSTRINGVAL);
 }
 
 . { fprintf(stderr, "Error: (line %d) unexpected character '%s'\n", yylineno, yytext); exit(1); }
 
+<<<<<<< HEAD
 %%
 
 int semicolon = 0;
@@ -241,3 +360,6 @@ int insert_semicolon(int token) {
 		return token;
 	}
 }
+=======
+%%
+>>>>>>> 526ae45f9ca2edb4e14c93ce13f9f5a35c696cb5
