@@ -39,6 +39,10 @@ void yyerror(const char *s) {
 %union {
 	int intval;
 	char *identifier;
+    float floatval;
+    char runeval;
+    bool boolval;
+    char *string;
 
     Instruction *ins;
     Declaration *decl;
@@ -144,11 +148,11 @@ void yyerror(const char *s) {
 %token tSEMICOLON
 %token tCOLON
 %token <identifier> tIDENTIFIER
-%token tINTVAL
-%token tFLOATVAL
-%token tBOOLVAL
-%token tRUNEVAL
-%token tSTRINGVAL
+%token <intval> tINTVAL
+%token <floatval> tFLOATVAL
+%token <boolval> tBOOLVAL
+%token <runeval> tRUNEVAL
+%token <stringval> tSTRINGVAL
 %token tNEWLINE
 
 /* Precedence directives resolve grammar ambiguities by breaking ties between shift/reduce
@@ -157,8 +161,10 @@ void yyerror(const char *s) {
  * the same precedence. Ties at the same level are broken using either %left or %right, which
  * denote left-associative and right-associative respectively.
  */
-%left '+' '-'
+%left '+' '-' 
 %left '*' '/'
+%left pMINUS pBANG pPLUS pBWXOR
+
 
 /* Start token (by default if this is missing it takes the first production */
 %start program
@@ -276,6 +282,15 @@ exp : tIDENTIFIER { $$ = new Expression(k_exprKindIdentifier, $1); }
     | tAPPEND tLBRACE exp tCOMMA exp tRBRACE { $$ = new Expression(k_exprKindAppend, $3, $5); }
     | tLEN tLBRACE exp tRBRACE { $$ = new Expression(k_exprKindLen, $3); }
     | tCAP tLBRACE exp tRBRACE { $$ = new Expression(k_exprKindCap, $3); }
-    ;
+    | tPLUS exp %prec pPLUS { $$ = new Expression(k_exprKindPlus, $2); }
+    | tMINUS exp %prec pMINUS { $$ = new Expression(k_exprKindMinus, $2); }
+    | tBANG exp %prec pBANG { $$ = new Expression(k_exprKindBang, $2); }
+    | tBWXOR exp %prec pBWXOR { $$ = new Expression(k_exprKindBwxor, $2); }
+    | tINTVAL { $$ = new Expression(k_exprKindInteger, $1); }
+    | tFLOATVAL { $$ = new Expression(k_exprKindFloat, $1); }
+    | tRUNEVAL { $$ = new Expression(k_exprKindRune, $1); }
+    | tSTRINGVAL { $$ = new Expression(k_exprKindString, $1); }
+    | tBOOLVAL { $$ = new Expression(k_exprKindBool, $1); }
+    ; 
 
 %%
