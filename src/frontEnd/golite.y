@@ -280,13 +280,12 @@ switchstmt : tSWITCH tLPAREN case_list tRPAREN { $$ = new Statement(k_stmtKindSw
     | tSWITCH shortdecl exp tLPAREN case_list tRPAREN { $$ = new Statement(k_stmtKindSwitch, $3, $5, $2); }
     ;
 
-exp : tIDENTIFIER { $$ = new Expression(k_exprKindIdentifier, $1); }
-    | tIDENTIFIER tPERIOD tIDENTIFIER { $$ = new Expression(k_exprKindFieldSelector, $1, $3); }
-    | tIDENTIFIER tLBRACKET exp tRBRACKET { $$ = new Expression(k_exprKindIndexer, $1, $3); }
-    | tIDENTIFIER tLBRACE id_list tRBRACE { $$ = new Expression(k_exprKindFunctionCall, $1, $3); }
-    | tAPPEND tLBRACE exp tCOMMA exp tRBRACE { $$ = new Expression(k_exprKindAppend, $3, $5); }
-    | tLEN tLBRACE exp tRBRACE { $$ = new Expression(k_exprKindLen, $3); }
-    | tCAP tLBRACE exp tRBRACE { $$ = new Expression(k_exprKindCap, $3); }
+exp : tIDENTIFIER tPERIOD tIDENTIFIER { $$ = new Binary(k_exprKindFieldSelector, $1, $3); }
+    | tIDENTIFIER tLBRACKET exp tRBRACKET { $$ = new Binary(k_exprKindIndexer, $1, $3); }
+    | tIDENTIFIER tLBRACE id_list tRBRACE { $$ = new Binary(k_exprKindFunctionCall, $1, $3); }
+    | tAPPEND tLBRACE exp tCOMMA exp tRBRACE { $$ = new Binary(k_exprKindAppend, $3, $5); }
+    | tLEN tLBRACE exp tRBRACE { $$ = new Binary(k_exprKindLen, $3); }
+    | tCAP tLBRACE exp tRBRACE { $$ = new Binary(k_exprKindCap, $3); }
     | tPLUS exp %prec pPLUS { $$ = new UnaryExpression(k_exprKindPlus, $2); }
     | tMINUS exp %prec pMINUS { $$ = new UnaryExpression(k_exprKindMinus, $2); }
     | tBANG exp %prec pBANG { $$ = new UnaryExpression(k_exprKindBang, $2); }
@@ -296,6 +295,7 @@ exp : tIDENTIFIER { $$ = new Expression(k_exprKindIdentifier, $1); }
     | tRUNEVAL { $$ = new Literals(k_exprKindRune, $1); }
     | tSTRINGVAL { $$ = new Literals(k_exprKindString, $1); }
     | tBOOLVAL { $$ = new Literals(k_exprKindBool, $1); }
+    | tIDENTIFIER { $$ = new Literals(k_exprKindIdentifier, $1); }
     ; 
 
 %%

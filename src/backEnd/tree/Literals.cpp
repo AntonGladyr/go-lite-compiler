@@ -1,4 +1,4 @@
- class Literal{
+ class Literal: public Expression{
     public : 
     bool value_;
     int line_;
