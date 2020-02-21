@@ -1,13 +1,6 @@
-#include "Statement.hpp"
-#include "Instruction.hpp"
-#include "Expression.hpp"
+#include "ForStatement.hpp"
 
 class ForStatement : public Statement {
-    private:
-        Instruction initStmt;
-        Expression condition;
-        Statement postStmt;
-        Instruction body;
     public:
         ForStatement(Instruction _body) : ForStatement {NULL, _body} { 
 

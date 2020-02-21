@@ -14,3 +14,13 @@ enum AssignStatementKind {
 	k_AssignStmtKindSelector,
 	k_AssignStmtKindIndex
 }
+
+enum DeclarationKind {
+	k_declKindDeclare,
+	k_declKindAssign,
+	k_declKindFactor,
+	k_declKindFunc,
+	k_declKindShortDec,
+	k_declKindType,
+	k_declKindTypeStruct
+}

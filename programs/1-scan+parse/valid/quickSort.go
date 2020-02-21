@@ -1,4 +1,4 @@
-package main 
+package main
 
 func main (){
 	print(quicksort([40,23,12,6,59,34]))

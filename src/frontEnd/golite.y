@@ -39,15 +39,20 @@ void yyerror(const char *s) {
 %union {
 	int intval;
 	char *identifier;
+    float floatval;
+    char runeval;
+    bool boolval;
+    char *string;
 
-    	//Function *function;
     Instruction *ins;
     Declaration *decl;
     Statement *stmt;
     Expression *exp;
 
+    vector<Declaration> *var_list;
     vector<Expression> *exp_list;
     vector<string> *id_list;
+    vector<vector<string>> *structdecl_list;
     vector<Pair<Expression, Instruction>> case_list;
     Function *function;
 }
@@ -59,12 +64,14 @@ void yyerror(const char *s) {
  */
 
 %type <ins> program ins
-%type <decl> decl varspec varspecs shortdecl
+%type <decl> decl varspec shortdecl
 %type <stmt> stmt ifstmt loopstmt assignstmt incdecstmt printstmt returnstmt switchstmt
 %type <exp> exp
 
+%type <var_list> varspecs
 %type <exp_list> exp_list
-%type <id_list> id_list structdecl_list
+%type <id_list> id_list 
+%type <structdecl_list> structdecl_list
 %type <case_list> case_list
 
 %token tBREAK
@@ -132,7 +139,7 @@ void yyerror(const char *s) {
 %token tNOTEQ
 %token tLESSEQ
 %token tGREATEREQ
-%token tSHORTDEFINE
+%token tSHORTDECLARE
 %token tELLIPSIS
 %token tLBRACE
 %token tLPAREN
@@ -145,11 +152,11 @@ void yyerror(const char *s) {
 %token tSEMICOLON
 %token tCOLON
 %token <identifier> tIDENTIFIER
-%token tINTVAL
-%token tFLOATVAL
-%token tBOOLVAL
-%token tRUNEVAL
-%token tSTRINGVAL
+%token <intval> tINTVAL
+%token <floatval> tFLOATVAL
+%token <boolval> tBOOLVAL
+%token <runeval> tRUNEVAL
+%token <stringval> tSTRINGVAL
 %token tNEWLINE
 
 /* Precedence directives resolve grammar ambiguities by breaking ties between shift/reduce
@@ -158,8 +165,10 @@ void yyerror(const char *s) {
  * the same precedence. Ties at the same level are broken using either %left or %right, which
  * denote left-associative and right-associative respectively.
  */
-%left '+' '-'
+%left '+' '-' 
 %left '*' '/'
+%left pMINUS pBANG pPLUS pBWXOR
+
 
 /* Start token (by default if this is missing it takes the first production */
 %start program
@@ -185,41 +194,42 @@ ins : %empty { $$ = NULL; }
     ;
 
 decl : tVAR varspec { $$ = $2; }
-    | tVAR tLBRACE varspecs tRBRACE { $$ = $3; }
-    | tFUNC tIDENTIFIER tLBRACE id_list tRBRACE tIDENTIFIER tLPAREN ins returnstmt tRPAREN { $$ = new Declaration($2, $4, $6); }
+    | tVAR tLBRACE varspecs tRBRACE { $$ = new Declaration($3); }
+    | tFUNC tIDENTIFIER tLBRACE id_list tRBRACE tLPAREN ins tRPAREN { $$ = new Declaration($2, $4, $7); }
+    | tFUNC tIDENTIFIER tLBRACE id_list tRBRACE tIDENTIFIER tLPAREN ins returnstmt tRPAREN { $$ = new Declaration($2, $4, $6, $8); }
     | shortdecl { $$ = $1; }
     | tTYPE tIDENTIFIER tIDENTIFIER { $$ = new Declaration($2, $3); }
     | tTYPE tIDENTIFIER tSTRUCT tLPAREN structdecl_list tRPAREN { $$ = new Declaration($2, $5); }
     ;
 
-varspecs : varspec
-    | varspec tNEWLINE varspecs
+varspecs : varspec { $$.push_back($1); }
+    | varspec tNEWLINE varspecs { $$.push_back($1); $$.push_back($3);}
     ;
 
-varspec : id_list tIDENTIFIER { $$ = new Declaration($1); }
+varspec : id_list tIDENTIFIER { $$ = new Declaration($1, $2); }
     | id_list tASSIGN exp_list tSEMICOLON {$$ = new Declaration($1, $3); }
-    | id_list tIDENTIFIER tASSIGN exp_list tSEMICOLON {$$ = new Declaration($1, $2, $4); }
+    | id_list tIDENTIFIER tASSIGN exp_list tSEMICOLON {$$ = new Declaration($1, $4, $2); }
     ;
 
 shortdecl : tIDENTIFIER tSHORTDECLARE exp tSEMICOLON { $$ = new Declaration($1, $3); }
     ;
 
-id_list : tIDENTIFIER { $$.ids.push_back($1); }
-    | tIDENTIFIER tCOMMA id_list { $$.ids.push_back($1); $$.ids.push_back($3); }
+id_list : tIDENTIFIER { $$.push_back($1); }
+    | tIDENTIFIER tCOMMA id_list { $$.ids.push_back($1); $$.push_back($3); }
     ;
 
 exp_list : %empty { $$ = NULL; }
-    | exp { $$.list.push_back($1); }
-    | exp tCOMMA exp_list { $$.list.push_back($1); $$.list.push_back($3); }
+    | exp { $$.push_back($1); }
+    | exp tCOMMA exp_list { $$.push_back($1); $$.push_back($3); }
     ;
 
-structdecl_list : id_list 
-    | id_list tNEWLINE id_list
+structdecl_list : id_list { $$.push_back($1); }
+    | id_list tNEWLINE id_list { $$.push_back($1); $$.push_back($3);}
     ;
 
 case_list : %empty { $$ = NULL; }
-    | tCASE exp tCOLON ins case_list { $$.list.emplace_back($2, $4); $$.list.push_back($5); }
-    | tDEFAULT tCOLON ins case_list { $$.list.emplace_back(NULL, $4); $$.list.push_back($4); }
+    | tCASE exp tCOLON ins case_list { $$.emplace_back($2, $4); $$.push_back($5); }
+    | tDEFAULT tCOLON ins case_list { $$.emplace_back(NULL, $4); $$.push_back($4); }
     ;
 
 stmt : loopstmt
@@ -277,5 +287,15 @@ exp : tIDENTIFIER { $$ = new Expression(k_exprKindIdentifier, $1); }
     | tAPPEND tLBRACE exp tCOMMA exp tRBRACE { $$ = new Expression(k_exprKindAppend, $3, $5); }
     | tLEN tLBRACE exp tRBRACE { $$ = new Expression(k_exprKindLen, $3); }
     | tCAP tLBRACE exp tRBRACE { $$ = new Expression(k_exprKindCap, $3); }
-    ;
+    | tPLUS exp %prec pPLUS { $$ = new UnaryExpression(k_exprKindPlus, $2); }
+    | tMINUS exp %prec pMINUS { $$ = new UnaryExpression(k_exprKindMinus, $2); }
+    | tBANG exp %prec pBANG { $$ = new UnaryExpression(k_exprKindBang, $2); }
+    | tBWXOR exp %prec pBWXOR { $$ = new UnaryExpression(k_exprKindBwxor, $2); }
+    | tINTVAL { $$ = new Literals(k_exprKindInteger, $1); }
+    | tFLOATVAL { $$ = new Literals(k_exprKindFloat, $1); }
+    | tRUNEVAL { $$ = new Literals(k_exprKindRune, $1); }
+    | tSTRINGVAL { $$ = new Literals(k_exprKindString, $1); }
+    | tBOOLVAL { $$ = new Literals(k_exprKindBool, $1); }
+    ; 
+
 %%

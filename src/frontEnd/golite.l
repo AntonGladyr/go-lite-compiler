@@ -45,14 +45,8 @@ ESCAPE [abfnrtv\\'"]
 %option yylineno
 %option noyywrap
 
-/* Removes warnings about input/output functions */
-<<<<<<< HEAD
-/*%option noinput*/
-/*%option nounput*/
-=======
 %option noinput
 %option nounput
->>>>>>> 526ae45f9ca2edb4e14c93ce13f9f5a35c696cb5
 
 /* The second section of a flex file contains the regular expressions, using helper definitions
  * where appropriate ({<helper name>}). Sections in flex are divided by %%.
@@ -89,7 +83,6 @@ ESCAPE [abfnrtv\\'"]
 }
 <COMMENT>.|"\n"	;
 
-<<<<<<< HEAD
 "break"		{ if (g_tokens) cout << "tBREAK" << endl; return insert_semicolon(tBREAK); }
 "case"		{ if (g_tokens) cout << "tCASE" << endl; return insert_semicolon(tCASE); }
 "chan"		{ if (g_tokens) cout << "tCHAN" << endl; return tCHAN; }
@@ -180,7 +173,6 @@ ESCAPE [abfnrtv\\'"]
 ":" 		{ if (g_tokens) cout << "tCOLON" << endl; return tCOLON; }
 \n		{ 	int token = insert_semicolon(tNEWLINE);
 			if (token != tNEWLINE) {
-=======
 "break"		{ if (g_tokens) cout << "tBREAK" << endl; RETURN(tBREAK); }
 "case"		{ if (g_tokens) cout << "tCASE" << endl; RETURN(tCASE); }
 "chan"		{ if (g_tokens) cout << "tCHAN" << endl; RETURN(tCHAN); }
@@ -271,7 +263,6 @@ ESCAPE [abfnrtv\\'"]
 ":" 		{ if (g_tokens) cout << "tCOLON" << endl; RETURN(tCOLON); }
 \n		{	
 			if (insertSemicolon()) {
->>>>>>> 526ae45f9ca2edb4e14c93ce13f9f5a35c696cb5
 				cout << "tSEMICOLON" << endl;
 				RETURN(tSEMICOLON);
 			}
@@ -327,7 +318,6 @@ ESCAPE [abfnrtv\\'"]
 
 . { fprintf(stderr, "Error: (line %d) unexpected character '%s'\n", yylineno, yytext); exit(1); }
 
-<<<<<<< HEAD
 %%
 
 int semicolon = 0;
@@ -360,6 +350,4 @@ int insert_semicolon(int token) {
 		return token;
 	}
 }
-=======
 %%
->>>>>>> 526ae45f9ca2edb4e14c93ce13f9f5a35c696cb5

@@ -1,8 +1,6 @@
-#include "Statement.hpp"
-#include "Expression.hpp"
-#include <vector>
+#include "AssignStatement.hpp"
 
-class AssignStatement: Statement {
+class AssignStatement : Statement {
     public:
         AssignStatement(vector<string> ids, vector<Expression> rhs) : kind{k_AssignStmtKindTuple} {
         	val.tupleAssign.ids = ids;
