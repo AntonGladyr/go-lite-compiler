@@ -45,8 +45,10 @@ void yyerror(const char *s) {
     Statement *stmt;
     Expression *exp;
 
+    vector<Declaration> *var_list;
     vector<Expression> *exp_list;
     vector<string> *id_list;
+    vector<vector<string>> *structdecl_list;
     vector<Pair<Expression, Instruction>> case_list;
     Function *function;
 }
@@ -58,12 +60,14 @@ void yyerror(const char *s) {
  */
 
 %type <ins> program ins
-%type <decl> decl varspec varspecs shortdecl
+%type <decl> decl varspec shortdecl
 %type <stmt> stmt ifstmt loopstmt assignstmt incdecstmt printstmt returnstmt switchstmt
 %type <exp> exp
 
+%type <var_list> varspecs
 %type <exp_list> exp_list
-%type <id_list> id_list structdecl_list
+%type <id_list> id_list 
+%type <structdecl_list> structdecl_list
 %type <case_list> case_list
 
 %token tBREAK
@@ -184,41 +188,42 @@ ins : %empty { $$ = NULL; }
     ;
 
 decl : tVAR varspec { $$ = $2; }
-    | tVAR tLBRACE varspecs tRBRACE { $$ = $3; }
-    | tFUNC tIDENTIFIER tLBRACE id_list tRBRACE tIDENTIFIER tLPAREN ins returnstmt tRPAREN { $$ = new Declaration($2, $4, $6); }
+    | tVAR tLBRACE varspecs tRBRACE { $$ = new Declaration($3); }
+    | tFUNC tIDENTIFIER tLBRACE id_list tRBRACE tLPAREN ins tRPAREN { $$ = new Declaration($2, $4, $7); }
+    | tFUNC tIDENTIFIER tLBRACE id_list tRBRACE tIDENTIFIER tLPAREN ins returnstmt tRPAREN { $$ = new Declaration($2, $4, $6, $8); }
     | shortdecl { $$ = $1; }
     | tTYPE tIDENTIFIER tIDENTIFIER { $$ = new Declaration($2, $3); }
     | tTYPE tIDENTIFIER tSTRUCT tLPAREN structdecl_list tRPAREN { $$ = new Declaration($2, $5); }
     ;
 
-varspecs : varspec
-    | varspec tNEWLINE varspecs
+varspecs : varspec { $$.push_back($1); }
+    | varspec tNEWLINE varspecs { $$.push_back($1); $$.push_back($3);}
     ;
 
-varspec : id_list tIDENTIFIER { $$ = new Declaration($1); }
+varspec : id_list tIDENTIFIER { $$ = new Declaration($1, $2); }
     | id_list tASSIGN exp_list tSEMICOLON {$$ = new Declaration($1, $3); }
-    | id_list tIDENTIFIER tASSIGN exp_list tSEMICOLON {$$ = new Declaration($1, $2, $4); }
+    | id_list tIDENTIFIER tASSIGN exp_list tSEMICOLON {$$ = new Declaration($1, $4, $2); }
     ;
 
 shortdecl : tIDENTIFIER tSHORTDECLARE exp tSEMICOLON { $$ = new Declaration($1, $3); }
     ;
 
-id_list : tIDENTIFIER { $$.ids.push_back($1); }
-    | tIDENTIFIER tCOMMA id_list { $$.ids.push_back($1); $$.ids.push_back($3); }
+id_list : tIDENTIFIER { $$.push_back($1); }
+    | tIDENTIFIER tCOMMA id_list { $$.ids.push_back($1); $$.push_back($3); }
     ;
 
 exp_list : %empty { $$ = NULL; }
-    | exp { $$.list.push_back($1); }
-    | exp tCOMMA exp_list { $$.list.push_back($1); $$.list.push_back($3); }
+    | exp { $$.push_back($1); }
+    | exp tCOMMA exp_list { $$.push_back($1); $$.push_back($3); }
     ;
 
-structdecl_list : id_list 
-    | id_list tNEWLINE id_list
+structdecl_list : id_list { $$.push_back($1); }
+    | id_list tNEWLINE id_list { $$.push_back($1); $$.push_back($3);}
     ;
 
 case_list : %empty { $$ = NULL; }
-    | tCASE exp tCOLON ins case_list { $$.list.emplace_back($2, $4); $$.list.push_back($5); }
-    | tDEFAULT tCOLON ins case_list { $$.list.emplace_back(NULL, $4); $$.list.push_back($4); }
+    | tCASE exp tCOLON ins case_list { $$.emplace_back($2, $4); $$.push_back($5); }
+    | tDEFAULT tCOLON ins case_list { $$.emplace_back(NULL, $4); $$.push_back($4); }
     ;
 
 stmt : loopstmt
