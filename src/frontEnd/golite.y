@@ -173,9 +173,10 @@ varspecs : varspec
     ;
 
 varspec : var_list vartype tSEMICOLON
-    | var_list tASSIGN multiexp tSEMICOLON
-    | var_list vartype tASSIGN multiexp tSEMICOLON
-    ;
+	| var_list vartype tASSIGN exp tSEMICOLON
+    	| var_list tASSIGN multiexp tSEMICOLON
+    	| var_list vartype tASSIGN multiexp tSEMICOLON
+    	;
 
 var_list : tIDENTIFIER 
     | tIDENTIFIER tCOMMA var_list
