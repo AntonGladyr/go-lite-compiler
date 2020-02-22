@@ -196,7 +196,6 @@ ins : %empty { $$ = NULL; }
 
 decl : tVAR varspec { $$ = $2; }
     | tVAR tLBRACE varspecs tRBRACE { $$ = new Declaration($3); }
-    | tFUNC tIDENTIFIER tLBRACE id_list tRBRACE tLPAREN ins tRPAREN { $$ = new Declaration($2, $4, $7); }
     | tFUNC tIDENTIFIER tLBRACE id_list tRBRACE tIDENTIFIER tLPAREN ins returnstmt tRPAREN { $$ = new Declaration($2, $4, $6, $8); }
     | shortdecl { $$ = $1; }
     | tTYPE tIDENTIFIER tIDENTIFIER { $$ = new Declaration($2, $3); }
