@@ -1,4 +1,4 @@
-#include "IfElseStatement.hpp"
+/*#include "IfElseStatement.hpp"
 
 class IfElseStatement : Statement {
 
@@ -36,4 +36,4 @@ class IfElseStatement : Statement {
 		val.declIfElseNestedStmt.ifIns = _ifIns;
 		val.declIfElseNestedStmt.elseIns = _elseIns; 
 	}
-}
+}*/

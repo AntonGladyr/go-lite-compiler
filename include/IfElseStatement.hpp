@@ -5,25 +5,21 @@
 #include "Instruction.hpp"
 
 class IfElseStatement : Statement {
-
-	union val {
-		struct { Expression exp; Instruction ifIns; Insctruction elseIns; } ifElseStmt;
-		struct { Declaration decl; Expression exp; Instruction ifIns; Insctruction elseIns; } declIfElseStmt;
-		struct { Expression exp; Instruction ifIns; Instruction elseIns; } ifElseNestedStmt;
-		struct { Declaration decl; Expression exp; Instruction ifIns; Instruction elseIns } declIfElseNestedStmt;
-	}
-
-	IfStatement(Expression _exp, Instruction _ifIns, Instruction _elseIns) : kind{ k_stmtKindIfElse } {
-	}
+	public:
+		Expression exp;
+		Declaration decl;
+		Instruction ifIns;
+		Instruction elseIns;
+		
+		IfStatement(Expression exp, Instruction ifIns, Instruction elseIns)
+			: kind(k_stmtKindIfElse), exp(exp), ifIns(ifIns), elseIns(elseIns) { }
 	
-	IfStatement(Declaration _decl, Expression _exp, Instruction _ifIns, IfStmt _elseIns)
-		: kind{ k_stmtKindDeclIfElse } {
-	}
+		IfStatement(Declaration decl, Expression exp, Instruction ifIns, IfStmt elseIns)
+			: kind(k_stmtKindDeclIfElse), decl(decl), exp(exp), ifIns(ifIns), elseIns(elseIns) { }
 
-	IfStatement(Expression _exp, Instruction _ifIns, Instruction _elseIns) : kind{ k_stmtKindIfElseNested } {
-	}
+		IfStatement(Expression exp, Instruction ifIns, Instruction elseIns)
+			: kind(k_stmtKindIfElseNested), exp(exp), ifIns(ifIns), elseIns(elseIns) { }
 
-	IfStatement(Declaration _decl, Expression _exp, Instruction _ifIns, Instruction _elseIns)
-		: kind{ k_stmtKindDeclIfElseNested } {
-	}
+		IfStatement(Declaration decl, Expression exp, Instruction ifIns, Instruction elseIns)
+			: kind(k_stmtKindDeclIfElseNested), decl(decl), exp(exp), ifIns(ifIns), elseIns(elseIns) { }
 }

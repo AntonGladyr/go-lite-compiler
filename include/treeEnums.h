@@ -1,18 +1,29 @@
 enum StatementKind {
 	k_stmtKindFor,
-	k_stmtKindAssign,
+	k_stmtKindAssignTuple,
+	k_stmtKindAssignSelector,
+	k_stmtKindAssignIndex,
 	k_stmtKindIf,
 	k_stmtKindSwitch,
 	k_stmtKindPrint,
+	k_stmtKindPrintLn,
 	k_stmtKindReturn,
+	k_stmtKindReturnExp,
 	k_stmtKindBreak,
-	k_stmtKindContinue
-}
-
-enum AssignStatementKind {
-	k_AssignStmtKindTuple,
-	k_AssignStmtKindSelector,
-	k_AssignStmtKindIndex
+	k_stmtKindContinue,
+	k_stmtKindInc,
+	k_stmtKindDec,
+	k_stmtKindIncExp,
+	k_stmtKindDecExp,
+	k_stmtSwitch,
+	k_stmtNoExpSwitch,
+	k_stmtDeclSwitch,
+	k_stmtKindIfStmt,
+	k_stmtKindDeclIfStmt,
+	k_stmtKindIfElse,
+	k_stmtKindDeclIfElse,
+	k_stmtKindIfElseNested,
+	k_stmtKindDeclIfElseNested
 }
 
 enum DeclarationKind {

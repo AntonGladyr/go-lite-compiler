@@ -77,8 +77,8 @@ void yyerror(const char *s) {
 
 %token tBREAK
 %token tCASE
-%token tCHAN
 %token tCONST
+%token tCHAN
 %token tCONTINUE
 %token tDEFAULT
 %token tDEFER
@@ -233,18 +233,18 @@ case_list : %empty { $$ = NULL; }
     ;
 
 stmt : loopstmt
-    | assignstmt
+    | assignstmt 
     | ifstmt
     | incdecstmt
     | printstmt
     | returnstmt
     | switchstmt
-    | tBREAK tSEMICOLON { $$ = new Statement(k_stmtKindBreak); }
-    | tCONTINUE tSEMICOLON { $$ = new Statement(k_stmtKindContinue); }
+    | tBREAK tSEMICOLON { $$ = new BreakStatement(); }
+    | tCONTINUE tSEMICOLON { $$ = new ContinueStatement(); }
     ;
 
-returnstmt : tRETURN tSEMICOLON { $$ = new Statement(k_stmtKindReturn); }
-    | tRETURN exp tSEMICOLON { $$ = new Statement(k_stmtKindReturn, exp); }
+returnstmt : tRETURN tSEMICOLON { $$ = new ReturnStatement(); }
+    | tRETURN exp tSEMICOLON { $$ = new ReturnStatement(exp); }
     ;
 
 loopstmt : tFOR ins tSEMICOLON exp tSEMICOLON assignstmt tSEMICOLON tLPAREN ins tRPAREN { $$ = new ForStatement($2, $4, $6, $9); }
@@ -265,19 +265,19 @@ ifstmt : tIF exp tLPAREN ins tRPAREN { $$ = new IfStatement($2, $4); }
     | tIF shortdecl exp tLPAREN ins tRPAREN tELSE tLPAREN ins tRPAREN { $$ = new IfElseStatement($3, $5, $9, $2); }
     ;
 
-incdecstmt : tIDENTIFIER tINC tSEMICOLON { $$ = new Statement(k_stmtKindInc, 1); }
-    | tIDENTIFIER tDEC tSEMICOLON { $$ = new Statement(k_stmtKindDec, 1); }
-    | tIDENTIFIER tPLUSASSIGN exp tSEMICOLON { $$ = new Statement(k_stmtKindInc, $3); }
-    | tIDENTIFIER tMINUSASSIGN exp tSEMICOLON { $$ = new Statemenent(k_stmtKindDec, $3); }
+incdecstmt : tIDENTIFIER tINC tSEMICOLON { $$ = new IncDecStatement(k_stmtKindInc); }
+    | tIDENTIFIER tDEC tSEMICOLON { $$ = new IncDecStatement(k_stmtKindDec); }
+    | tIDENTIFIER tPLUSASSIGN exp tSEMICOLON { $$ = new IncDecStatement(k_stmtKindIncExp, $3); }
+    | tIDENTIFIER tMINUSASSIGN exp tSEMICOLON { $$ = new IncDecStatement(k_stmtKindDecExp, $3); }
     ;
 
-printstmt : tPRINT tLBRACE exp_list tRBRACE { $$ = new Statement(k_stmtKindPrint, $3, false); }
-    | tPRINTLN tLBRACE exp_list tRBRACE { $$ = new Statement(k_stmtKindPrint, $3, true); }
+printstmt : tPRINT tLBRACE exp_list tRBRACE { $$ = new PrintStatement(k_stmtKindPrint, $3); }
+    | tPRINTLN tLBRACE exp_list tRBRACE { $$ = new PrintStatement(k_stmtKindPrintLn, $3); }
     ;
 
-switchstmt : tSWITCH tLPAREN case_list tRPAREN { $$ = new Statement(k_stmtKindSwitch, $3); }
-    | tSWITCH exp tLPAREN case_list tRPAREN { $$ = new Statement(k_stmtKindSwitch, $2, $4); }
-    | tSWITCH shortdecl exp tLPAREN case_list tRPAREN { $$ = new Statement(k_stmtKindSwitch, $3, $5, $2); }
+switchstmt : tSWITCH tLPAREN case_list tRPAREN { $$ = new SwitchStatement($3); }
+    | tSWITCH exp tLPAREN case_list tRPAREN { $$ = new SwitchStatement($2, $4); }
+    | tSWITCH shortdecl exp tLPAREN case_list tRPAREN { $$ = new SwitchStatement($3, $5, $2); }
     ;
 
 exp : tIDENTIFIER tPERIOD tIDENTIFIER { $$ = new Binary(k_exprKindFieldSelector, $1, $3); }

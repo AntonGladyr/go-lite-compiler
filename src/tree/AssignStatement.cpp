@@ -1,4 +1,4 @@
-#include "AssignStatement.hpp"
+/*#include "AssignStatement.hpp"
 
 class AssignStatement : Statement {
     public:
@@ -17,4 +17,4 @@ class AssignStatement : Statement {
 		val.indexAssign.index = index;
 		val.indexAssign.rhs = rhs;
 	}
-}
+};*/

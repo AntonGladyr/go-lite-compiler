@@ -1,4 +1,4 @@
-#include "ForStatement.hpp"
+/*#include "ForStatement.hpp"
 
 class ForStatement : public Statement {
     public:
@@ -15,4 +15,4 @@ class ForStatement : public Statement {
             : initStmt{_initStmt}, condition{_condition}, postStmt{_postStmt}, body{_body} {
             statementKind = k_stmtKindFor;
         }
-}
+}*/

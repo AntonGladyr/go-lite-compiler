@@ -1,4 +1,4 @@
-#include "Statement.hpp"
+/*#include "Statement.hpp"
 
 class Statement : Instruction {
 	protected:
@@ -37,4 +37,4 @@ class Statement : Instruction {
 		Statement(StatementKind k_stmtKindContinue) {
 			this.kind = k_stmtKindContinue;
 		}			
-}
+}*/

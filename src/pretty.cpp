@@ -62,7 +62,59 @@ class PrettyPrinter {
         }
 
         void prettyStatement(Statement *s, int numTabs) {
-
+		switch(s->kind) {
+			//todo add for statement
+			case k_stmtKindFor:
+				break;
+			case k_stmtKindAssignTuple:
+				break;
+			case k_stmtKindAssignSelector:
+				break;
+			case k_stmtKindAssignIndex:
+				break;
+			case k_stmtKindIf:
+				break;
+			case k_stmtKindSwitch:
+				break;
+			case k_stmtKindPrint:
+				break;
+			case k_stmtKindPrintLn:
+				break;
+			case k_stmtKindReturn:
+				break;
+			case k_stmtKindReturnExp:
+				break;
+			case k_stmtKindBreak:
+				break;
+			case k_stmtKindContinue:
+				break;
+			case k_stmtKindInc:
+				break;
+			case k_stmtKindDec:
+				break;
+			case k_stmtKindIncExp:
+				break;
+			case k_stmtKindDecExp:
+				break;
+			case k_stmtSwitch:
+				break;
+			case k_stmtNoExpSwitch:
+				break;
+			case k_stmtDeclSwitch:
+				break;
+			case k_stmtKindIfStmt:
+				break;
+			case k_stmtKindDeclIfStmt:
+				break;
+			case k_stmtKindIfElse:
+				break;
+			case k_stmtKindDeclIfElse:
+				break;
+			case k_stmtKindIfElseNested:
+				break;
+			case k_stmtKindDeclIfElseNested:
+				break;
+		}
         }
 
         void prettyExpression(Expression *e, int numTabs) {
@@ -74,5 +126,4 @@ class PrettyPrinter {
                 printf("    "); //4 spaces per tab;
             }
         }
-}
 }

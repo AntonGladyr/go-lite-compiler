@@ -1,4 +1,4 @@
-#include "IfStatement.hpp"
+/*#include "IfStatement.hpp"
 
 class IfStmt: Statement {
 	public:
@@ -17,4 +17,4 @@ class IfStmt: Statement {
 			val.declIfStmt.exp = _exp;
 			val.declIfStmt.ins = _ifIns;
 		}		
-}
+}*/
