@@ -265,10 +265,10 @@ ifstmt : tIF exp tLPAREN ins tRPAREN { $$ = new IfStatement($2, $4); }
     | tIF shortdecl exp tLPAREN ins tRPAREN tELSE tLPAREN ins tRPAREN { $$ = new IfElseStatement($3, $5, $9, $2); }
     ;
 
-incdecstmt : tIDENTIFIER tINC tSEMICOLON { $$ = new IncDecStatement(k_stmtKindInc); }
-    | tIDENTIFIER tDEC tSEMICOLON { $$ = new IncDecStatement(k_stmtKindDec); }
-    | tIDENTIFIER tPLUSASSIGN exp tSEMICOLON { $$ = new IncDecStatement(k_stmtKindIncExp, $3); }
-    | tIDENTIFIER tMINUSASSIGN exp tSEMICOLON { $$ = new IncDecStatement(k_stmtKindDecExp, $3); }
+incdecstmt : tIDENTIFIER tINC tSEMICOLON { $$ = new IncDecStatement(k_stmtKindInc, $$1); }
+    | tIDENTIFIER tDEC tSEMICOLON { $$ = new IncDecStatement(k_stmtKindDec, $$1); }
+    | tIDENTIFIER tPLUSASSIGN exp tSEMICOLON { $$ = new IncDecStatement(k_stmtKindIncExp, $$1, $3); }
+    | tIDENTIFIER tMINUSASSIGN exp tSEMICOLON { $$ = new IncDecStatement(k_stmtKindDecExp, $$1, $3); }
     ;
 
 printstmt : tPRINT tLBRACE exp_list tRBRACE { $$ = new PrintStatement(k_stmtKindPrint, $3); }
