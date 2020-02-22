@@ -257,12 +257,12 @@ assignstmt : id_list tASSIGN exp_list tSEMICOLON { $$ = new AssignStatement($1, 
     | tIDENTIFIER tLBRACKET exp tRBRACKET tASSIGN exp tSEMICOLON { $$ = new AssignStatement($1, $3, $6); }
     ;
 
-ifstmt : tIF exp tLPAREN ins tRPAREN { $$ = new IfStatement($2, $4); }
-    | tIF shortdecl exp tLPAREN ins tRPAREN { $$ = new IfStatement($3, $5, $2); }
-    | tIF exp tLPAREN ins tRPAREN tELSE ifstmt { $$ = new IfElseStatement($2, $4, $7); }
-    | tIF shortdecl exp tLPAREN ins tRPAREN tELSE ifstmt { $$ = new IfElseStatement($3, $5, $8, $2); }
-    | tIF exp tLPAREN ins tRPAREN tELSE tLPAREN ins tRPAREN { $$ = new IfElseStatement($2, $4, $8); }
-    | tIF shortdecl exp tLPAREN ins tRPAREN tELSE tLPAREN ins tRPAREN { $$ = new IfElseStatement($3, $5, $9, $2); }
+ifstmt : tIF exp tLBRACE ins tRBRACE { $$ = new IfStatement($2, $4); }
+    | tIF shortdecl exp tLBRACE ins tRBRACE { $$ = new IfStatement($3, $5, $2); }
+    | tIF exp tLBRACE ins tRBRACE tELSE ifstmt { $$ = new IfElseStatement($2, $4, $7); }
+    | tIF shortdecl exp tLBRACE ins tRBRACE tELSE ifstmt { $$ = new IfElseStatement($3, $5, $8, $2); }
+    | tIF exp tLBRACE ins tRBRACE tELSE tLBRACE ins tRBRACE { $$ = new IfElseStatement($2, $4, $8); }
+    | tIF shortdecl exp tLBRACE ins tRBRACE tELSE tLBRACE ins tRBRACE { $$ = new IfElseStatement($3, $5, $9, $2); }
     ;
 
 incdecstmt : tIDENTIFIER tINC tSEMICOLON { $$ = new IncDecStatement(k_stmtKindInc, $$1); }
