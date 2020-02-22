@@ -1,14 +1,20 @@
 #ifndef TREE_H
 #define TREE_H
 
-class Node;
+class Node {
+	public:
+		int lineno;
+};
+
 class Instruction;
 class Declaration;
 class Statement;
 class Expression;
 
-enum StatementKind {
-	k_stmtKindFor,
+enum class StatementKind {
+	k_stmtKindForInfinite,
+	k_stmtKindForWhile,
+	k_stmtKindForThreePart,
 	k_stmtKindAssignTuple,
 	k_stmtKindAssignSelector,
 	k_stmtKindAssignIndex,

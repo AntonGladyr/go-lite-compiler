@@ -15,6 +15,4 @@ class Instruction {
 
         Instruction(Instruction *_ins, Instruction *_next) : val.block{_ins}, val.next{_next} {
         }
-
-    private:
-}
+};

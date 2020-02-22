@@ -2,12 +2,14 @@
 #include <string.h>
 #include <main.h>
 
-using namespace std;
+void yyparse();
+int yylex();
+
 int main(int argc, char *argv[]){
        if(!strcmp(argv[1], "scan")) {
         g_tokens = 1;
         while(yylex());
-        cout << "OK" << endl;
+        std::cout << "OK" << std::endl;
         return 0;
     }
     else if(!strcmp(argv[1], "tokens")) {
@@ -17,13 +19,13 @@ int main(int argc, char *argv[]){
     }
     else if(!strcmp(argv[1], "parse")) {
         yyparse();
-        cout << "OK" << endl;
+        std::cout << "OK" << std::endl;
         return 0;
     }
     else if(!strcmp(argv[1], "pretty")) {
         yyparse();
       //   prettyInstruction(rootIns, 0);
-        cout << "OK" << endl;
+        std::cout << "OK" << std::endl;
         return 0;
     }
 }
