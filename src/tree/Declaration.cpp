@@ -5,8 +5,8 @@ class Declaration : public Node {
             struct { vector<string> ids; string type; } declareDecl;
             struct { vector<string> ids; vector<Expression> rhs; string type; } assignDecl;
             struct { vector<Declaration> decls; } factorDecl;
-            struct { string id; vector<string> locals; string type; Instruction body; } funcDecl;
-            struct { string id; Expression rhs; } shortDecl;
+            struct { string id; vector<string> locals; string type; Instruction *body; } funcDecl;
+            struct { string id; Expression *rhs; } shortDecl;
             struct { string alias1; string alias2; } typeDecl;
             struct { string alias; vector<vector<string>> structdecl_list; } typeStructDecl;
         }
@@ -23,9 +23,9 @@ class Declaration : public Node {
         }
 
         //===functions===
-        Declaration(string id, vector<string> locals, Instruction body) : Declaration{id, locals, NULL, body} { }
+        Declaration(string id, vector<string> locals, Instruction *body) : Declaration{id, locals, NULL, body} { }
 
-        Declaration(string id, vector<string> locals, string type, Instruction body) : kind{k_declKindFunc} {
+        Declaration(string id, vector<string> locals, string type, Instruction *body) : kind{k_declKindFunc} {
             funcDecl.id = id;
             funcDecl.locals = locals;
             funcDecl.type = type;
@@ -51,7 +51,7 @@ class Declaration : public Node {
         //===! declaration with assignment ===
 
         //short declaration
-        Declaration(string id, Expression rhs) : kind{k_declKindShortDec} {
+        Declaration(string id, Expression *rhs) : kind{k_declKindShortDec} {
             val.shortDecl.id = id;
             val.shortDecl.rhs = id;
         }

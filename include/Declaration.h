@@ -1,34 +1,44 @@
-class Declaration : public Node {
+#ifndef DECLARATION_H 
+#define DECLARATION_H
+
+#include <vector>
+#include <string>
+
+#include "tree.h"
+
+class Declaration : Node {
     public:
         DeclarationKind kind;
         union val {
-            struct { vector<string> ids; string type; } declareDecl;
-            struct { vector<string> ids; vector<Expression> rhs; string type; } assignDecl;
-            struct { vector<Declaration> decls; } factorDecl;
-            struct { string id; vector<string> locals; string type; Instruction body; } funcDecl;
-            struct { string id; Expression rhs; } shortDecl;
-            struct { string alias1; string alias2; } typeDecl;
-            struct { string alias; vector<vector<string>> structdecl_list; } typeStructDecl;
-        }
+            struct { std::vector<std::string> ids; std::string type; } declareDecl;
+            struct { std::vector<std::string> ids; std::vector<Expression> rhs; std::string type; } assignDecl;
+            struct { std::vector<Declaration> decls; } factorDecl;
+            struct { std::string id; std::vector<std::string> locals; std::string type; Instruction *body; } funcDecl;
+            struct { std::string id; Expression *rhs; } shortDecl;
+            struct { std::string alias1; std::string alias2; } typeDecl;
+            struct { std::string alias; std::vector<std::vector<std::string>> structdecl_list; } typeStructDecl;
+        };
 
         //declaration without initialization
-        Declaration(vector<string> ids, string type);
+        Declaration(std::vector<std::string> ids, std::string type);
         
         //factored var declaration
-        Declaration(vector<Declaration> decls);
+        Declaration(std::vector<Declaration> decls);
 
         //===functions===
-        Declaration(string id, vector<string> locals, Instruction body);
-        Declaration(string id, vector<string> locals, string type, Instruction body);
+        Declaration(std::string id, std::vector<std::string> locals, Instruction *body);
+        Declaration(std::string id, std::vector<std::string> locals, std::string type, Instruction *body);
 
         //===declaration with assignment===
-        Declaration(vector<string> ids, vector<Expression> rhs);
-        Declaration(vector<string> ids, vector<Expression>rhs, string type);
+        Declaration(std::vector<std::string> ids, std::vector<Expression> rhs);
+        Declaration(std::vector<std::string> ids, std::vector<Expression>rhs, std::string type);
 
         //short declaration
-        Declaration(string id, Expression rhs);
+        Declaration(std::string id, Expression *rhs);
 
         //===type declaration
-        Declaration(string alias1, string alias2);
-        Declaration(string id, vector<vector<string>> structdecl_list);
+        Declaration(std::string alias1, std::string alias2);
+        Declaration(std::string id, std::vector<std::vector<std::string>> structdecl_list);
 }
+
+#endif 

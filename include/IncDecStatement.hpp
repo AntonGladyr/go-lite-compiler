@@ -3,9 +3,10 @@
 //#include "treeEnums.h"
 
 class IncDecStatement : public Statement {
+	string id;
 	Epxression exp;
 
 	public:
-		IncDecStatement(StatementKind kind) : kind(kind);
-		IncDecStatement(StatementKind kind, Expression exp) : kind(kind), exp(exp);
+		IncDecStatement(StatementKind kind, string id) : kind(kind), id(id);
+		IncDecStatement(StatementKind kind, string id, Expression exp) : kind(kind), id(id), exp(exp);
 }

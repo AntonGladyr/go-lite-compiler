@@ -1,7 +1,14 @@
-/*enum StatementKind {
-	k_stmtKindForInfinite,
-	k_stmtKindForWhile,
-	k_stmtKindForThreePart,
+#ifndef TREE_H
+#define TREE_H
+
+class Node;
+class Instruction;
+class Declaration;
+class Statement;
+class Expression;
+/*
+enum StatementKind {
+	k_stmtKindFor,
 	k_stmtKindAssignTuple,
 	k_stmtKindAssignSelector,
 	k_stmtKindAssignIndex,
@@ -26,7 +33,8 @@
 	k_stmtKindDeclIfElse,
 	k_stmtKindIfElseNested,
 	k_stmtKindDeclIfElseNested
-}
+
+};
 */
  enum UnaryKind {
             k_expKindUMinus,
@@ -58,6 +66,8 @@
             k_expKindOr
         };
 
+
+
 enum DeclarationKind {
     k_declKindDeclare,
     k_declKindAssign,
@@ -66,9 +76,11 @@ enum DeclarationKind {
     k_declKindShortDec,
     k_declKindType,
     k_declKindTypeStruct
-}
+};
 
 enum InstructionKind {
     k_insKindDecl,
     k_insKindStmt
-}
+};
+
+#endif
