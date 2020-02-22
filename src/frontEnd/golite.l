@@ -180,7 +180,7 @@ ESCAPE [abfnrtv\\'"]
 		}
 
 ([a-zA-Z]|"_")([a-zA-Z]|[0-9]|"_")* { 
-    //yylval.identifier = (yytext);
+    yylval.identifier = strdup(yytext);
     if (g_tokens) cout << "tIDENTIFIER(" << yytext << ")" << endl;
     RETURN(tIDENTIFIER);
 }

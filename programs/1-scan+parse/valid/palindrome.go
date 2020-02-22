@@ -1,8 +1,7 @@
 // this is to check if the integer is a plalindrome
 package main
-import "fmt"
 
-funct main (){
+func main (){
 
     var number, r , i, sum int
     var count =0;
@@ -12,10 +11,10 @@ funct main (){
             sum = (sum*10)+r;
     }
     if(number ==sum){
-        fmt.Print("It is a palindrome")
+        print("It is a palindrome")
 
     }else{
-        fmt.Print("Not a palindrome")
+        print("Not a palindrome")
     }
 
 }
