@@ -1,6 +1,8 @@
 #ifndef MAIN_H 
 #define MAIN_H
 
+#include "Instruction.h"
+
 void yyparse();
 int yylex();
 int g_tokens;

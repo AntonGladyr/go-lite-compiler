@@ -29,19 +29,35 @@ class PrettyPrinter {
             prettyInstruction(ins->next, numTabs);
         } 
 
-        void prettyDeclaration(Declaration *d) {
+        void prettyDeclaration(Declaration *d, int numTabs) {
+            printTabs(numTabs);
             switch(d->kind) {
                 case k_declKindDeclare: 
                     cout << "var " << d->val.declareDecl.ids << " " << d->val.declareDecl.type << ";" << endl;
                     break;
                 case k_declKindAssign: 
-                    cout << "var " << d->val.assignDecl.ids << " = " << prettyExpression(d->val.assignDecl.rhs) << endl;
+                    cout << "var " << d->val.assignDecl.ids << " = " << prettyExpression(d->val.assignDecl.rhs, 0) << endl;
                     break;
-                case k_declKindFactor: break;
-                case k_declKindFunc: break;
-                case k_declKindShortDec: break;
-                case k_declKindType: break;
-                case k_declKindTypeStruct: break;
+                case k_declKindFactor: 
+                    for(const auto& decl : d->val.factorDecl.decls) {
+                        prettyDeclaration(d, numTabs);
+                    }
+                    break;
+                case k_declKindFunc: 
+                    cout << "func " << d->val.funcDecl.id << "(" << d->val.funcDecl.locals << ")" << d->val.funcDecl.type << "{" << endl;
+                    prettyInstruction(d->val.funcDecl.body, numTabs + 1);
+                    cout << "}" << endl;
+                    break;
+                case k_declKindShortDec: 
+                    cout << d->val.shortDecl.id << " := " << prettyExpression(d->val.shortDecl.rhs, 0);
+                    break;
+                case k_declKindType: 
+                    cout << "type " << d->val.typeDecl.alias1 << " " << d->val.typeDecl.alias2 << endl;
+                    break;
+                case k_declKindTypeStruct: 
+                    cout << "type " << d->val.typeStructDecl.alias << " struct {\n";
+                    // need to fix grammar
+                    break;
             }
         }
 
@@ -52,4 +68,11 @@ class PrettyPrinter {
         void prettyExpression(Expression *e, int numTabs) {
 
         }
+
+        void printTabs(int numTabs) {
+            for(int i = 0; i < numTabs; i++) {
+                printf("    "); //4 spaces per tab;
+            }
+        }
+}
 }
