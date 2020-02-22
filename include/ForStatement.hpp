@@ -10,17 +10,15 @@ class ForStatement : public Statement {
         	Statement postStmt;
         	Instruction body;
 
-        	ForStatement(Instruction _body) : ForStatement {NULL, _body} { }
+		ForStatement(Instruction body) : kind(k_stmtKindForInfinite), body(body) { }
 
-        	ForStatement(Expression _condition, Instruction _body) 
-            		: ForStatement{NULL, _condition, NULL, _body} { 
-        	}
-        
-        	ForStatement(Instruction _initStmt, Expression _condition, Statement _postStmt, Instruction _body)
-            		: kind{k_stmtKindFor},
-			  initStmt{_initStmt},
-			  condition{_condition},
-			  postStmt{_postStmt},
-			  body{_body}
+		ForStatement(Expression exp, Instruction body) : kind(k_stmtKindForWhile), exp(exp), body(body) { }
+
+		ForStatement(Instruction initStmt, Expression condition, Statement postStmt, Instruction body)
+			: kind(k_stmtKindForThreePart),
+			  initStmt(initStmt),
+			  condition(condition),
+			  postStmt(postStmt),
+			  body(body)
 		{ }
 }

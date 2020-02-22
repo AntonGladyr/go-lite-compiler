@@ -1,5 +1,7 @@
 enum StatementKind {
-	k_stmtKindFor,
+	k_stmtKindForInfinite,
+	k_stmtKindForWhile,
+	k_stmtKindForThreePart,
 	k_stmtKindAssignTuple,
 	k_stmtKindAssignSelector,
 	k_stmtKindAssignIndex,

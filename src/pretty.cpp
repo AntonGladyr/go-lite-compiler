@@ -47,8 +47,11 @@ class PrettyPrinter {
 
         void prettyStatement(Statement *s, int numTabs) {
 		switch(s->kind) {
-			//todo add for statement
-			case k_stmtKindFor:
+			case k_stmtKindForInfinite:
+				break;
+			case k_stmtKindForWhile:
+				break;
+			case k_stmtKindForThreePart:
 				break;
 			case k_stmtKindAssignTuple:
 				break;
