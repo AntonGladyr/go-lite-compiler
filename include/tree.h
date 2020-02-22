@@ -1,3 +1,12 @@
+#ifndef TREE_H
+#define TREE_H
+
+class Node;
+class Instruction;
+class Declaration;
+class Statement;
+class Expression;
+
 enum StatementKind {
 	k_stmtKindFor,
 	k_stmtKindAssignTuple,
@@ -24,7 +33,7 @@ enum StatementKind {
 	k_stmtKindDeclIfElse,
 	k_stmtKindIfElseNested,
 	k_stmtKindDeclIfElseNested
-}
+};
 
 enum DeclarationKind {
     k_declKindDeclare,
@@ -34,9 +43,11 @@ enum DeclarationKind {
     k_declKindShortDec,
     k_declKindType,
     k_declKindTypeStruct
-}
+};
 
 enum InstructionKind {
     k_insKindDecl,
     k_insKindStmt
-}
+};
+
+#endif
