@@ -62,41 +62,66 @@ class PrettyPrinter {
         }
 
         void prettyStatement(Statement *s, int numTabs) {
-		switch(s->kind) {
-			//todo add for statement
-			case k_stmtKindFor:
+		printTabs(numTabs);
+		switch(s.kind) {
+			case k_stmtKindForInfinite:
+				break;
+			case k_stmtKindForWhile:
+				break;
+			case k_stmtKindForThreePart:
 				break;
 			case k_stmtKindAssignTuple:
+				cout << s.ids << " = " ;
+				for(const auto& exp : s.exp_list) {
+                        		prettyExpression(exp, numTabs);
+					cout  << ", ";
+                    		}
+				cout << ";" << endl;
 				break;
 			case k_stmtKindAssignSelector:
+				cout << s.id << "." << s.selectorId << " = " << prettyExpression(s.exp) << ";" << endl;
+				// need to fix grammar
 				break;
 			case k_stmtKindAssignIndex:
+				cout << s.id << "[" << prettyExpression(s.index) << "]"
+				     << " = " << prettyExpression(exp) << ";" << endl;
+				// need to fix grammar
 				break;
 			case k_stmtKindIf:
 				break;
 			case k_stmtKindSwitch:
 				break;
 			case k_stmtKindPrint:
+				
 				break;
 			case k_stmtKindPrintLn:
 				break;
 			case k_stmtKindReturn:
+				cout << "return;" << endl;
 				break;
 			case k_stmtKindReturnExp:
+				cout << "return " << prettyExpression(s.exp, numTabs) << ";" << endl;
 				break;
 			case k_stmtKindBreak:
+				cout << "break;" << endl;
 				break;
 			case k_stmtKindContinue:
+				cout << "continue;" << endl;
 				break;
 			case k_stmtKindInc:
+				cout << s.id << "++;" << endl;
 				break;
 			case k_stmtKindDec:
+				cout << s.id << "--;" << endl;
 				break;
 			case k_stmtKindIncExp:
+				cout << s.id << " += " << prettyExpression(s.exp, numTabs) << ";" << endl;
 				break;
 			case k_stmtKindDecExp:
+				cout << s.id << " -= " << prettuExpression(s.exp, numTabs) << ";" << endl;
 				break;
 			case k_stmtSwitch:
+				
 				break;
 			case k_stmtNoExpSwitch:
 				break;

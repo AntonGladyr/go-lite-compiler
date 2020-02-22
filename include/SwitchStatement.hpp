@@ -1,7 +1,7 @@
-#include "Statement.hpp"
-#include "Expression.hpp"
-#include "treeEnums.h"
-#include <vector>
+//#include "Statement.hpp"
+//#include "Expression.hpp"
+//#include "treeEnums.h"
+//#include <vector>
 
 class SwitchStatement : public Statement {
 	vector<Pair<Expression, Instruction>> case_list;

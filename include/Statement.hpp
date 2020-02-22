@@ -2,7 +2,7 @@
 #define STATEMENT_HPP
 
 #include "Node.hpp"
-#include "treeEnums.h"
+#include "StatementEnum.hpp"
 
 class Statement : Node {
 	public:
