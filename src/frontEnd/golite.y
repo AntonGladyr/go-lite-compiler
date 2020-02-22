@@ -247,9 +247,9 @@ returnstmt : tRETURN tSEMICOLON { $$ = new ReturnStatement(); }
     | tRETURN exp tSEMICOLON { $$ = new ReturnStatement(exp); }
     ;
 
-loopstmt : tFOR ins tSEMICOLON exp tSEMICOLON assignstmt tSEMICOLON tLPAREN ins tRPAREN { $$ = new ForStatement($2, $4, $6, $9); }
-    | tFOR exp tLPAREN ins tRPAREN { $$ = new ForStatement($2, $4); }
-    | tFOR tLPAREN ins tRPAREN { $$ = new ForStatement($3); }
+loopstmt : tFOR ins tSEMICOLON exp tSEMICOLON assignstmt tLBRACE ins tRBRACE { $$ = new ForStatement($2, $4, $6, $8); }
+    | tFOR exp tLBRACE ins tRBRACE { $$ = new ForStatement($2, $4); }
+    | tFOR tLBRACE ins tRBRACE { $$ = new ForStatement($3); }
     ;
 
 assignstmt : id_list tASSIGN exp_list tSEMICOLON { $$ = new AssignStatement($1, $3); }
@@ -275,9 +275,9 @@ printstmt : tPRINT tLBRACE exp_list tRBRACE { $$ = new PrintStatement(k_stmtKind
     | tPRINTLN tLBRACE exp_list tRBRACE { $$ = new PrintStatement(k_stmtKindPrintLn, $3); }
     ;
 
-switchstmt : tSWITCH tLPAREN case_list tRPAREN { $$ = new SwitchStatement($3); }
-    | tSWITCH exp tLPAREN case_list tRPAREN { $$ = new SwitchStatement($2, $4); }
-    | tSWITCH shortdecl exp tLPAREN case_list tRPAREN { $$ = new SwitchStatement($3, $5, $2); }
+switchstmt : tSWITCH tLBRACE case_list tRBRACE { $$ = new SwitchStatement($3); }
+    | tSWITCH exp tLBRACE case_list tRBRACE { $$ = new SwitchStatement($2, $4); }
+    | tSWITCH shortdecl tLBRACE case_list tRBRACE { $$ = new SwitchStatement($2, $4); }
     ;
 
 exp : tIDENTIFIER tPERIOD tIDENTIFIER { $$ = new Binary(k_exprKindFieldSelector, $1, $3); }

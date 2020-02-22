@@ -156,7 +156,7 @@ ESCAPE [abfnrtv\\'"]
 "!=" 		{ if (g_tokens) cout << "tNOTEQ" << endl; RETURN(tNOTEQ); }
 "<=" 		{ if (g_tokens) cout << "tLESSEQ" << endl; RETURN(tLESSEQ); }
 ">=" 		{ if (g_tokens) cout << "tGREATEREQ" << endl; RETURN(tGREATEREQ); }
-":=" 		{ if (g_tokens) cout << "tSHORTDEFINE" << endl; RETURN(tSHORTDEFINE); }
+":=" 		{ if (g_tokens) cout << "tSHORTDECLARE" << endl; RETURN(tSHORTDECLARE); }
 "..." 		{ if (g_tokens) cout << "tELLIPSIS" << endl; RETURN(tELLIPSIS); }
 
 "(" 		{ if (g_tokens) cout << "tLPAREN" << endl; RETURN(tLPAREN); }
