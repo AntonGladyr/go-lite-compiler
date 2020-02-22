@@ -3,8 +3,6 @@
 
 #include "Instruction.hpp"
 
-void yyparse();
-int yylex();
 int g_tokens;
 
 Instruction *rootIns;
