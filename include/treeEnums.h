@@ -28,6 +28,35 @@
 	k_stmtKindDeclIfElseNested
 }
 */
+ enum UnaryKind {
+            k_expKindUMinus,
+            k_expKindUNot
+            k_expKindUPLUS,
+            k_expKindUXOR
+        };
+
+
+        enum BinaryKind {
+            k_expKindMinus,
+            k_expKindPlus,
+            k_expKindMultiply,
+            k_expKindDivide,
+            k_expKindModulo,
+            k_expKindBitAnd,
+            k_expKindBitOr,
+            k_expKindBitXor,
+            k_expKindBitClear,
+            k_expKindLeftShift,
+            k_expKindRightShift,
+            k_expKindIsEqual,
+            k_expKindIsNotEqual,
+            k_expKindLessThan,
+            k_expKindLessThanEqual,
+            k_expKindGreaterThan,
+            k_expKindGreaterThanEqual,
+            k_expKindAnd,
+            k_expKindOr
+        };
 
 enum DeclarationKind {
     k_declKindDeclare,
