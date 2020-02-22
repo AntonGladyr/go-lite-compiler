@@ -12,3 +12,8 @@ enum DeclarationKind {
     k_declKindType,
     k_declKindTypeStruct
 }
+
+enum InstructionKind {
+    k_insKindDecl,
+    k_insKindStmt
+}

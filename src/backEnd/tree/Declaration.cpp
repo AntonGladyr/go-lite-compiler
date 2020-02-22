@@ -2,7 +2,7 @@ class Declaration : public Node {
     public:
         DeclarationKind kind;
         union val {
-            struct { vector<string> ids; string type; } typeDecl;
+            struct { vector<string> ids; string type; } declareDecl;
             struct { vector<string> ids; vector<Expression> rhs; string type; } assignDecl;
             struct { vector<Declaration> decls; } factorDecl;
             struct { string id; vector<string> locals; string type; Instruction body; } funcDecl;
@@ -13,8 +13,8 @@ class Declaration : public Node {
 
         //declaration without initialization
         Declaration(vector<string> ids, string type) : kind{k_declKindDeclare} {
-            val.typeDecl.ids = ids;
-            val.typeDecl.type = type;
+            val.declareDecl.ids = ids;
+            val.declareDecl.type = type;
         }
 
         //factored var declaration
