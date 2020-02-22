@@ -1,13 +1,7 @@
-package main 
+package main
 
-<<<<<<< HEAD
 func main (){
 	print(quicksort([40,23,12,6,59,34]))
-=======
-func main() {
-	slice := generateSlice(20)
-	fmt.Println
->>>>>>> 526ae45f9ca2edb4e14c93ce13f9f5a35c696cb5
 }
 func quicksort(t[] int){
 	if len(t) < 2 {

@@ -183,7 +183,7 @@ void yyerror(const char *s) {
  * same LHS may be joined together and separated with a pipe.
  */
  //todo: unary binary literals expressions,
-%% 
+%%
 
 program : tPACKAGE tIDENTIFIER ins { $$ = $3; }
     ;
@@ -281,22 +281,22 @@ switchstmt : tSWITCH tLPAREN case_list tRPAREN { $$ = new Statement(k_stmtKindSw
     | tSWITCH shortdecl exp tLPAREN case_list tRPAREN { $$ = new Statement(k_stmtKindSwitch, $3, $5, $2); }
     ;
 
-exp : tIDENTIFIER { $$ = new Expression(k_exprKindIdentifier, $1); }
-    | tIDENTIFIER tPERIOD tIDENTIFIER { $$ = new Expression(k_exprKindFieldSelector, $1, $3); }
-    | tIDENTIFIER tLBRACKET exp tRBRACKET { $$ = new Expression(k_exprKindIndexer, $1, $3); }
-    | tIDENTIFIER tLBRACE id_list tRBRACE { $$ = new Expression(k_exprKindFunctionCall, $1, $3); }
-    | tAPPEND tLBRACE exp tCOMMA exp tRBRACE { $$ = new Expression(k_exprKindAppend, $3, $5); }
-    | tLEN tLBRACE exp tRBRACE { $$ = new Expression(k_exprKindLen, $3); }
-    | tCAP tLBRACE exp tRBRACE { $$ = new Expression(k_exprKindCap, $3); }
-    | tPLUS exp %prec pPLUS { $$ = new Expression(k_exprKindPlus, $2); }
-    | tMINUS exp %prec pMINUS { $$ = new Expression(k_exprKindMinus, $2); }
-    | tBANG exp %prec pBANG { $$ = new Expression(k_exprKindBang, $2); }
-    | tBWXOR exp %prec pBWXOR { $$ = new Expression(k_exprKindBwxor, $2); }
-    | tINTVAL { $$ = new Expression(k_exprKindInteger, $1); }
-    | tFLOATVAL { $$ = new Expression(k_exprKindFloat, $1); }
-    | tRUNEVAL { $$ = new Expression(k_exprKindRune, $1); }
-    | tSTRINGVAL { $$ = new Expression(k_exprKindString, $1); }
-    | tBOOLVAL { $$ = new Expression(k_exprKindBool, $1); }
+exp : tIDENTIFIER tPERIOD tIDENTIFIER { $$ = new Binary(k_exprKindFieldSelector, $1, $3); }
+    | tIDENTIFIER tLBRACKET exp tRBRACKET { $$ = new Binary(k_exprKindIndexer, $1, $3); }
+    | tIDENTIFIER tLBRACE id_list tRBRACE { $$ = new Binary(k_exprKindFunctionCall, $1, $3); }
+    | tAPPEND tLBRACE exp tCOMMA exp tRBRACE { $$ = new Binary(k_exprKindAppend, $3, $5); }
+    | tLEN tLBRACE exp tRBRACE { $$ = new Binary(k_exprKindLen, $3); }
+    | tCAP tLBRACE exp tRBRACE { $$ = new Binary(k_exprKindCap, $3); }
+    | tPLUS exp %prec pPLUS { $$ = new UnaryExpression(k_exprKindPlus, $2); }
+    | tMINUS exp %prec pMINUS { $$ = new UnaryExpression(k_exprKindMinus, $2); }
+    | tBANG exp %prec pBANG { $$ = new UnaryExpression(k_exprKindBang, $2); }
+    | tBWXOR exp %prec pBWXOR { $$ = new UnaryExpression(k_exprKindBwxor, $2); }
+    | tINTVAL { $$ = new Literals(k_exprKindInteger, $1); }
+    | tFLOATVAL { $$ = new Literals(k_exprKindFloat, $1); }
+    | tRUNEVAL { $$ = new Literals(k_exprKindRune, $1); }
+    | tSTRINGVAL { $$ = new Literals(k_exprKindString, $1); }
+    | tBOOLVAL { $$ = new Literals(k_exprKindBool, $1); }
+    | tIDENTIFIER { $$ = new Literals(k_exprKindIdentifier, $1); }
     ; 
 
 %%
