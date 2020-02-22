@@ -5,4 +5,6 @@ void yyparse();
 int yylex();
 int g_tokens;
 
+Instruction *rootIns;
+
 #endif /* !MAIN_H */
