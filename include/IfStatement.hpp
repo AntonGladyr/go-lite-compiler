@@ -1,7 +1,7 @@
-#include "Statement.hpp"
-#include "Expression.hpp"
-#include "Declaration.hpp"
-#include "Instruction.hpp"
+//#include "Statement.hpp"
+//#include "Expression.hpp"
+//#include "Declaration.hpp"
+//#include "Instruction.hpp"
 
 class IfStatement: public Statement {
 	public:

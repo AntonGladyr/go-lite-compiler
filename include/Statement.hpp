@@ -1,5 +1,5 @@
 #include "Node.hpp"
-#include "treeEnums.h"
+#include "StatementEnum.hpp"
 
 class Statement : public Node {
 	public:

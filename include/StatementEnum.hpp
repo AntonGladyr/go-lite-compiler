@@ -1,4 +1,4 @@
-/*enum StatementKind {
+enum class StatementKind {
 	k_stmtKindForInfinite,
 	k_stmtKindForWhile,
 	k_stmtKindForThreePart,
@@ -26,20 +26,4 @@
 	k_stmtKindDeclIfElse,
 	k_stmtKindIfElseNested,
 	k_stmtKindDeclIfElseNested
-}
-*/
-
-enum DeclarationKind {
-    k_declKindDeclare,
-    k_declKindAssign,
-    k_declKindFactor,
-    k_declKindFunc,
-    k_declKindShortDec,
-    k_declKindType,
-    k_declKindTypeStruct
-}
-
-enum InstructionKind {
-    k_insKindDecl,
-    k_insKindStmt
-}
+};
