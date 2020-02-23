@@ -182,8 +182,13 @@ class PrettyPrinter {
 				prettyInstruction(s.ins);
 				break;
 			case k_stmtKindIfElse:
+				cout << "if " << prettyExpression(s.exp, numTabs);
+				prettyInstruction(s.ins);
+				cout << "else ";
+				prettyInstruction(s.elseIns);
 				break;
 			case k_stmtKindDeclIfElse:
+				cout << "if " << prettyExpression(s.expm);
 				break;
 			case k_stmtKindIfElseNested:
 				break;

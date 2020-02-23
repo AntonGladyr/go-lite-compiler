@@ -10,7 +10,7 @@
 
     template <>
     class Literal<bool> : public Expression {
-        public::
+        public:
         bool value_;
         int line_;
 
@@ -33,7 +33,7 @@
 
     template <>
     class Literal<char*> : public Expression {
-        public::
+        public:
         char* value_;
         int line_;
 
