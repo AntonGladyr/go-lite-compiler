@@ -6,7 +6,7 @@ void yyparse();
 int yylex();
 
 int main(int argc, char *argv[]){
-       if(!strcmp(argv[1], "scan")) {
+	if(!strcmp(argv[1], "scan")) {
         g_tokens = 1;
         while(yylex());
         std::cout << "OK" << std::endl;
