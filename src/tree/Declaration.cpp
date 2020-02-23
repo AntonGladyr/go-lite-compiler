@@ -4,7 +4,7 @@ class Declaration : public Node {
         union val {
             struct { vector<string> ids; string type; } declareDecl;
             struct { vector<string> ids; vector<Expression> rhs; string type; } assignDecl;
-            struct { vector<Declaration> decls; } factorDecl;
+            struct { vector<Declaration*> decls; } factorDecl;
             struct { string id; vector<string> locals; string type; Instruction *body; } funcDecl;
             struct { string id; Expression *rhs; } shortDecl;
             struct { string alias1; string alias2; } typeDecl;
@@ -18,12 +18,12 @@ class Declaration : public Node {
         }
 
         //factored var declaration
-        Declaration(vector<Declaration> decls) : kind{k_declKindFactor}, val.factorDecl{decls} {
+        Declaration(vector<Declaration*> decls) : kind{k_declKindFactor}, val.factorDecl{decls} {
             factorDecl.decls = decls;
         }
 
         //===functions===
-        Declaration(string id, vector<string> locals, Instruction *body) : Declaration{id, locals, NULL, body} { }
+        Declaration(char *id, vector<char*> locals, Instruction *body) : Declaration{id, locals, NULL, body} { }
 
         Declaration(string id, vector<string> locals, string type, Instruction *body) : kind{k_declKindFunc} {
             funcDecl.id = id;

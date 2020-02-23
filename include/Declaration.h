@@ -23,20 +23,20 @@ class Declaration : Node {
         Declaration(std::vector<std::string> ids, std::string type);
         
         //factored var declaration
-        Declaration(std::vector<Declaration> decls);
+        Declaration(std::vector<Declaration*> decls);
 
         //===functions===
         Declaration(std::string id, std::vector<std::string> locals, Instruction *body);
         Declaration(std::string id, std::vector<std::string> locals, std::string type, Instruction *body);
 
         //===declaration with assignment===
-        Declaration(std::vector<std::string> ids, std::vector<Expression> rhs);
-        Declaration(std::vector<std::string> ids, std::vector<Expression>rhs, std::string type);
+        Declaration(std::vector<std::string> ids, std::vector<Expression*> rhs);
+        Declaration(std::vector<std::string> ids, std::vector<Expression*> rhs, std::string type);
 
         //short declaration
         Declaration(std::string id, Expression *rhs);
 
-        //===type declaration
+        //type declaration
         Declaration(std::string alias1, std::string alias2);
         Declaration(std::string id, std::vector<std::vector<std::string>> structdecl_list);
 }
