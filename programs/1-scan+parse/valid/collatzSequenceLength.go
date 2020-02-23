@@ -27,5 +27,3 @@ func collatzSequenceLength(x int) int {
 
   return seqLength
 }
-
-

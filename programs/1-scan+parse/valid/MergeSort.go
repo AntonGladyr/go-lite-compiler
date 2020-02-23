@@ -75,4 +75,3 @@ func sort(l, h int)[10] int {
     return array;
 
 }
-

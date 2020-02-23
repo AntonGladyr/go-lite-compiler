@@ -1,11 +1,11 @@
 package main 
 
 func main (){
-	println(gcd(10,25))
+	println(lcm(10,25))
 }
 
 func lcm (a int, b int) int{
-	lcm := o
+	lcm := 0
 	if a >b{
 		lcm =a
 	}else{
@@ -18,5 +18,5 @@ func lcm (a int, b int) int{
 		}
 		lcm++;
 	}
-
+	return lcm;
 }

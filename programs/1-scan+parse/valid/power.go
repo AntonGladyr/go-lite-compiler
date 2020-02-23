@@ -1,11 +1,11 @@
 package main 
 
 func main (){
-	power(3,10);
+	print(power(3,10));
 }
 
 func power(a int, b int ) int {
-	var count := 1;
+	var count =1;
 	for i:=0 ; i<b ; i++{
 		count = count*a
 	}

@@ -174,19 +174,19 @@ ESCAPE [abfnrtv\\'"]
 ":" 		{ if (g_tokens) cout << "tCOLON" << endl; RETURN(tCOLON); }
 \n		{	
 			if (insertSemicolon()) {
-				cout << "tSEMICOLON" << endl;
+				cout << (g_tokens ? "tSEMICOLON\n" : "");
 				RETURN(tSEMICOLON);
 			}
 		}
 
 ([a-zA-Z]|"_")([a-zA-Z]|[0-9]|"_")* { 
-    yylval.identifier = strdup(yytext);
+    //yylval.identifier = strdup(yytext);
     if (g_tokens) cout << "tIDENTIFIER(" << yytext << ")" << endl;
     RETURN(tIDENTIFIER);
 }
 
 0|([1-9][0-9]*) {
-     //yylval.intLiteral = atof(yytext);
+    //yylval.intLiteral = atof(yytext);
     if (g_tokens) cout << "tINTVAL(" << yytext << ")" << endl;
     RETURN(tINTVAL);
 }
@@ -215,10 +215,10 @@ ESCAPE [abfnrtv\\'"]
 	RETURN(tRUNEVAL);
 }
 
-\"([0-9]|[a-zA-Z]|[\t]|\\{ESCAPE})*\" {
-    //yylval.string = (yytext);
-    if (g_tokens) cout << "tSTRINGVAL(" << yytext << ")" << endl;
-    RETURN(tSTRINGVAL);
+\"[^"]*\" {
+	//yylval.string = (yytext);
+    	if (g_tokens) cout << "tSTRINGVAL(" << yytext << ")" << endl;
+    	RETURN(tSTRINGVAL);
 }
 
 `(\\.|[^'])*` {
@@ -230,3 +230,15 @@ ESCAPE [abfnrtv\\'"]
 . { fprintf(stderr, "Error: (line %d) unexpected character '%s'\n", yylineno, yytext); exit(1); }
 
 %%
+
+
+//TODO fix 
+
+/*
+\"([0-9]|[a-zA-Z]|[\t]|\\{ESCAPE})*\" {
+    //yylval.string = (yytext);
+    if (g_tokens) cout << "tSTRINGVAL(" << yytext << ")" << endl;
+    RETURN(tSTRINGVAL);
+}
+
+*/
