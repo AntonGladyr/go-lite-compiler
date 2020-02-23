@@ -1,7 +1,7 @@
 package main 
 
 func main (){
-	println(gcd(10,25))
+	println(gcd(132,48))
 }
 
 func gcd (a int, b int) int{
