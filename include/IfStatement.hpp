@@ -1,6 +1,6 @@
 //#include "Statement.hpp"
 #include "Expression.hpp"
-#include "Declaration.h"
+#include "Declaration.hpp"
 #include "Instruction.hpp"
 
 class IfStatement: public Statement {

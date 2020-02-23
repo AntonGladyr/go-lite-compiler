@@ -18,7 +18,7 @@
 #include "tree.h"
 #include "Instruction.hpp"
 #include "Statement.hpp"
-#include "Declaration.h"
+#include "Declaration.hpp"
 #include "ForStatement.hpp"
 #include "AssignStatement.hpp"
 #include "IfStatement.hpp"
@@ -213,12 +213,12 @@ ins : %empty { $$ = NULL; }
     | tLPAREN ins tRPAREN ins { $$ = new Instruction($2, $4); }
     ;
 
-decl : tVAR varspec { $$ = $2; }
-    | tVAR tLBRACE varspecs tRBRACE { $$ = new Declaration(*$3); delete $3; }
-    | tFUNC tIDENTIFIER tLBRACE id_list tRBRACE tIDENTIFIER tLPAREN ins returnstmt tRPAREN { $$ = new Declaration($2, *$4, $6, $8); }
+decl : tVAR varspec { /* TODO: fix //$$ = $2; */}
+    | tVAR tLBRACE varspecs tRBRACE { /* TODO: fix //$$ = new Declaration(*$3); delete $3; */ }
+    | tFUNC tIDENTIFIER tLBRACE id_list tRBRACE tIDENTIFIER tLPAREN ins returnstmt tRPAREN { $$ = new FunctionDeclaration($2, *$4, $6, $8); }
     | shortdecl { $$ = $1; }
-    | tTYPE tIDENTIFIER tIDENTIFIER { $$ = new Declaration($2, $3); }
-    | tTYPE tIDENTIFIER tSTRUCT tLPAREN structdecl_list tRPAREN { $$ = new Declaration($2, *$5); }
+    | tTYPE tIDENTIFIER tIDENTIFIER { $$ = new TypeDeclaration($2, $3); }
+    | tTYPE tIDENTIFIER tSTRUCT tLPAREN structdecl_list tRPAREN { $$ = new StructDeclaration($2, *$5); }
     ;
 
 varspecs : %empty { $$ = new std::vector<Declaration*>(); }
@@ -231,7 +231,7 @@ varspec : id_list tIDENTIFIER { $$ = new Declaration(*$1, $2); }
     | id_list tIDENTIFIER tASSIGN exp_list tSEMICOLON {$$ = new Declaration(*$1, *$4, $2); }
     ;
 
-shortdecl : tIDENTIFIER tSHORTDECLARE exp tSEMICOLON { $$ = new Declaration($1, $3); }
+shortdecl : tIDENTIFIER tSHORTDECLARE exp tSEMICOLON { $$ = new ShortDeclaration($1, $3); }
     ;
 
 id_list : tIDENTIFIER { $$ = new std::vector<std::string>(); $$->push_back($1); }
@@ -280,10 +280,10 @@ assignstmt : id_list tASSIGN exp_list tSEMICOLON { $$ = new AssignStatement($1, 
 
 ifstmt : tIF exp tLBRACE ins tRBRACE { $$ = new IfStatement($2, $4); }
     | tIF shortdecl exp tLBRACE ins tRBRACE { $$ = new IfStatement($3, $5, $2); }
-    | tIF exp tLBRACE ins tRBRACE tELSE ifstmt { $$ = new IfElseStatement($2, $4, $7); }
-    | tIF shortdecl exp tLBRACE ins tRBRACE tELSE ifstmt { $$ = new IfElseStatement($3, $5, $8, $2); }
-    | tIF exp tLBRACE ins tRBRACE tELSE tLBRACE ins tRBRACE { $$ = new IfElseStatement($2, $4, $8); }
-    | tIF shortdecl exp tLBRACE ins tRBRACE tELSE tLBRACE ins tRBRACE { $$ = new IfElseStatement($3, $5, $9, $2); }
+    | tIF exp tLBRACE ins tRBRACE tELSE ifstmt { $$ = new IfElseStatement(k_stmtKindIfElse, $2, $4, $7); }
+    | tIF shortdecl exp tLBRACE ins tRBRACE tELSE ifstmt { $$ = new IfElseStatement(k_stmtKindDeclIfElse, $3, $5, $8, $2); }
+    | tIF exp tLBRACE ins tRBRACE tELSE tLBRACE ins tRBRACE { $$ = new IfElseStatement(k_stmtKindIfElseNested, $2, $4, $8); }
+    | tIF shortdecl exp tLBRACE ins tRBRACE tELSE tLBRACE ins tRBRACE { $$ = new IfElseStatement(k_stmtKindDeclIfElseNested, $3, $5, $9, $2); }
     ;
 
 incdecstmt : tIDENTIFIER tINC tSEMICOLON { $$ = new IncDecStatement(k_stmtKindInc, $$1); }
