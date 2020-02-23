@@ -36,15 +36,12 @@ enum StatementKind {
 
 };
 */
- enum UnaryKind {
-            k_expKindUMinus,
-            k_expKindUNot
-            k_expKindUPLUS,
-            k_expKindUXOR
-        };
+           
+       
 
 
-        enum BinaryKind {
+        enum ExpressionKind {
+		//Binary
             k_expKindMinus,
             k_expKindPlus,
             k_expKindMultiply,
@@ -63,8 +60,25 @@ enum StatementKind {
             k_expKindGreaterThan,
             k_expKindGreaterThanEqual,
             k_expKindAnd,
-            k_expKindOr
-        };
+            k_expKindOr,
+		//Unary
+ 	    k_expKindUMinus,
+            k_expKindUNot
+            k_expKindUPLUS,
+            k_expKindUXOR,
+		//Literals
+	    k_expKindBoolean,
+	    k_expKindInteger,
+ 	    k_expKindString,
+	    k_expKindRune,
+	    k_expKindFloat,
+		//Buildins 
+	    k_expKindAppend,
+	    k_expKindLen,
+	    k_expKindCap
+ };
+
+       
 
 
 
