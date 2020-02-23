@@ -11,7 +11,7 @@ func binarySearch(count int, a []int) bool {
         if a[middle] < count {
             l = middle + 1
         }else{
-            high = middle - 1
+            h = middle - 1
         }
     }
  
@@ -25,7 +25,7 @@ func binarySearch(count int, a []int) bool {
  
 func main(){
     items := []int{2,6,10,56,63,66,99,100,101}
-    if binarySearch(63, items)) {
+    if binarySearch(63, items) {
 		println("Found!")
 	}else {
 		println("Not Found ... ")

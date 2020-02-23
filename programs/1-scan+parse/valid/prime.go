@@ -1,8 +1,7 @@
 // this is to check if the integer is a prime
 package main
-import "fmt"
 
-funct main (){
+func main (){
 
     var number, r , i, sum int
     var count =0;
