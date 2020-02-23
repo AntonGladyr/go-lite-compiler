@@ -291,16 +291,16 @@ exp : tIDENTIFIER tPERIOD tIDENTIFIER { $$ = new Binary(k_exprKindFieldSelector,
     | tAPPEND tLBRACE exp tCOMMA exp tRBRACE { $$ = new Binary(k_exprKindAppend, $3, $5); }
     | tLEN tLBRACE exp tRBRACE { $$ = new Binary(k_exprKindLen, $3); }
     | tCAP tLBRACE exp tRBRACE { $$ = new Binary(k_exprKindCap, $3); }
-    | tPLUS exp %prec pPLUS { $$ = new UnaryExpression(k_exprKindPlus, $2); }
-    | tMINUS exp %prec pMINUS { $$ = new UnaryExpression(k_exprKindMinus, $2); }
-    | tBANG exp %prec pBANG { $$ = new UnaryExpression(k_exprKindBang, $2); }
-    | tBWXOR exp %prec pBWXOR { $$ = new UnaryExpression(k_exprKindBwxor, $2); }
-    | tINTVAL { $$ = new Literals(k_exprKindInteger, $1); }
-    | tFLOATVAL { $$ = new Literals(k_exprKindFloat, $1); }
-    | tRUNEVAL { $$ = new Literals(k_exprKindRune, $1); }
-    | tSTRINGVAL { $$ = new Literals(k_exprKindString, $1); }
-    | tBOOLVAL { $$ = new Literals(k_exprKindBool, $1); }
-    | tIDENTIFIER { $$ = new Literals(k_exprKindIdentifier, $1); }
+    | tPLUS exp %prec pPLUS { $$ = new Unary(k_exprKindPlus, $2); }
+    | tMINUS exp %prec pMINUS { $$ = new Unary(k_exprKindMinus, $2); }
+    | tBANG exp %prec pBANG { $$ = new Unary(k_exprKindBang, $2); }
+    | tBWXOR exp %prec pBWXOR { $$ = new Unary(k_exprKindBwxor, $2); }
+    | tINTVAL { $$ = new Literal(k_exprKindInt, $1); }
+    | tFLOATVAL { $$ = new Literal(k_exprKindFloat, $1); }
+    | tRUNEVAL { $$ = new Literal(k_exprKindChar, $1); }
+    | tSTRINGVAL { $$ = new Literal(k_exprKindChar, $1); }
+    | tBOOLVAL { $$ = new Literal(k_exprKindBool, $1); }
+    | tIDENTIFIER { $$ = new Literal(k_exprKindIdentifier, $1); }
     ; 
 
 %%
