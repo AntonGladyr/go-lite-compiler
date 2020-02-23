@@ -1,20 +1,25 @@
-// this is to check if the integer is a plalindrome
+// this is to check if the number is a plalindrome
 package main
 
 func main (){
+    var t, number int
+    var r, sum int
+    
+    r, sum = 0, 0
 
-    var number, r , i, sum int
-    var count =0;
-    fmt.Scan(&number);
-    for i =number  ;i >0; i/10 {
-            r = number%10;
-            sum = (sum*10)+r;
+    number = 101
+
+    t = number
+
+    for number > 0 {
+        r = number % 10 
+        sum = (sum * 10) + r
+        number = number / 10
     }
-    if(number ==sum){
-        print("It is a palindrome")
 
-    }else{
-        print("Not a palindrome")
+    if t == sum {
+        println("It is a palidrome")
+    } else {
+        println("NOT a palidrome")
     }
-
 }
