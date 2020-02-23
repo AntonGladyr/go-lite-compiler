@@ -1,4 +1,4 @@
-class Declaration : public Node {
+/*class Declaration : public Node {
     public:
         DeclarationKind kind;
         union val {
@@ -66,4 +66,4 @@ class Declaration : public Node {
             val.typeStructDecl.id = id;
             val.typeStructDecl.structdecl_list = structdecl_list;
         }
-}
+};*/

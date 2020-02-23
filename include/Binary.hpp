@@ -2,7 +2,7 @@
 #define BINARY_H
 
 #include <Expression.hpp>
-#include <treeEnums.h>
+#include <tree.h>
 
 
 

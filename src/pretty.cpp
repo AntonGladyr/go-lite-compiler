@@ -1,7 +1,7 @@
 #include <utility>
 
 class PrettyPrinter {
-    public:
+/*    public:
         PrettyPrinter(Instruction *rootIns) : this.rootIns{rootIns}
 
         void printProgram() {
@@ -201,4 +201,5 @@ class PrettyPrinter {
                 printf("    "); //4 spaces per tab;
             }
         }
+*/
 };

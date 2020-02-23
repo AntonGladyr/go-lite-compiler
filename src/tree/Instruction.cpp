@@ -1,4 +1,4 @@
-class Instruction {
+/*class Instruction {
     public:
         Instruction *next;
         union val {
@@ -15,4 +15,4 @@ class Instruction {
 
         Instruction(Instruction *_ins, Instruction *_next) : val.block{_ins}, val.next{_next} {
         }
-};
+};*/

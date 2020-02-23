@@ -10,17 +10,11 @@ class Instruction;
 class Declaration;
 class Statement;
 class Expression;
-<<<<<<< HEAD
 
-enum class StatementKind {
+enum StatementKind {
 	k_stmtKindForInfinite,
 	k_stmtKindForWhile,
 	k_stmtKindForThreePart,
-=======
-/*
-enum StatementKind {
-	k_stmtKindFor,
->>>>>>> dev
 	k_stmtKindAssignTuple,
 	k_stmtKindAssignSelector,
 	k_stmtKindAssignIndex,
@@ -47,10 +41,10 @@ enum StatementKind {
 	k_stmtKindDeclIfElseNested
 
 };
-*/
+
  enum UnaryKind {
             k_expKindUMinus,
-            k_expKindUNot
+            k_expKindUNot,
             k_expKindUPLUS,
             k_expKindUXOR
         };

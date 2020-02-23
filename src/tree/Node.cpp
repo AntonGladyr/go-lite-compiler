@@ -1,4 +1,4 @@
-public Node {
+/*public Node {
     public: 
         int lineno;
-}
+}*/
