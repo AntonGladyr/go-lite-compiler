@@ -6,12 +6,17 @@
 
     class Builtins : public Expression {
     public:
-	Expression* left_expression_ = nullptr;
-        Expression* right_expression_ = nullptr;
-        Builtsins(Expression* left_expression, Expression* right_expression) :
-                left_expression_(left_expression), right_expression_(right_expression){}
+	union val {
+		Expression* left_expression_ ;
+		Expression* right_expression_ ;
+        };
+	Expression* expression_;
+	//append
+        Builtsins(ExpressionKind kind, Expression* left_expression, Expression* right_expression);
+	//cap and len
+ 	Builtsins(ExpressionKind kind, Expression* expression) ;
 
-        bool isBuiltins() { return true; }
+        bool isBuiltins();
 
       
    

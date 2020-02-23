@@ -3,31 +3,19 @@
 
 #include <Expression.hpp>
 
-
-
-    /**
-     * Class representing unary expression
-     * unary_expression: <operator> <expr>
-     * operator:
-     *     -
-     *     !
-     *     +
-     *     ^
-     */
     class Unary : public Expression {
     public:
 
 	Expression* operand_ = nullptr;
-        UnaryKind kind_;
        
        
-        Unary(Expression* operand, UnaryKind kind) : operand_(operand), kind_(kind) {}
+        Unary(Expression* operand, ExpressionKind kind);
 
 
         int getLine();
 
        
-        bool isUnary() { return true; }
+        bool isUnary();
 
       
     };

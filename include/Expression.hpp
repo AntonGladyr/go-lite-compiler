@@ -2,32 +2,14 @@
 #define EXPRESSIONS_EXPRESSION_H
 
 #include <string>
+#include <Node.hpp>
 
 
-    class Expression {
+    class Expression : public Node{
     public:
-
-        virtual bool isParenthesis() { return false; }
-        virtual bool isIdentifier() { return false; }
-        virtual bool isLiterals() { return false; }
-        virtual bool isUnary() { return false; }
-       
-        virtual bool isBinary() { return false; }
-        virtual bool isIndexing() { return false; }
-
-        virtual bool isFieldSelectors() { return false; }
-        virtual bool isBuiltins() { return false; }
-	
+	ExpressionKind kind_;
 
       
-
-      
-
-
-       
-        virtual int getLine() = 0;
-
-       
     };
 
 #endif
