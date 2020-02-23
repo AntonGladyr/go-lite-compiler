@@ -1,4 +1,6 @@
-//#include "Statement.hpp"
+#ifndef IFELSESTATEMENT_HPP
+#define IFELSESTATEMENT_HPP
+
 #include "Expression.hpp"
 #include "Declaration.hpp"
 #include "Instruction.hpp"
@@ -22,3 +24,5 @@ class IfElseStatement : Statement {
 				Instruction elseIns
 		) : Statement(kind), decl(decl), exp(exp), ifIns(ifIns), elseIns(elseIns) { }	
 };
+
+#endif

@@ -1,5 +1,6 @@
-//#include "treeEnums.h"
-//#include "Statement.hpp"
+#ifndef FORSTATEMENT_HPP
+#define FORSTATEMENT_HPP
+
 #include "Expression.hpp"
 #include "Instruction.hpp"
 
@@ -24,3 +25,5 @@ class ForStatement : public Statement {
 			  body{body}
 		{ }
 };
+
+#endif

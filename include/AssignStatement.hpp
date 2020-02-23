@@ -1,7 +1,8 @@
-//#include "Statement.hpp"
+#ifndef ASSIGNSTATEMENT_HPP
+#define ASSIGNSTATEMENT_HPP
+
 #include "Expression.hpp"
 #include <vector>
-//#include "treeEnums.h"
 
 class AssignStatement : public Statement {
     public:
@@ -23,3 +24,5 @@ class AssignStatement : public Statement {
 	AssignStatement(std::string id, Expression index, Expression exp)
 		: Statement(k_stmtKindAssignIndex), id{id}, index{index}, exp{exp} { };
 };
+
+#endif

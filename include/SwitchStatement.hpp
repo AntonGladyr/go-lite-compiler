@@ -1,6 +1,7 @@
-//#include "Statement.hpp"
+#ifndef SWITCHSTATEMENT_HPP
+#define SWITCHSTATEMENT_HPP
+
 #include "Expression.hpp"
-//#include "treeEnums.h"
 #include <vector>
 #include <utility> 
 
@@ -16,3 +17,5 @@ class SwitchStatement : public Statement {
 	SwitchStatement(Declaration decl, std::vector<std::pair<Expression, Instruction>> case_list)
 		: Statement(k_stmtDeclSwitch), decl(decl), exp(exp), case_list(case_list) { }
 };
+
+#endif

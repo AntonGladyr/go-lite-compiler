@@ -1,4 +1,6 @@
-//#include "Statement.hpp"
+#ifndef IFSTATEMENT_HPP
+#define IFSTATEMENT_HPP
+
 #include "Expression.hpp"
 #include "Declaration.hpp"
 #include "Instruction.hpp"
@@ -16,3 +18,5 @@ class IfStatement: public Statement {
 		IfStatement(Declaration decl, Expression exp, Instruction ifIns)
 			: Statement(k_stmtKindDeclIfStmt), decl{decl}, exp{exp}, ins{ifIns} { }
 };
+
+#endif

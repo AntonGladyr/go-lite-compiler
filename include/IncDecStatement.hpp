@@ -1,6 +1,7 @@
-//#include "Statement.hpp"
+#ifndef INCDECSTATEMENT_HPP
+#define INCDECSTATEMENT_HPP
+
 #include "Expression.hpp"
-//#include "treeEnums.h"
 
 class IncDecStatement : public Statement {
 	std::string id;
@@ -11,3 +12,5 @@ class IncDecStatement : public Statement {
 		IncDecStatement(StatementKind kind, std::string id) : Statement(kind), id{id} { }
 		IncDecStatement(StatementKind kind, std::string id, Expression exp) : Statement(kind), id{id}, exp{exp} { }
 };
+
+#endif
