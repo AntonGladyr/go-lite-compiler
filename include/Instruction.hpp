@@ -16,6 +16,8 @@ class Instruction {
         Instruction(Statement *_stmt, Instruction *_next);
         Instruction(Instruction *_ins, Instruction *_next);
 
+	Instruction() {}
+
 };
 
 #endif

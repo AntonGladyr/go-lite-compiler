@@ -1,23 +1,25 @@
 //#include "Statement.hpp"
-//#include "Expression.hpp"
-//#include <vector>
+#include "Expression.hpp"
+#include <vector>
 //#include "treeEnums.h"
 
 class AssignStatement : public Statement {
     public:
-	vector<string> ids;
-	vector<Expression> exp_list;
-	string id;
-	string selectorId;
+	std::vector<std::string> ids;
+	std::vector<Expression> exp_list;
+	std::string id;
+	std::string selectorId;
 	Expression exp;	
 	Expression index;
+	
+	AssignStatement();
 		
-        AssignStatement(vector<string> ids, vector<Expression> exp_list)
-		: kind(k_stmtKindAssignTuple), ids(ids), exp_list(exp_list) { }
+        AssignStatement(std::vector<std::string> ids, std::vector<Expression> exp_list)
+		: Statement(k_stmtKindAssignTuple), ids{ids}, exp_list{exp_list} { };
 
-	AssignStatement(string id, string selectorId, Expression exp)
-		: kind(k_stmtKindAssignSelector), id(id), selectorId(selectorId), exp(exp) { }
+	AssignStatement(std::string id, std::string selectorId, Expression exp)
+		: Statement(k_stmtKindAssignSelector), id{id}, selectorId{selectorId}, exp{exp} { };
 
-	AssignStatement(string id, Expression index, Expression exp)
-		: kind(k_stmtKindAssignIndex), id(id), index(index), exp(exp) { }
-}
+	AssignStatement(std::string id, Expression index, Expression exp)
+		: Statement(k_stmtKindAssignIndex), id{id}, index{index}, exp{exp} { };
+};

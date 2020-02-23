@@ -3,5 +3,6 @@
 
 class BreakStatement : public Statement {
 	public:
-		BreakStatement() : kind(k_stmtKindBreak); 
-}
+		BreakStatement();
+		BreakStatement() : Statement(k_stmtKindBreak) { } 
+};

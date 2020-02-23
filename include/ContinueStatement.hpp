@@ -3,6 +3,7 @@
 
 class ContinueStatement : public Statement {
 	public:
-		ContinueStatement() : kind(k_stmtKindContinue);
+		ContinueStatement();
+		ContinueStatement() : Statement(k_stmtKindContinue) { }
 
-}
+};

@@ -6,7 +6,10 @@
 
 class Statement : Node {
 	public:
-		StatementKind kind;	
+		StatementKind kind;
+	
+	Statement();
+	Statement(StatementKind kind) : kind{kind} { }
 };
 
 

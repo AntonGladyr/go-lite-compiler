@@ -1,8 +1,7 @@
 //#include "Statement.hpp"
-//#include "Expression.hpp"
-//#include "Instruction.hpp"
-//#include "Declaration.hpp"
-//#include "Instruction.hpp"
+#include "Expression.hpp"
+#include "Declaration.h"
+#include "Instruction.hpp"
 
 class IfElseStatement : Statement {
 	public:
@@ -11,6 +10,8 @@ class IfElseStatement : Statement {
 		Instruction ifIns;
 		Instruction elseIns;
 		
+		IfElseStatement();
+
 		IfStatement(Expression exp, Instruction ifIns, Instruction elseIns)
 			: kind(k_stmtKindIfElse), exp(exp), ifIns(ifIns), elseIns(elseIns) { }
 	
@@ -22,4 +23,4 @@ class IfElseStatement : Statement {
 
 		IfStatement(Declaration decl, Expression exp, Instruction ifIns, Instruction elseIns)
 			: kind(k_stmtKindDeclIfElseNested), decl(decl), exp(exp), ifIns(ifIns), elseIns(elseIns) { }
-}
+};
