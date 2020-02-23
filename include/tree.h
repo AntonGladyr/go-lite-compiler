@@ -1,11 +1,7 @@
 #ifndef TREE_H
 #define TREE_H
 
-class Node {
-	public:
-		int lineno;
-};
-
+class Node;
 class Instruction;
 class Declaration;
 class Statement;

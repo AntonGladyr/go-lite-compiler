@@ -1,4 +1,8 @@
-/*class Declaration : public Node {
+/*#include "Node.hpp"
+#include "tree.h"
+#include <vector>
+
+class Declaration : public Node {
     public:
         DeclarationKind kind;
         union val {

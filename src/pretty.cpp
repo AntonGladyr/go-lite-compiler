@@ -132,7 +132,8 @@ class PrettyPrinter {
 				cout << s.id << "++;" << endl;
 				break;
 			case k_stmtKindDec:
-				cout << s.id << "--;" << endl;
+				cout << s.id << "--;" << 
+;
 				break;
 			case k_stmtKindIncExp:
 				cout << s.id << " += " << prettyExpression(s.exp, numTabs) << ";" << endl;
@@ -197,7 +198,241 @@ class PrettyPrinter {
 		}
         }
 
-        void prettyExpression(Expression *e, int numTabs) {
+        void prettyExpression(Expression *e) {
+		switch (e->kind_): 
+			case k_expKindMinus:
+				cout << "("
+				prettyExpression(e.left_operand_);
+				cout << "-";
+				prettyExpression(e.right_operand_)
+				cout << ")"
+				break;
+
+			case k_expKindPlus:
+
+				cout << "("
+				prettyExpression(e.left_operand_);
+				cout << "+";
+				prettyExpression(e.right_operand_)
+				cout << ")"
+				break;
+
+            		case k_expKindMultiply:
+				
+				cout << "("
+				prettyExpression(e.left_operand_);
+				cout << "*";
+				prettyExpression(e.right_operand_)
+				cout << ")"
+				break;
+
+            		case k_expKindDivide:
+				
+				cout << "("
+				prettyExpression(e.left_operand_);
+				cout << "/";
+				prettyExpression(e.right_operand_)
+				cout << ")"
+				break;
+
+           		case k_expKindModulo:
+				
+				cout << "("
+				prettyExpression(e.left_operand_);
+				cout << "%";
+				prettyExpression(e.right_operand_)
+				cout << ")"
+				break;
+
+            		case k_expKindBitAnd:
+				
+				cout << "("
+				prettyExpression(e->left_operand_);
+				cout << "&";
+				prettyExpression(e->right_operand_)
+				cout << ")"
+				break;;
+
+            		case k_expKindBitOr:
+				
+				cout << "("
+				prettyExpression(e.left_operand_);
+				cout << "|";
+				prettyExpression(e.right_operand_)
+				cout << ")"
+				break;
+
+           		case k_expKindBitXor:
+				
+				cout << "("
+				prettyExpression(e.left_operand_);
+				cout << "^";
+				prettyExpression(e.right_operand_)
+				cout << ")"
+				break;
+
+           		case k_expKindBitClear:
+				
+				cout << "("
+				prettyExpression(e.left_operand_);
+				cout << "&^";
+				prettyExpression(e.right_operand_)
+				cout << ")"
+				break;
+            		case k_expKindLeftShift:
+				
+				cout << "("
+				prettyExpression(e.left_operand_);
+				cout << "<<";
+				prettyExpression(e.right_operand_)
+				cout << ")"
+				break;
+
+            		case k_expKindRightShift:
+				
+				cout << "("
+				prettyExpression(e.left_operand_);
+				cout << ">>";
+				prettyExpression(e.right_operand_)
+				cout << ")"
+				break;
+           		case k_expKindIsEqual:
+				
+				cout << "("
+				prettyExpression(e.left_operand_);
+				cout << "==";
+				prettyExpression(e.right_operand_)
+				cout << ")"
+				break;
+
+            		case k_expKindIsNotEqual:
+				
+				cout << "("
+				prettyExpression(e.left_operand_);
+				cout << "!=";
+				prettyExpression(e.right_operand_)
+				cout << ")"
+				break;
+
+           		case  k_expKindLessThan:
+				
+				cout << "("
+				prettyExpression(e.left_operand_);
+				cout << "<";
+				prettyExpression(e.right_operand_)
+				cout << ")"
+				break;
+
+            		case k_expKindLessThanEqual:
+
+				cout << "("
+				prettyExpression(e.left_operand_);
+				cout << "<=";
+				prettyExpression(e.right_operand_)
+				cout << ")"
+				break;
+
+            		case k_expKindGreaterThan:
+				
+				cout << "("
+				prettyExpression(e.left_operand_);
+				cout << ">";
+				prettyExpression(e.right_operand_)
+				cout << ")"
+				break;
+
+            		case k_expKindGreaterThanEqual:
+
+				cout << "("
+				prettyExpression(e.left_operand_);
+				cout << ">=";
+				prettyExpression(e.right_operand_)
+				cout << ")"
+				break;
+
+           		case k_expKindAnd:
+
+				cout << "("
+				prettyExpression(e.left_operand_);
+				cout << "&&";
+				prettyExpression(e.right_operand_)
+				cout << ")"
+				break;
+
+           		case  k_expKindOr:
+
+				cout << "("
+				prettyExpression(e.left_operand_);
+				cout << "||";
+				prettyExpression(e.right_operand_)
+				cout << ")"
+				break;
+
+ 	    		case k_expKindUMinus:
+				cout << "("
+				cout << "-";
+				prettyExpression(e.operand_)
+				cout << ")"
+				break;
+            		case k_expKindUNot:
+				cout << "("
+				cout << "!";
+				prettyExpression(e.operand_)
+				cout << ")"
+				break;
+           		case k_expKindUPLUS:
+				cout << "("
+				cout << "+";
+				prettyExpression(e.operand_)
+				cout << ")"
+				break;
+            		case k_expKindUXOR:
+				cout << "("
+				cout << "^";
+				prettyExpression(e.operand_)
+				cout << ")"
+				break;
+			//literals
+			case k_expKindBoolean:
+				
+				cout << (e.valueBool)
+				break;
+
+	   		case k_expKindInteger:
+				cout << (e.valueInt)
+				break;
+ 	    		case k_expKindString:
+				cout << (e.valueChar)
+				break;
+	    		case k_expKindRune:
+				cout << (e.valueChar)
+				break;
+	    		case k_expKindFloat:
+				cout << (e.valueFloat)
+				break;
+				//Buildins 
+		
+	    		case k_expKindAppend:
+				cout << "append"
+				cout << "(";
+				prettyExpression(e.val.left_expression_)
+				cout << ",";
+				prettyExpression(e.val.right_expression_)
+				cout << ")"
+				break;
+	    		case k_expKindLen:
+				cout << "len"
+				cout << "(";
+				prettyExpression(e.expression_)
+				cout << ")"
+				break;
+	    		case k_expKindCap:
+				cout << "cap";
+				cout << "("; ;
+				prettyExpression(e.expression_)
+				cout << ")" ;
+				break;
+ };
 
         }
 

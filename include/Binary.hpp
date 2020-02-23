@@ -5,46 +5,15 @@
 #include <tree.h>
 
 
+class Binary : public Expression {
+	public:
+		Expression* left_operand_ = nullptr;
+		Expression* right_operand_ = nullptr;
 
-    /**
-     *
-     *   +
-     *   -
-     *   *
-     *   /
-     *   %
-     *   &
-     *   |
-     *   ^
-     *   &^
-     *   <<
-     *   >>
-     *   ==
-     *   !=
-     *   <
-     *   >
-     *   <=
-     *   >=
-     *   &&
-     *   ||
-     */
-    class Binary : public Expression {
-    public:
-
-
-        Expression* left_operand_ = nullptr;
-        Expression* right_operand_ = nullptr;
-        BinaryKind kind_;
-
-       
-
+		Binary( ExpressionKind kind, Expression* lhs, Expression* rhs)
+			: left_operand_(lhs), right_operand_(rhs), kind_(kind);
       
-        Binary(Expression* lhs, Expression* rhs, BinaryKind kind) : left_operand_(lhs), right_operand_(rhs), kind_(kind) {}
-
-        bool isBinary() { return true; }
-
-     
-        
-    };
+		bool isBinary();
+};
 
 #endif

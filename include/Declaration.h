@@ -10,7 +10,7 @@
 class Declaration : Node {
     public:
         DeclarationKind kind;
-        union val {
+        union {
             struct { std::vector<std::string> ids; std::string type; } declareDecl;
             struct { std::vector<std::string> ids; std::vector<Expression> rhs; std::string type; } assignDecl;
             struct { std::vector<Declaration> decls; } factorDecl;
@@ -18,7 +18,7 @@ class Declaration : Node {
             struct { std::string id; Expression *rhs; } shortDecl;
             struct { std::string alias1; std::string alias2; } typeDecl;
             struct { std::string alias; std::vector<std::vector<std::string>> structdecl_list; } typeStructDecl;
-        };
+        } val;
 
         //declaration without initialization
         Declaration(std::vector<std::string> ids, std::string type)
@@ -28,7 +28,7 @@ class Declaration : Node {
         Declaration(std::vector<Declaration*> decls) : kind{k_declKindFactor}, val.factorDecl{decls};
 
         //===functions===
-        Declaration(std::string id, std::vector<std::string> locals, string type, Instruction *body)
+        Declaration(std::string id, std::vector<std::string> locals, std::string type, Instruction *body)
 		: kind{k_declKindFunc}, funcDecl.id{id}, funcDecl.locals{locals}, funcDecl.type{type}, funcDecl.body{body};
 	
         //===declaration with assignment===

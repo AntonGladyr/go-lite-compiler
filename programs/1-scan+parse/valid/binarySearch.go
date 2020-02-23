@@ -11,7 +11,7 @@ func binarySearch(count int, a []int) bool {
         if a[middle] < count {
             l = middle + 1
         }else{
-            high = middle - 1
+            h = middle - 1
         }
     }
  

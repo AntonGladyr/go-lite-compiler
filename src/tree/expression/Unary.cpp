@@ -1,7 +1,23 @@
-#include <Unary.hpp>
+//#include <Unary.hpp>
+/* class Unary : public Expression {
+    public:
+
+	Expression* operand_ = nullptr;
+       
+       
+        Unary(Expression* operand, ExpressionKind kind) : operand_(operand), kind_(kind) {}
 
 
-int Unary::getLine() {
-    return operand_->getLine();
-}
+        int getLine() {
+   	 return operand_->getLine();
+	}
 
+
+       
+        bool isUnary() { return true; }
+
+      
+    };
+
+
+*/
