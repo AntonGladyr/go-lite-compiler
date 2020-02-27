@@ -231,19 +231,26 @@ ins : %empty { /*$$ = NULL;*/ }
     ;
 
 decl : tVAR varspec { /* TODO: fix //$$ = $2; */}
+    | tVAR tIDENTIFIER tLBRACKET exp tRBRACKET tIDENTIFIER tSEMICOLON
     | tVAR tLBRACE varspecs tRBRACE { /* TODO: fix //$$ = new Declaration(*$3); delete $3; */ }
-    | tFUNC tIDENTIFIER tLPAREN params_list tRPAREN tIDENTIFIER tLBRACE ins returnstmt tRBRACE tSEMICOLON
-	{/*$$ = new FunctionDeclaration($2, *$4, $6, $8);*/}
-    | tFUNC tIDENTIFIER tLPAREN params_list tRPAREN tLBRACE ins returnstmt tRBRACE tSEMICOLON
+    | tFUNC tIDENTIFIER tLPAREN params_list tRPAREN func_return_type tLBRACE ins returnstmt tRBRACE tSEMICOLON
 	{ /*$$ = new FunctionDeclaration($2, *$4, $6, $8);*/ }
+    | tFUNC tIDENTIFIER tLPAREN id_list tIDENTIFIER tRPAREN func_return_type tLBRACE ins returnstmt tRBRACE tSEMICOLON
     | shortdecl {/*$$ = $1;*/}
     | tTYPE tIDENTIFIER tIDENTIFIER { /*$$ = new TypeDeclaration($2, $3);*/ }
     | tTYPE tIDENTIFIER tSTRUCT tLPAREN structdecl_list tRPAREN {/*$$ = new StructDeclaration($2, *$5);*/}
     ;
 
-params_list: tIDENTIFIER tIDENTIFIER
-    | params_list tCOMMA tIDENTIFIER tIDENTIFIER
+func_return_type : tIDENTIFIER
+    | tLBRACKET exp tRBRACKET tIDENTIFIER
+    | %empty { /*$$ = NULL; */ }
+
+params_list: param
+    | params_list tCOMMA param
     | %empty { $$ = NULL; } 
+
+param: tIDENTIFIER tIDENTIFIER
+    | tIDENTIFIER tLBRACKET tRBRACKET tIDENTIFIER
 
 varspecs : %empty {/*$$ = new std::vector<Declaration*>();*/}
     | varspec {/*$$ = new std::vector<Declaration*>(); $$->push_back($1);*/}
@@ -256,6 +263,7 @@ varspec : id_list tIDENTIFIER tSEMICOLON {/*$$ = new Declaration(*$1, $2);*/}
     ;
 
 shortdecl : tIDENTIFIER tSHORTDECLARE exp tSEMICOLON {/*$$ = new ShortDeclaration($1, $3);*/}
+    | tIDENTIFIER tSHORTDECLARE tLBRACKET tRBRACKET tIDENTIFIER tLBRACE exp_list tRBRACE tSEMICOLON
     ;
 
 id_list : tIDENTIFIER {/*$$ = new std::vector<std::string>(); $$->push_back($1);*/}
@@ -278,7 +286,8 @@ case_list : %empty {/*$$ = new std::vector<std::pair<Expression*, Instruction*>>
     | tDEFAULT tCOLON ins case_list {/*$$->emplace_back(NULL, $4);*/}
     ;
 
-stmt : loopstmt
+stmt : func_call tSEMICOLON
+    | loopstmt
     | assignstmt 
     | ifstmt
     | printstmt
@@ -329,29 +338,50 @@ switchstmt : tSWITCH tLBRACE case_list tRBRACE {/*$$ = new SwitchStatement($3);*
     | tSWITCH shortdecl tLBRACE case_list tRBRACE {/*$$ = new SwitchStatement($2, $4);*/}
     ;
 
+func_call : tIDENTIFIER tLPAREN id_list tRPAREN {/*$$ = new Binary(k_exprKindFunctionCall, $1, $3);*/}
+    | tIDENTIFIER tLPAREN exp_list tRPAREN { }
+ 
+
 exp : tIDENTIFIER tPERIOD tIDENTIFIER {/*$$ = new Binary(k_exprKindFieldSelector, $1, $3);*/}
     | tIDENTIFIER tLBRACKET exp tRBRACKET {/*$$ = new Binary(k_exprKindIndexer, $1, $3);*/}
-    | tIDENTIFIER tLPAREN id_list tRPAREN {/*$$ = new Binary(k_exprKindFunctionCall, $1, $3);*/}
-    | tIDENTIFIER tLPAREN exp_list tRPAREN { }
+    | func_call
     | tAPPEND tLPAREN exp tCOMMA exp tRPAREN {/*$$ = new Binary(k_exprKindAppend, $3, $5);*/}
     | tLEN tLPAREN exp tRPAREN {/*$$ = new Binary(k_exprKindLen, $3);*/}
     | tCAP tLPAREN exp tRPAREN {/*$$ = new Binary(k_exprKindCap, $3);*/}
-    | exp tPLUS exp %prec pPLUS {/*$$ = new Unary(k_exprKindPlus, $2);*/}
-    | exp tMINUS exp %prec pMINUS {/*$$ = new Unary(k_exprKindMinus, $2);*/}
+    | tLPAREN exp tRPAREN { } 
+    | exp tPLUS exp {/*$$ = new Unary(k_exprKindPlus, $2);*/}
+    | exp tMINUS exp {/*$$ = new Unary(k_exprKindMinus, $2);*/}
     | exp tTIMES exp { } 
     | exp tDIV exp { }
-    | exp tREM exp { } 
-    | tLPAREN exp tRPAREN { } 
-    | exp tOR exp { } 
+    | exp tREM exp { }
+    | exp tBWAND exp { }
+    | exp tBWOR exp { } 
+    | exp tBWXOR exp {/*$$ = new Unary(k_exprKindBwxor, $2);*/}
+    | exp tLEFTSHIFT exp { }
+    | exp tRIGHTSHIFT exp { }
+    | exp tBWANDNOT exp { }
+    | exp tPLUSASSIGN { }
+    | exp tMINUSASSIGN { }
+    | exp tMULTASSIGN exp { }
+    | exp tDIVASSIGN exp { }
+    | exp tREMASSIGN exp { }
+    | exp tBWANDASSIGN exp { }
+    | exp tBWORASSIGN exp { }
+    | exp tBWXORASSIGN exp { }
+    | exp tLSHIFTASSIGN exp { }
+    | exp tRSHIFTASSIGN exp { }
+    | exp tBWANDNOTASSIGN exp { }
     | exp tAND exp { } 
+    | exp tOR exp { } 
     | exp tEQUAL exp { } 
     | exp tNOTEQ exp { } 
     | exp tGREATER exp { }
     | exp tLESS exp { } 
     | exp tGREATEREQ exp { } 
-    | exp tLESSEQ exp { } 
+    | exp tLESSEQ exp { }
     | tBANG exp %prec pBANG {/*$$ = new Unary(k_exprKindBang, $2);*/}
-    | tBWXOR exp %prec pBWXOR {/*$$ = new Unary(k_exprKindBwxor, $2);*/}
+    | exp tINC { }
+    | exp tDEC { }
     | tINTVAL {/*$$ = new Literal(k_exprKindInt, $1);*/}
     | tFLOATVAL {/*$$ = new Literal(k_exprKindFloat, $1);*/}
     | tRUNEVAL {/*$$ = new Literal(k_exprKindChar, $1);*/}
