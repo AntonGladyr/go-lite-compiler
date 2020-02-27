@@ -224,9 +224,9 @@ void yyerror(const char *s) {
 program : tPACKAGE tIDENTIFIER tSEMICOLON ins { /*$$ = $3; */}
     ;
 
-ins : %empty { $$ = NULL; }
-    | decl ins {/*$$ = new Instruction($1, $2);*/}
-    | stmt ins {/*$$ = new Instruction($1, $2);*/}
+ins : %empty { /*$$ = NULL;*/ }
+    | ins decl { /*$$ = new Instruction($1, $2);*/}
+    | ins stmt { /*$$ = new Instruction($1, $2);*/ }
     | tLPAREN ins tRPAREN ins {/*$$ = new Instruction($2, $4);*/}
     ;
 
@@ -235,7 +235,7 @@ decl : tVAR varspec { /* TODO: fix //$$ = $2; */}
     | tFUNC tIDENTIFIER tLPAREN params_list tRPAREN tIDENTIFIER tLBRACE ins returnstmt tRBRACE tSEMICOLON
 	{/*$$ = new FunctionDeclaration($2, *$4, $6, $8);*/}
     | tFUNC tIDENTIFIER tLPAREN params_list tRPAREN tLBRACE ins returnstmt tRBRACE tSEMICOLON
-	{/*$$ = new FunctionDeclaration($2, *$4, $6, $8);*/}
+	{ /*$$ = new FunctionDeclaration($2, *$4, $6, $8);*/ }
     | shortdecl {/*$$ = $1;*/}
     | tTYPE tIDENTIFIER tIDENTIFIER { /*$$ = new TypeDeclaration($2, $3);*/ }
     | tTYPE tIDENTIFIER tSTRUCT tLPAREN structdecl_list tRPAREN {/*$$ = new StructDeclaration($2, *$5);*/}
@@ -250,7 +250,7 @@ varspecs : %empty {/*$$ = new std::vector<Declaration*>();*/}
     | varspecs tNEWLINE varspec {/*$1->push_back($3);*/}
     ;
 
-varspec : id_list tIDENTIFIER {/*$$ = new Declaration(*$1, $2);*/}
+varspec : id_list tIDENTIFIER tSEMICOLON {/*$$ = new Declaration(*$1, $2);*/}
     | id_list tASSIGN exp_list tSEMICOLON {/*$$ = new Declaration(*$1, *$3);*/}
     | id_list tIDENTIFIER tASSIGN exp_list tSEMICOLON {/*$$ = new Declaration(*$1, *$4, $2);*/}
     ;
@@ -294,6 +294,7 @@ returnstmt : tRETURN tSEMICOLON {/*&$$ = new ReturnStatement();*/}
     ;
 
 loopstmt : tFOR shortdecl exp tSEMICOLON assignstmt tLBRACE ins tRBRACE tSEMICOLON {/*$$ = new ForStatement($2, $4, $6, $8);*/}
+    | tFOR tIDENTIFIER tASSIGN exp tSEMICOLON exp tSEMICOLON assignstmt tLBRACE ins tRBRACE tSEMICOLON {/*$$ = new ForStatement($2, $4, $6, $8);*/}
     | tFOR exp tLBRACE ins tRBRACE tSEMICOLON {/*$$ = new ForStatement($2, $4);*/}
     | tFOR tLBRACE ins tRBRACE tSEMICOLON {/*$$ = new ForStatement($3);*/}
     ;
@@ -305,12 +306,12 @@ assignstmt : id_list tASSIGN exp_list tSEMICOLON {/*$$ = new AssignStatement($1,
     | incdecstmt tSEMICOLON
     ;
 
-ifstmt : tIF exp tLBRACE ins tRBRACE {/*$$ = new IfStatement($2, $4);*/}
-    | tIF shortdecl exp tLBRACE ins tRBRACE {/*$$ = new IfStatement($3, $5, $2);*/}
+ifstmt : tIF exp tLBRACE ins tRBRACE tSEMICOLON {/*$$ = new IfStatement($2, $4);*/}
+    | tIF shortdecl exp tLBRACE ins tRBRACE tSEMICOLON {/*$$ = new IfStatement($3, $5, $2);*/}
     | tIF exp tLBRACE ins tRBRACE tELSE ifstmt {/*$$ = new IfElseStatement(k_stmtKindIfElse, $2, $4, $7);*/}
     | tIF shortdecl exp tLBRACE ins tRBRACE tELSE ifstmt {/*$$ = new IfElseStatement(k_stmtKindDeclIfElse, $3, $5, $8, $2);*/}
-    | tIF exp tLBRACE ins tRBRACE tELSE tLBRACE ins tRBRACE {/*$$ = new IfElseStatement(k_stmtKindIfElseNested, $2, $4, $8);*/}
-    | tIF shortdecl exp tLBRACE ins tRBRACE tELSE tLBRACE ins tRBRACE {/*$$ = new IfElseStatement(k_stmtKindDeclIfElseNested, $3, $5, $9, $2);*/}
+    | tIF exp tLBRACE ins tRBRACE tELSE tLBRACE ins tRBRACE tSEMICOLON{/*$$ = new IfElseStatement(k_stmtKindIfElseNested, $2, $4, $8);*/}
+    | tIF shortdecl exp tLBRACE ins tRBRACE tELSE tLBRACE ins tRBRACE tSEMICOLON{/*$$ = new IfElseStatement(k_stmtKindDeclIfElseNested, $3, $5, $9, $2);*/}
     ;
 
 incdecstmt : tIDENTIFIER tINC {/*$$ = new IncDecStatement(k_stmtKindInc, $$1);*/}
@@ -338,7 +339,8 @@ exp : tIDENTIFIER tPERIOD tIDENTIFIER {/*$$ = new Binary(k_exprKindFieldSelector
     | exp tPLUS exp %prec pPLUS {/*$$ = new Unary(k_exprKindPlus, $2);*/}
     | exp tMINUS exp %prec pMINUS {/*$$ = new Unary(k_exprKindMinus, $2);*/}
     | exp tTIMES exp { } 
-    | exp tDIV exp { } 
+    | exp tDIV exp { }
+    | exp tREM exp { } 
     | tLPAREN exp tRPAREN { } 
     | exp tOR exp { } 
     | exp tAND exp { } 
@@ -348,7 +350,6 @@ exp : tIDENTIFIER tPERIOD tIDENTIFIER {/*$$ = new Binary(k_exprKindFieldSelector
     | exp tLESS exp { } 
     | exp tGREATEREQ exp { } 
     | exp tLESSEQ exp { } 
-    | tMINUS exp %prec tUMINUS { } 
     | tBANG exp %prec pBANG {/*$$ = new Unary(k_exprKindBang, $2);*/}
     | tBWXOR exp %prec pBWXOR {/*$$ = new Unary(k_exprKindBwxor, $2);*/}
     | tINTVAL {/*$$ = new Literal(k_exprKindInt, $1);*/}
