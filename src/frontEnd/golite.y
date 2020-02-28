@@ -231,18 +231,23 @@ ins : %empty { /*$$ = NULL;*/ }
     ;
 
 decl : tVAR varspec { /* TODO: fix //$$ = $2; */}
-    | tVAR tIDENTIFIER tLBRACKET exp tRBRACKET tIDENTIFIER tSEMICOLON
+    | tVAR tIDENTIFIER array_indexes tIDENTIFIER tSEMICOLON { }
     | tVAR tLBRACE varspecs tRBRACE { /* TODO: fix //$$ = new Declaration(*$3); delete $3; */ }
     | tFUNC tIDENTIFIER tLPAREN params_list tRPAREN func_return_type tLBRACE ins returnstmt tRBRACE tSEMICOLON
 	{ /*$$ = new FunctionDeclaration($2, *$4, $6, $8);*/ }
     | tFUNC tIDENTIFIER tLPAREN id_list tIDENTIFIER tRPAREN func_return_type tLBRACE ins returnstmt tRBRACE tSEMICOLON
     | shortdecl {/*$$ = $1;*/}
     | tTYPE tIDENTIFIER tIDENTIFIER { /*$$ = new TypeDeclaration($2, $3);*/ }
-    | tTYPE tIDENTIFIER tSTRUCT tLPAREN structdecl_list tRPAREN {/*$$ = new StructDeclaration($2, *$5);*/}
+    | tTYPE tIDENTIFIER tSTRUCT tLBRACE structdecl_list tRBRACE {/*$$ = new StructDeclaration($2, *$5);*/}
     ;
 
+array_indexes : array_index
+    | array_indexes array_index { }
+
+array_index : tLBRACKET exp tRBRACKET { }
+
 func_return_type : tIDENTIFIER
-    | tLBRACKET exp tRBRACKET tIDENTIFIER
+    | tLBRACKET tINTVAL tRBRACKET tIDENTIFIER
     | %empty { /*$$ = NULL; */ }
 
 params_list: param
@@ -310,7 +315,7 @@ loopstmt : tFOR shortdecl exp tSEMICOLON assignstmt tLBRACE ins tRBRACE tSEMICOL
 
 assignstmt : id_list tASSIGN exp_list tSEMICOLON {/*$$ = new AssignStatement($1, $3);*/}
     | tIDENTIFIER tPERIOD tIDENTIFIER tASSIGN exp tSEMICOLON {/*$$ = new AssignStatement($1, $3, $5);*/}
-    | tIDENTIFIER tLBRACKET exp tRBRACKET tASSIGN exp tSEMICOLON {/*$$ = new AssignStatement($1, $3, $6);*/} 
+    | tIDENTIFIER array_indexes tASSIGN exp tSEMICOLON {/*$$ = new AssignStatement($1, $3, $6);*/} 
     | incdecstmt
     | incdecstmt tSEMICOLON
     ;
@@ -339,11 +344,11 @@ switchstmt : tSWITCH tLBRACE case_list tRBRACE tSEMICOLON{/*$$ = new SwitchState
     ;
 
 func_call : tIDENTIFIER tLPAREN id_list tRPAREN {/*$$ = new Binary(k_exprKindFunctionCall, $1, $3);*/}
-    | tIDENTIFIER tLPAREN exp_list tRPAREN { }
- 
+    | tIDENTIFIER tLPAREN exp_list tRPAREN { } 
+
 
 exp : tIDENTIFIER tPERIOD tIDENTIFIER {/*$$ = new Binary(k_exprKindFieldSelector, $1, $3);*/}
-    | tIDENTIFIER tLBRACKET exp tRBRACKET {/*$$ = new Binary(k_exprKindIndexer, $1, $3);*/}
+    | tIDENTIFIER array_indexes {/*$$ = new Binary(k_exprKindIndexer, $1, $3);*/}
     | func_call
     | tAPPEND tLPAREN exp tCOMMA exp tRPAREN {/*$$ = new Binary(k_exprKindAppend, $3, $5);*/}
     | tLEN tLPAREN exp tRPAREN {/*$$ = new Binary(k_exprKindLen, $3);*/}
