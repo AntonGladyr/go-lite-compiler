@@ -16,6 +16,7 @@
 * <https://cmake.org/cmake/help/v2.8.8/cmake.html#module:FindBISON>
 * <http://www.jonathanbeard.io/tutorials/FlexBisonC++>
 * <http://westes.github.io/flex/manual/Start-Conditions.html>
+* <https://gobyexample.com>
 * <https://en.wikipedia.org/wiki/Quicksort>
 * <https://www.geeksforgeeks.org/quick-sort/>
 * <https://medium.com/@rgalus/sorting-algorithms-quick-sort-implementation-in-go-9ebfd91fe95f>

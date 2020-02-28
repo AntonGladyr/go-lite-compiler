@@ -333,9 +333,9 @@ printstmt : tPRINT tLPAREN exp_list tRPAREN tSEMICOLON {/*$$ = new PrintStatemen
     | tPRINTLN tLPAREN exp_list tRPAREN tSEMICOLON {/*$$ = new PrintStatement(k_stmtKindPrintLn, $3);*/}
     ;
 
-switchstmt : tSWITCH tLBRACE case_list tRBRACE {/*$$ = new SwitchStatement($3);*/}
-    | tSWITCH exp tLBRACE case_list tRBRACE {/*$$ = new SwitchStatement($2, $4);*/}
-    | tSWITCH shortdecl tLBRACE case_list tRBRACE {/*$$ = new SwitchStatement($2, $4);*/}
+switchstmt : tSWITCH tLBRACE case_list tRBRACE tSEMICOLON{/*$$ = new SwitchStatement($3);*/}
+    | tSWITCH exp tLBRACE case_list tRBRACE tSEMICOLON{/*$$ = new SwitchStatement($2, $4);*/}
+    | tSWITCH shortdecl tLBRACE case_list tRBRACE tSEMICOLON{/*$$ = new SwitchStatement($2, $4);*/}
     ;
 
 func_call : tIDENTIFIER tLPAREN id_list tRPAREN {/*$$ = new Binary(k_exprKindFunctionCall, $1, $3);*/}
