@@ -172,14 +172,15 @@ ESCAPE [abfnrtv\\'"]
 ";" 		{ if (g_tokens) cout << "tSEMICOLON" << endl; RETURN(tSEMICOLON); }
 
 ":" 		{ if (g_tokens) cout << "tCOLON" << endl; RETURN(tCOLON); }
-\n		{	
+
+"\n"		{
 			if (insertSemicolon()) {
 				cout << (g_tokens ? "tSEMICOLON\n" : "");
 				RETURN(tSEMICOLON);
 			}
 		}
 
-([a-zA-Z]|"_")([a-zA-Z]|[0-9]|"_")* { 
+([a-zA-Z]|"_")([a-zA-Z]|[0-9]|"_")* {
     //yylval.identifier = strdup(yytext);
     if (g_tokens) cout << "tIDENTIFIER(" << yytext << ")" << endl;
     RETURN(tIDENTIFIER);
@@ -215,13 +216,13 @@ ESCAPE [abfnrtv\\'"]
 	RETURN(tRUNEVAL);
 }
 
-\"[^"]*\" {
+\".*\" {
 	//yylval.string = (yytext);
     	if (g_tokens) cout << "tSTRINGVAL(" << yytext << ")" << endl;
     	RETURN(tSTRINGVAL);
 }
 
-`(\\.|[^'])*` {
+`(\\.|[^`])*` {
     //yylval.string = (yytext);
     if (g_tokens) cout << "tSTRINGVAL(" << yytext << ")" << endl;
     RETURN(tSTRINGVAL);

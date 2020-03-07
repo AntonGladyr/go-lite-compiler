@@ -232,13 +232,16 @@ ins : %empty { /*$$ = NULL;*/ }
 
 decl : tVAR varspec { /* TODO: fix //$$ = $2; */}
     | tVAR tIDENTIFIER array_indexes tIDENTIFIER tSEMICOLON { }
+    | tVAR tIDENTIFIER tLBRACKET tRBRACKET tIDENTIFIER tSEMICOLON { /*literals*/ }
     | tVAR tLBRACE varspecs tRBRACE { /* TODO: fix //$$ = new Declaration(*$3); delete $3; */ }
     | tFUNC tIDENTIFIER tLPAREN params_list tRPAREN func_return_type tLBRACE ins returnstmt tRBRACE tSEMICOLON
 	{ /*$$ = new FunctionDeclaration($2, *$4, $6, $8);*/ }
     | tFUNC tIDENTIFIER tLPAREN id_list tIDENTIFIER tRPAREN func_return_type tLBRACE ins returnstmt tRBRACE tSEMICOLON
     | shortdecl {/*$$ = $1;*/}
-    | tTYPE tIDENTIFIER tIDENTIFIER { /*$$ = new TypeDeclaration($2, $3);*/ }
-    | tTYPE tIDENTIFIER tSTRUCT tLBRACE structdecl_list tRBRACE {/*$$ = new StructDeclaration($2, *$5);*/}
+    | tTYPE tIDENTIFIER tIDENTIFIER tSEMICOLON { /*$$ = new TypeDeclaration($2, $3);*/ }
+    | tTYPE tIDENTIFIER tSTRUCT tLBRACE structdecl_list tRBRACE tSEMICOLON {/*$$ = new StructDeclaration($2, *$5);*/}
+    | tVAR tIDENTIFIER tSTRUCT tLBRACE structdecl_list tRBRACE tSEMICOLON
+    | tTYPE tLPAREN typedecl_list tRPAREN tSEMICOLON { }
     ;
 
 array_indexes : array_index
@@ -263,8 +266,10 @@ varspecs : %empty {/*$$ = new std::vector<Declaration*>();*/}
     ;
 
 varspec : id_list tIDENTIFIER tSEMICOLON {/*$$ = new Declaration(*$1, $2);*/}
+    | id_list tLPAREN tIDENTIFIER tRPAREN tSEMICOLON { }
     | id_list tASSIGN exp_list tSEMICOLON {/*$$ = new Declaration(*$1, *$3);*/}
     | id_list tIDENTIFIER tASSIGN exp_list tSEMICOLON {/*$$ = new Declaration(*$1, *$4, $2);*/}
+    | id_list tLPAREN tIDENTIFIER tRPAREN tASSIGN exp_list tSEMICOLON {/*$$ = new Declaration(*$1, *$4, $2);*/}
     ;
 
 shortdecl : tIDENTIFIER tSHORTDECLARE exp tSEMICOLON {/*$$ = new ShortDeclaration($1, $3);*/}
@@ -281,9 +286,15 @@ exp_list : %empty {/*$$ = new std::vector<Expression*>();*/}
     | exp_list tCOMMA exp {/*$1->push_back($3);*/}
     ;
 
+type_decl : id_list tIDENTIFIER tSEMICOLON
+    | tIDENTIFIER tSTRUCT tLBRACE structdecl_list tRBRACE tSEMICOLON
+
+typedecl_list : type_decl
+    | typedecl_list type_decl
+
 structdecl_list : %empty {/*$$ = new std::vector<std::vector<std::string>>();*/}
-    | id_list {/*$$ = new std::vector<std::vector<std::string>>(); $$->push_back(*$1);*/}
-    | structdecl_list tNEWLINE id_list {/*$1->push_back(*$3);*/}
+    | id_list tIDENTIFIER tSEMICOLON {/*$$ = new std::vector<std::vector<std::string>>(); $$->push_back(*$1);*/}
+    | structdecl_list id_list tIDENTIFIER tSEMICOLON {/*$1->push_back(*$3);*/}
     ;
 
 case_list : %empty {/*$$ = new std::vector<std::pair<Expression*, Instruction*>>();*/}
@@ -315,7 +326,7 @@ loopstmt : tFOR shortdecl exp tSEMICOLON assignstmt tLBRACE ins tRBRACE tSEMICOL
 
 assignstmt : id_list tASSIGN exp_list tSEMICOLON {/*$$ = new AssignStatement($1, $3);*/}
     | tIDENTIFIER tPERIOD tIDENTIFIER tASSIGN exp tSEMICOLON {/*$$ = new AssignStatement($1, $3, $5);*/}
-    | tIDENTIFIER array_indexes tASSIGN exp tSEMICOLON {/*$$ = new AssignStatement($1, $3, $6);*/} 
+    | tIDENTIFIER array_indexes tASSIGN exp tSEMICOLON {/*$$ = new AssignStatement($1, $3, $6);*/}
     | incdecstmt
     | incdecstmt tSEMICOLON
     ;

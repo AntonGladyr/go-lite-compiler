@@ -20,4 +20,9 @@ func main() {
         }
     }
     println("2d: ", twoD)
+
+    var x [3]int
+    x[0] = 1
+    x[1] = 2
+    x[2] = 3
 }
