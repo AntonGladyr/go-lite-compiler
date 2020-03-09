@@ -1,7 +1,5 @@
 # GoLang Project
 
-* `Andy Jian`: 260741607
-* `Victor Massenet`: 260779781
 * `Anton Gladyr`: 260892882
 
 # Building scripts

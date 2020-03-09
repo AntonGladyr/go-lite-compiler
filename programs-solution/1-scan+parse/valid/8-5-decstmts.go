@@ -62,7 +62,7 @@ func dec_stmts() {
 
 	// slices
 	type t7 []int			// base type
-	type t8 []t1			// type id
+	type t8 []t1                    // type id
 	type t9 []struct {		// composite type
 		a int
 	}

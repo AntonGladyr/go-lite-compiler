@@ -36,6 +36,7 @@ int insertSemicolon() {
 %}
 
 %x COMMENT
+%x LINE_COMMENT
 
 /*Helper definitions */
 DIGIT [0-9]
@@ -74,8 +75,16 @@ ESCAPE [abfnrtv\\'"]
 %%
 
 [ \t\r]+
-"//"([^\n])*
-
+"//".*	{
+	if (insertSemicolon()) {
+		cout << (g_tokens ? "tSEMICOLON\n" : "");
+		RETURN(tSEMICOLON);
+	}
+	BEGIN(LINE_COMMENT);
+}
+<LINE_COMMENT>"\n" BEGIN(INITIAL);
+<LINE_COMMENT><<EOF>> yyterminate();
+	
 "/*"	BEGIN(COMMENT);
 <COMMENT>"/*"	{ fprintf(stderr, "Error: (line %d) Multiple comments opened\n", yylineno); exit(1); }
 <COMMENT>"*/"	BEGIN(INITIAL);
@@ -173,7 +182,7 @@ ESCAPE [abfnrtv\\'"]
 
 ":" 		{ if (g_tokens) cout << "tCOLON" << endl; RETURN(tCOLON); }
 
-"\n"		{
+"\n"		{	
 			if (insertSemicolon()) {
 				cout << (g_tokens ? "tSEMICOLON\n" : "");
 				RETURN(tSEMICOLON);
