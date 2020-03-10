@@ -224,26 +224,33 @@ void yyerror(const char *s) {
  //todo: unary binary literals expressions,
 %%
 
-program : tPACKAGE tIDENTIFIER tSEMICOLON { /*$$ = $3; */}
-    | var_decl
+program : tPACKAGE tIDENTIFIER tSEMICOLON top_level_decl_list { /*$$ = $3; */}
+    ;
+
+top_level_decl_list : decl
+    | top_level_decl_list decl
+    ;
+
+decl : var_decl
     | type_decl
     | func_decl
-    | %empty { $$ = NULL; }
+    | %empty { $$ = NULL; }  
     ;
 
-var_decl : tVAR id_listne type
-    | tVAR id_listne tASSIGN exp_list
-    | tVAR id_listne type tASSIGN exp_list
+var_decl : tVAR id_listne type tSEMICOLON
+    | tVAR id_listne tASSIGN exp_list tSEMICOLON
+    | tVAR id_listne type tASSIGN exp_list tSEMICOLON 
     ;
 
-type_decl : tTYPE tIDENTIFIER type tSEMICOLON { /*$$ = new TypeDeclaration($2, $3);*/ }
+type_decl : tTYPE tIDENTIFIER type tSEMICOLON { /*$$ = new TypeDeclaration($2, $3);*/ } 
     ;
 
-func_decl : tFUNC tIDENTIFIER tLPAREN params tRPAREN tLBRACE stmt_list returnstmt tRBRACE tSEMICOLON
-    tFUNC tIDENTIFIER tLPAREN params tRPAREN type tLBRACE stmt_list returnstmt tRBRACE tSEMICOLON
+func_decl : tFUNC tIDENTIFIER tLPAREN params tRPAREN block_stmt tSEMICOLON
+    | tFUNC tIDENTIFIER tLPAREN params tRPAREN type block_stmt tSEMICOLON 
     ;
 
-stmt_list : stmt_list stmt
+stmt_list : stmt 
+    | stmt_list stmt
     ;
    
 type : tIDENTIFIER
@@ -264,29 +271,44 @@ exp_list :
     | exp_list tCOMMA exp {/*$1->push_back($3);*/}
     ;
 
-params : tIDENTIFIER type
+param : tIDENTIFIER type
+    ;
+
+params : param
+    | params tCOMMA param
     | %empty
     ;
 
-array_index : array_index tLBRACKET tINTVAL tRBRACKET { }
+array_index : tLBRACKET tINTVAL tRBRACKET { }
+
+array_index_list : array_index
+    | array_index_list array_index
     ;
 
-stmt :  block_stmt { }
-    | func_call tSEMICOLON
+stmt : block_stmt { }
+    | stmt_decl 
     | loopstmt
     | assignstmt
     | incdecstmt 
-    | ifstmt
+    | ifstmt tSEMICOLON
     | printstmt
     | returnstmt
-    | switchstmt 
+    | switchstmt
+    | expstmt tSEMICOLON
     | tBREAK tSEMICOLON {/*$$ = new BreakStatement();*/}
     | tCONTINUE tSEMICOLON {/*$$ = new ContinueStatement();*/}
-    | tSEMICOLON { $$ = NULL; }
+    | tSEMICOLON { $$ = NULL; } 
+    ;
+
+stmt_decl : var_decl
+    | type_decl 
     ;
 
 returnstmt : tRETURN tSEMICOLON {/*&$$ = new ReturnStatement();*/}
     | tRETURN exp tSEMICOLON {/*$$ = new ReturnStatement(exp);*/} 
+    ;
+
+expstmt : exp
     ;
 
 loopstmt : tFOR tIDENTIFIER tASSIGN exp tSEMICOLON exp tSEMICOLON assignstmt block_stmt tSEMICOLON {/*$$ = new ForStatement($2, $4, $6, $8);*/}
@@ -298,9 +320,14 @@ loopstmt : tFOR tIDENTIFIER tASSIGN exp tSEMICOLON exp tSEMICOLON assignstmt blo
 assignstmt : exp_list tASSIGN exp_list tSEMICOLON
     ;
 
-ifstmt : tIF exp block_stmt tSEMICOLON {/*$$ = new IfStatement($2, $4);*/} 
-    | tIF exp block_stmt tELSE block_stmt tSEMICOLON {/*$$ = new IfElseStatement(k_stmtKindIfElse, $2, $4, $7);*/} 
-    | tIF exp block_stmt tELSE block_stmt tELSE ifstmt tSEMICOLON {/*$$ = new IfElseStatement(k_stmtKindIfElseNested, $2, $4, $8);*/} 
+ifstmt : tIF exp tail {/*$$ = new IfStatement($2, $4);*/} 
+    | tIF exp tail tELSE tail {/*$$ = new IfElseStatement(k_stmtKindIfElse, $2, $4, $7);*/} 
+    | tIF exp tail tELSE ifstmt {/*$$ = new IfElseStatement(k_stmtKindIfElseNested, $2, $4, $8);*/}
+    | %empty
+    ;
+
+tail : stmt
+    block_stmt
     ;
 
 incdecstmt : exp tINC {/*$$ = new IncDecStatement(k_stmtKindInc, $$1);*/} 
@@ -320,7 +347,8 @@ case_list : %empty {/*$$ = new std::vector<std::pair<Expression*, Instruction*>>
     | tDEFAULT tCOLON stmt_list case_list {/*$$->emplace_back(NULL, $4);*/}
     ;
 
-block_stmt: tLBRACE stmt_list tRBRACE tSEMICOLON
+block_stmt: tLBRACE stmt_list tRBRACE
+    | tLBRACE tRBRACE 
     ;
 
 func_call : tIDENTIFIER tLPAREN id_listpe tRPAREN {/*$$ = new Binary(k_exprKindFunctionCall, $1, $3);*/}
@@ -328,10 +356,11 @@ func_call : tIDENTIFIER tLPAREN id_listpe tRPAREN {/*$$ = new Binary(k_exprKindF
     | tLPAREN tIDENTIFIER tRPAREN tLPAREN exp_list tRPAREN
     ; 
 
-exp : tIDENTIFIER { } 
-    | tIDENTIFIER array_index {/*$$ = new Binary(k_exprKindIndexer, $1, $3);*/}
+exp : tIDENTIFIER { }
+    | tLPAREN tIDENTIFIER tRPAREN 
+    | tIDENTIFIER array_index_list {/*$$ = new Binary(k_exprKindIndexer, $1, $3);*/}
     | func_call
-    | func_call array_index 
+    | func_call array_index_list 
     | tLEN tLPAREN exp tRPAREN {/*$$ = new Binary(k_exprKindLen, $3);*/}
     | tCAP tLPAREN exp tRPAREN {/*$$ = new Binary(k_exprKindCap, $3);*/}
     | tLPAREN exp tRPAREN { } 
