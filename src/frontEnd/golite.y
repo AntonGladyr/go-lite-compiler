@@ -99,8 +99,8 @@ void yyerror(const char *s) {
  * of identifiers separated by spaces.
  */
 
-%type <ins> program ins
-%type <decl> decl varspec shortdecl
+%type <ins> program
+%type <decl> decl varspec 
 %type <stmt> stmt ifstmt loopstmt assignstmt incdecstmt printstmt returnstmt switchstmt
 %type <exp> exp
 
@@ -224,167 +224,87 @@ void yyerror(const char *s) {
  //todo: unary binary literals expressions,
 %%
 
-program : tPACKAGE tIDENTIFIER tSEMICOLON ins { /*$$ = $3; */}
+program : tPACKAGE tIDENTIFIER tSEMICOLON { /*$$ = $3; */}
+    | var_decl
+    | type_decl
+    | func_decl
+    | %empty { $$ = NULL; }
     ;
 
-ins : %empty { $$ = NULL; }
-    | ins decl { /*$$ = new Instruction($1, $2);*/}
-    | ins stmt { /*$$ = new Instruction($1, $2);*/ }
-    | tLPAREN ins tRPAREN ins {/*$$ = new Instruction($2, $4);*/}
+var_decl : tVAR id_listne type
+    | tVAR id_listne tASSIGN exp_list
+    | tVAR id_listne type tASSIGN exp_list
     ;
 
+type_decl : tTYPE tIDENTIFIER type tSEMICOLON { /*$$ = new TypeDeclaration($2, $3);*/ }
+    ;
+
+func_decl : tFUNC tIDENTIFIER tLPAREN params tRPAREN tLBRACE stmt_list returnstmt tRBRACE tSEMICOLON
+    tFUNC tIDENTIFIER tLPAREN params tRPAREN type tLBRACE stmt_list returnstmt tRBRACE tSEMICOLON
+    ;
+
+stmt_list : stmt_list stmt
+    ;
+   
 type : tIDENTIFIER
-    | tLBRACKET tINT tRBRACKET type
+    | tLBRACKET tINTVAL tRBRACKET type
     | tLPAREN type tRPAREN
-
-decl : tVAR idlist type
-    | tVAR id_list tASSIGN explist
-    | tVAR id_list type tASSIGN explist
-
-decl : tVAR varspec { /* TODO: fix //$$ = $2; */}
-    | tVAR tIDENTIFIER array_indexes tIDENTIFIER tSEMICOLON { }
-    | tVAR tIDENTIFIER tLBRACKET tRBRACKET tIDENTIFIER tSEMICOLON { /*literals*/ }
-    | tVAR tLPAREN varspecs tRPAREN tSEMICOLON { /* TODO: fix //$$ = new Declaration(*$3); delete $3; */ } 
-    | tVAR tIDENTIFIER tSTRUCT tLBRACE structdecl_list tRBRACE tSEMICOLON
-    | tVAR tIDENTIFIER array_indexes tSTRUCT tLBRACE structdecl_list tRBRACE tSEMICOLON
-    | tFUNC tIDENTIFIER tLPAREN params_list tRPAREN func_return_type tLBRACE ins returnstmt tRBRACE tSEMICOLON
-	{ /*$$ = new FunctionDeclaration($2, *$4, $6, $8);*/ }
-    | tFUNC tIDENTIFIER tLPAREN id_list tIDENTIFIER tRPAREN func_return_type tLBRACE ins returnstmt tRBRACE tSEMICOLON
-    | tTYPE tIDENTIFIER identifier tSEMICOLON { /*$$ = new TypeDeclaration($2, $3);*/ }
-    | tTYPE tIDENTIFIER tSTRUCT tLBRACE structdecl_list tRBRACE tSEMICOLON {/*$$ = new StructDeclaration($2, *$5);*/}
-    | tTYPE tIDENTIFIER array_indexes tIDENTIFIER tSEMICOLON { /*$$ = new TypeDeclaration($2, $3);*/ }
-    | tTYPE tIDENTIFIER array_indexes tSTRUCT tLBRACE structdecl_list tRBRACE tSEMICOLON {/*$$ = new StructDeclaration($2, *$5);*/} 
-    | tTYPE tLPAREN typedecl_list tRPAREN tSEMICOLON { }
-    | shortdecl {/*$$ = $1;*/}
     ;
 
-array_indexes : array_index
-    | array_indexes array_index { }
-
-array_index : tLBRACKET exp tRBRACKET { }
-    | tLBRACKET tRBRACKET { }
-
-func_return_type : tIDENTIFIER
-    | array_indexes tIDENTIFIER
-    | %empty { /*$$ = NULL; */ }
-
-param : id_lsit type
-
-params_list: param
-    | params_list tCOMMA param
-    | %empty { $$ = NULL; } 
-
-param: id_list tIDENTIFIER
-    | id_list tLPAREN tIDENTIFIER tRPAREN
-    | tIDENTIFIER array_indexes tIDENTIFIER
-
-varspecs : %empty {/*$$ = new std::vector<Declaration*>();*/}
-    | varspec {/*$$ = new std::vector<Declaration*>(); $$->push_back($1);*/}
-    | varspecs varspec {/*$1->push_back($3);*/}
+id_listne : tIDENTIFIER {/*$$ = new std::vector<std::string>(); $$->push_back($1);*/}
+    | id_listne tCOMMA tIDENTIFIER {/*$1->push_back($3);*/}
     ;
 
-varspec : id_list identifier tSEMICOLON {/*$$ = new Declaration(*$1, $2);*/}
-    | id_list tASSIGN exp_list tSEMICOLON {/*$$ = new Declaration(*$1, *$3);*/}
-    | id_list identifier tASSIGN exp_list tSEMICOLON {/*$$ = new Declaration(*$1, *$4, $2);*/}
+id_listpe : %empty
+    | id_listne
     ;
-
-shortdecl : id_list tSHORTDECLARE exp_list tSEMICOLON {/*$$ = new ShortDeclaration($1, $3);*/}
-    | tIDENTIFIER tSHORTDECLARE exp tSEMICOLON { }    
-    | tIDENTIFIER tSHORTDECLARE array_indexes tIDENTIFIER tLBRACE exp_list tRBRACE tSEMICOLON
-    ;
-
-identifier : tIDENTIFIER
-    | tLPAREN tIDENTIFIER tRPAREN
-    ;
-
-id_list : identifier {/*$$ = new std::vector<std::string>(); $$->push_back($1);*/}
-    | id_list tCOMMA identifier {/*$1->push_back($3);*/}
-    | %empty 
-    ;
-
-idlistne: tID
-    |idlist ',' tID
-
-idlistpe -> %empty,
-    |idlistne
 
 exp_list : 
     | exp {/*$$ = new std::vector<Expression*>(); $$->push_back($1);*/}
     | exp_list tCOMMA exp {/*$1->push_back($3);*/}
-    | %empty {/*$$ = new std::vector<Expression*>();*/}
     ;
 
-type_decl : id_list tIDENTIFIER tSEMICOLON { }
-    | tIDENTIFIER tSTRUCT tLBRACE structdecl_list tRBRACE tSEMICOLON { }
-    | %empty 
+params : tIDENTIFIER type
+    | %empty
     ;
 
-typedecl_list : type_decl
-    | typedecl_list type_decl
+array_index : array_index tLBRACKET tINTVAL tRBRACKET { }
     ;
 
-structdecl : id_list tIDENTIFIER tSEMICOLON {/*$$ = new std::vector<std::vector<std::string>>(); $$->push_back(*$1);*/}
-    | tIDENTIFIER tSTRUCT tLBRACE structdecl_list tRBRACE tSEMICOLON { }
-    | %empty { }
-
-structdecl_list : %empty {/*$$ = new std::vector<std::vector<std::string>>();*/}
-    | structdecl {/*$$ = new std::vector<std::vector<std::string>>(); $$->push_back(*$1);*/}
-    | structdecl_list structdecl {/*$1->push_back(*$3);*/}
-    ;
-
-case_list : %empty {/*$$ = new std::vector<std::pair<Expression*, Instruction*>>();*/}
-    | tCASE exp tCOLON ins case_list {/*$$ = new std::vector<std::pair<Expression*, Instruction*>>(); $$->emplace_back($2, $4);*/}
-    | tDEFAULT tCOLON ins case_list {/*$$->emplace_back(NULL, $4);*/}
-    ;
-
-stmt : func_call tSEMICOLON
+stmt :  block_stmt { }
+    | func_call tSEMICOLON
     | loopstmt
-    | assignstmt 
+    | assignstmt
+    | incdecstmt 
     | ifstmt
     | printstmt
     | returnstmt
-    | switchstmt
-    | op_assign_stmt
+    | switchstmt 
     | tBREAK tSEMICOLON {/*$$ = new BreakStatement();*/}
     | tCONTINUE tSEMICOLON {/*$$ = new ContinueStatement();*/}
     | tSEMICOLON { $$ = NULL; }
-    | block_stmt { }
     ;
 
 returnstmt : tRETURN tSEMICOLON {/*&$$ = new ReturnStatement();*/}
-    | tRETURN exp tSEMICOLON {/*$$ = new ReturnStatement(exp);*/}
-    | %empty { $$ = NULL; }
+    | tRETURN exp tSEMICOLON {/*$$ = new ReturnStatement(exp);*/} 
     ;
 
-loopstmt : tFOR shortdecl exp tSEMICOLON assignstmt tLBRACE ins tRBRACE tSEMICOLON {/*$$ = new ForStatement($2, $4, $6, $8);*/}
-    | tFOR tIDENTIFIER tASSIGN exp tSEMICOLON exp tSEMICOLON assignstmt tLBRACE ins tRBRACE tSEMICOLON {/*$$ = new ForStatement($2, $4, $6, $8);*/}
-    | tFOR tSEMICOLON tSEMICOLON tLBRACE ins tRBRACE tSEMICOLON  
-    | tFOR exp tLBRACE ins tRBRACE tSEMICOLON {/*$$ = new ForStatement($2, $4);*/}
-    | tFOR tLBRACE ins tRBRACE tSEMICOLON {/*$$ = new ForStatement($3);*/}
+loopstmt : tFOR tIDENTIFIER tASSIGN exp tSEMICOLON exp tSEMICOLON assignstmt block_stmt tSEMICOLON {/*$$ = new ForStatement($2, $4, $6, $8);*/}
+    | tFOR tSEMICOLON tSEMICOLON block_stmt tSEMICOLON  
+    | tFOR exp block_stmt tSEMICOLON {/*$$ = new ForStatement($2, $4);*/}
+    | tFOR block_stmt tSEMICOLON {/*$$ = new ForStatement($3);*/}
     ;
 
-assignstmt : id_list tASSIGN exp_list tSEMICOLON {/*$$ = new AssignStatement($1, $3);*/}
-    | field_selectors tASSIGN exp tSEMICOLON {/*$$ = new AssignStatement($1, $3, $5);*/}
-    | tIDENTIFIER array_indexes tASSIGN exp tSEMICOLON {/*$$ = new AssignStatement($1, $3, $6);*/} 
-    | incdecstmt
-    | incdecstmt tSEMICOLON
-    | exp_list tASSIGN exp_list
+assignstmt : exp_list tASSIGN exp_list tSEMICOLON
     ;
 
-ifstmt : tIF exp tLBRACE ins tRBRACE tSEMICOLON {/*$$ = new IfStatement($2, $4);*/}
-    | tIF shortdecl exp tLBRACE ins tRBRACE tSEMICOLON {/*$$ = new IfStatement($3, $5, $2);*/}
-    | tIF exp tLBRACE ins tRBRACE tELSE ifstmt {/*$$ = new IfElseStatement(k_stmtKindIfElse, $2, $4, $7);*/}
-    | tIF shortdecl exp tLBRACE ins tRBRACE tELSE ifstmt {/*$$ = new IfElseStatement(k_stmtKindDeclIfElse, $3, $5, $8, $2);*/}
-    | tIF exp tLBRACE ins tRBRACE tELSE tLBRACE ins tRBRACE tSEMICOLON{/*$$ = new IfElseStatement(k_stmtKindIfElseNested, $2, $4, $8);*/}
-    | tIF shortdecl exp tLBRACE ins tRBRACE tELSE tLBRACE ins tRBRACE tSEMICOLON{/*$$ = new IfElseStatement(k_stmtKindDeclIfElseNested, $3, $5, $9, $2);*/}
+ifstmt : tIF exp block_stmt tSEMICOLON {/*$$ = new IfStatement($2, $4);*/} 
+    | tIF exp block_stmt tELSE block_stmt tSEMICOLON {/*$$ = new IfElseStatement(k_stmtKindIfElse, $2, $4, $7);*/} 
+    | tIF exp block_stmt tELSE block_stmt tELSE ifstmt tSEMICOLON {/*$$ = new IfElseStatement(k_stmtKindIfElseNested, $2, $4, $8);*/} 
     ;
 
-incdecstmt : tIDENTIFIER tINC {/*$$ = new IncDecStatement(k_stmtKindInc, $$1);*/}
-    | tINC tIDENTIFIER { }
-    | tIDENTIFIER tDEC {/*$$ = new IncDecStatement(k_stmtKindDec, $$1);*/}
-    | tDEC tIDENTIFIER { }
-    | tIDENTIFIER tPLUSASSIGN exp {/*$$ = new IncDecStatement(k_stmtKindIncExp, $$1, $3);*/}
-    | tIDENTIFIER tMINUSASSIGN exp {/*$$ = new IncDecStatement(k_stmtKindDecExp, $$1, $3);*/}
+incdecstmt : exp tINC {/*$$ = new IncDecStatement(k_stmtKindInc, $$1);*/} 
+    | exp tDEC {/*$$ = new IncDecStatement(k_stmtKindDec, $$1);*/}
     ;
 
 printstmt : tPRINT tLPAREN exp_list tRPAREN tSEMICOLON {/*$$ = new PrintStatement(k_stmtKindPrint, $3);*/}
@@ -392,44 +312,26 @@ printstmt : tPRINT tLPAREN exp_list tRPAREN tSEMICOLON {/*$$ = new PrintStatemen
     ;
 
 switchstmt : tSWITCH tLBRACE case_list tRBRACE tSEMICOLON{/*$$ = new SwitchStatement($3);*/}
-    | tSWITCH exp tLBRACE case_list tRBRACE tSEMICOLON{/*$$ = new SwitchStatement($2, $4);*/}
-    | tSWITCH shortdecl tLBRACE case_list tRBRACE tSEMICOLON{/*$$ = new SwitchStatement($2, $4);*/}
+    | tSWITCH exp tLBRACE case_list tRBRACE tSEMICOLON{/*$$ = new SwitchStatement($2, $4);*/} 
     ;
 
-op_assign_stmt : exp tPLUSASSIGN exp{ }
-    | exp tMINUSASSIGN exp { }
-    | exp tMULTASSIGN exp { }
-    | exp tDIVASSIGN exp { }
-    | exp tREMASSIGN exp { }
-    | exp tBWANDASSIGN exp { }
-    | exp tBWORASSIGN exp { }
-    | exp tBWXORASSIGN exp { }
-    | exp tLSHIFTASSIGN exp { }
-    | exp tRSHIFTASSIGN exp { }
-    | exp tBWANDNOTASSIGN exp { }
-
-
-block_stmt: tLBRACE ins tRBRACE tSEMICOLON
+case_list : %empty {/*$$ = new std::vector<std::pair<Expression*, Instruction*>>();*/}
+    | tCASE exp tCOLON stmt_list case_list {/*$$ = new std::vector<std::pair<Expression*, Instruction*>>(); $$->emplace_back($2, $4);*/}
+    | tDEFAULT tCOLON stmt_list case_list {/*$$->emplace_back(NULL, $4);*/}
     ;
 
-func_call : tIDENTIFIER tLPAREN id_list tRPAREN {/*$$ = new Binary(k_exprKindFunctionCall, $1, $3);*/}
+block_stmt: tLBRACE stmt_list tRBRACE tSEMICOLON
+    ;
+
+func_call : tIDENTIFIER tLPAREN id_listpe tRPAREN {/*$$ = new Binary(k_exprKindFunctionCall, $1, $3);*/}
     | tIDENTIFIER tLPAREN exp_list tRPAREN { } 
     | tLPAREN tIDENTIFIER tRPAREN tLPAREN exp_list tRPAREN
     ; 
 
-selector : tIDENTIFIER
-    | tIDENTIFIER array_indexes
-
-field_selectors : selector tPERIOD selector { }
-    | field_selectors tPERIOD selector { }
-
-exp : tIDENTIFIER { }
-    | field_selectors {/*$$ = new Binary(k_exprKindFieldSelector, $1, $3);*/}
-    | field_selectors array_indexes
-    | tIDENTIFIER array_indexes {/*$$ = new Binary(k_exprKindIndexer, $1, $3);*/}
+exp : tIDENTIFIER { } 
+    | tIDENTIFIER array_index {/*$$ = new Binary(k_exprKindIndexer, $1, $3);*/}
     | func_call
-    | func_call array_indexes
-    | tAPPEND tLPAREN exp tCOMMA exp tRPAREN {/*$$ = new Binary(k_exprKindAppend, $3, $5);*/}
+    | func_call array_index 
     | tLEN tLPAREN exp tRPAREN {/*$$ = new Binary(k_exprKindLen, $3);*/}
     | tCAP tLPAREN exp tRPAREN {/*$$ = new Binary(k_exprKindCap, $3);*/}
     | tLPAREN exp tRPAREN { } 
