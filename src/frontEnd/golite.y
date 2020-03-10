@@ -233,6 +233,14 @@ ins : %empty { $$ = NULL; }
     | tLPAREN ins tRPAREN ins {/*$$ = new Instruction($2, $4);*/}
     ;
 
+type : tIDENTIFIER
+    | tLBRACKET tINT tRBRACKET type
+    | tLPAREN type tRPAREN
+
+decl : tVAR idlist type
+    | tVAR id_list tASSIGN explist
+    | tVAR id_list type tASSIGN explist
+
 decl : tVAR varspec { /* TODO: fix //$$ = $2; */}
     | tVAR tIDENTIFIER array_indexes tIDENTIFIER tSEMICOLON { }
     | tVAR tIDENTIFIER tLBRACKET tRBRACKET tIDENTIFIER tSEMICOLON { /*literals*/ }
@@ -259,6 +267,8 @@ array_index : tLBRACKET exp tRBRACKET { }
 func_return_type : tIDENTIFIER
     | array_indexes tIDENTIFIER
     | %empty { /*$$ = NULL; */ }
+
+param : id_lsit type
 
 params_list: param
     | params_list tCOMMA param
@@ -291,6 +301,12 @@ id_list : identifier {/*$$ = new std::vector<std::string>(); $$->push_back($1);*
     | id_list tCOMMA identifier {/*$1->push_back($3);*/}
     | %empty 
     ;
+
+idlistne: tID
+    |idlist ',' tID
+
+idlistpe -> %empty,
+    |idlistne
 
 exp_list : 
     | exp {/*$$ = new std::vector<Expression*>(); $$->push_back($1);*/}

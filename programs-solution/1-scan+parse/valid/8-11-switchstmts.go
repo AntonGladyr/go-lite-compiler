@@ -16,20 +16,6 @@ func switch_stmts() {
 		case 1, 3, 5, 7, 9:
 	}
 
-	// statement, no expression,
-	switch x++; {
-		case x < 0:
-		case x > 0:
-		default:
-	}
-
-	// default in the middle
-	switch x++; x {
-		case 0:
-		default:
-		case 1, 3, 5, 7, 9:
-	}
-
 	// empty
 	switch {
 

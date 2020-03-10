@@ -3,14 +3,8 @@ package main
 func f() {
 }
 
-func g(l, a, b, c int) {
+func g(l int, a int, b int, c int) {
 
-}
-
-func h() []int {
-	var a []int
-	a = append(a, 0)
-	return a
 }
 
 func funccall_exprs() {
@@ -22,7 +16,4 @@ func funccall_exprs() {
 
 	(f)()
 	(g)(0, a, b+c, d[0])
-
-	h()[0] = 0
-	a = h()[0]
-}
+} 

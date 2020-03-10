@@ -20,17 +20,3 @@ func f4(a int, b int) {
 
 }
 
-// two params (short form), no return value
-func f5(a, b int) {
-
-}
-
-// two sets of short form params
-func f6(a, b int, c, d bool) {
-
-}
-
-// parenthesized types
-func f7(a (int)) {
-
-}
