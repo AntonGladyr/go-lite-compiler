@@ -279,72 +279,90 @@ params : param
     | %empty
     ;
 
-array_index : tLBRACKET tINTVAL tRBRACKET { }
+array_index : tLBRACKET exp tRBRACKET { }
 
 array_index_list : array_index
     | array_index_list array_index
     ;
 
-stmt : block_stmt { }
+stmt : block_stmt tSEMICOLON { }
     | stmt_decl 
-    | loopstmt
-    | assignstmt
-    | incdecstmt 
+    | loopstmt tSEMICOLON
+    | assignstmt tSEMICOLON
+    | incdecstmt tSEMICOLON
     | ifstmt tSEMICOLON
-    | printstmt
-    | returnstmt
-    | switchstmt
+    | printstmt tSEMICOLON
+    | returnstmt tSEMICOLON
+    | switchstmt tSEMICOLON
     | expstmt tSEMICOLON
     | tBREAK tSEMICOLON {/*$$ = new BreakStatement();*/}
     | tCONTINUE tSEMICOLON {/*$$ = new ContinueStatement();*/}
-    | tSEMICOLON { $$ = NULL; } 
+    | emptystmt tSEMICOLON { $$ = NULL; }
+    ;
+
+emptystmt : %empty
     ;
 
 stmt_decl : var_decl
     | type_decl 
     ;
 
-returnstmt : tRETURN tSEMICOLON {/*&$$ = new ReturnStatement();*/}
-    | tRETURN exp tSEMICOLON {/*$$ = new ReturnStatement(exp);*/} 
+returnstmt : tRETURN {/*&$$ = new ReturnStatement();*/}
+    | tRETURN exp {/*$$ = new ReturnStatement(exp);*/} 
     ;
 
 expstmt : exp
-    ;
-
-loopstmt : tFOR tIDENTIFIER tASSIGN exp tSEMICOLON exp tSEMICOLON assignstmt block_stmt tSEMICOLON {/*$$ = new ForStatement($2, $4, $6, $8);*/}
-    | tFOR tSEMICOLON tSEMICOLON block_stmt tSEMICOLON  
-    | tFOR exp block_stmt tSEMICOLON {/*$$ = new ForStatement($2, $4);*/}
-    | tFOR block_stmt tSEMICOLON {/*$$ = new ForStatement($3);*/}
-    ;
-
-assignstmt : exp_list tASSIGN exp_list tSEMICOLON
-    ;
-
-ifstmt : tIF exp tail {/*$$ = new IfStatement($2, $4);*/} 
-    | tIF exp tail tELSE tail {/*$$ = new IfElseStatement(k_stmtKindIfElse, $2, $4, $7);*/} 
-    | tIF exp tail tELSE ifstmt {/*$$ = new IfElseStatement(k_stmtKindIfElseNested, $2, $4, $8);*/}
     | %empty
     ;
 
-tail : stmt
-    block_stmt
+loopstmt : tFOR simplestmt tSEMICOLON expstmt tSEMICOLON simplestmt block_stmt
+    | tFOR exp block_stmt {/*$$ = new ForStatement($2, $4);*/}
+    | tFOR block_stmt {/*$$ = new ForStatement($3);*/}
+    ;
+
+simplestmt : emptystmt
+    | expstmt
+    | incdecstmt
+    | assignstmt
+    ;
+
+assignstmt : exp_list tASSIGN exp_list 
+    ;
+
+ifstmt : tIF exp block_stmt {/*$$ = new IfStatement($2, $4);*/} 
+    | tIF exp block_stmt tELSE block_stmt {/*$$ = new IfElseStatement(k_stmtKindIfElse, $2, $4, $7);*/} 
+    | tIF exp block_stmt tELSE ifstmt {/*$$ = new IfElseStatement(k_stmtKindIfElseNested, $2, $4, $8);*/} 
     ;
 
 incdecstmt : exp tINC {/*$$ = new IncDecStatement(k_stmtKindInc, $$1);*/} 
     | exp tDEC {/*$$ = new IncDecStatement(k_stmtKindDec, $$1);*/}
     ;
 
-printstmt : tPRINT tLPAREN exp_list tRPAREN tSEMICOLON {/*$$ = new PrintStatement(k_stmtKindPrint, $3);*/}
-    | tPRINTLN tLPAREN exp_list tRPAREN tSEMICOLON {/*$$ = new PrintStatement(k_stmtKindPrintLn, $3);*/}
+printstmt : tPRINT tLPAREN exp_list tRPAREN {/*$$ = new PrintStatement(k_stmtKindPrint, $3);*/}
+    | tPRINTLN tLPAREN exp_list tRPAREN {/*$$ = new PrintStatement(k_stmtKindPrintLn, $3);*/}
     ;
 
-switchstmt : tSWITCH tLBRACE case_list tRBRACE tSEMICOLON{/*$$ = new SwitchStatement($3);*/}
-    | tSWITCH exp tLBRACE case_list tRBRACE tSEMICOLON{/*$$ = new SwitchStatement($2, $4);*/} 
+switchstmt : tSWITCH switch_body {/*$$ = new SwitchStatement($3);*/}
+    | tSWITCH exp switch_body {/*$$ = new SwitchStatement($2, $4);*/} 
     ;
 
-case_list : %empty {/*$$ = new std::vector<std::pair<Expression*, Instruction*>>();*/}
-    | tCASE exp tCOLON stmt_list case_list {/*$$ = new std::vector<std::pair<Expression*, Instruction*>>(); $$->emplace_back($2, $4);*/}
-    | tDEFAULT tCOLON stmt_list case_list {/*$$->emplace_back(NULL, $4);*/}
+switch_body : tLBRACE case_list default tRBRACE
+    | tLBRACE tRBRACE
+    ;
+
+case : tCASE exp_list tCOLON casestmt
+    | %empty
+    ;
+
+casestmt : stmt_list
+    | %empty
+    ;
+
+case_list : case
+    | case_list case 
+    ;
+
+default : tDEFAULT tCOLON casestmt 
     ;
 
 block_stmt: tLBRACE stmt_list tRBRACE
