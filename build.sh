@@ -1,10 +1,7 @@
 #!/bin/bash
 
 # Build the compiler
-
-make clean -C ./build
+./buildMakefile.sh 
 make -C ./build
-cd build
-rm -f golite
-cd bin
+cd build/bin
 cp golite ../

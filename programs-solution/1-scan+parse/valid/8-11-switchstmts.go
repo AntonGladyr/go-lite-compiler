@@ -12,8 +12,8 @@ func switch_stmts() {
 
 	// expression, no default
 	switch x {
-		case 0:
-		case 1, 3, 5, 7, 9:
+		case 0:	
+		case 1, 3, 5, 7, 9: 
 	}
 
 	// empty
