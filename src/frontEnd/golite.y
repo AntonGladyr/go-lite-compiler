@@ -219,16 +219,16 @@ void yyerror(const char *s) {
 %%
 
 program : tPACKAGE tIDENTIFIER tSEMICOLON decl_list { /*$$ = $3; */}
+    | tPACKAGE tIDENTIFIER tSEMICOLON { }
     ;
 
 decl_list : decl
-    | decl_list decl
-    | %empty 
+    | decl_list decl 
     ;
 
 decl : var_decl tSEMICOLON
     | type_decl tSEMICOLON
-    | func_decl tSEMICOLON
+    | func_decl tSEMICOLON 
     ;
 
 var_decl : tVAR id_listne type { $$ = NULL; }
@@ -256,10 +256,6 @@ id_listne : tIDENTIFIER {/*$$ = new std::vector<std::string>(); $$->push_back($1
     | id_listne tCOMMA tIDENTIFIER {/*$1->push_back($3);*/}
     ;
 
-paren_exp : exp
-    | tLPAREN exp tRPAREN
-    ;
-
 exp_list : exp {/*$$ = new std::vector<Expression*>(); $$->push_back($1);*/}
     | exp_list tCOMMA exp {/*$1->push_back($3);*/}
     ;
@@ -283,7 +279,7 @@ stmt : block_stmt tSEMICOLON { $$ = NULL; }
     | stmt_decl tSEMICOLON { $$ = NULL; }
     | loopstmt tSEMICOLON { $$ = NULL; }
     | ifstmt tSEMICOLON { $$ = NULL; }
-    | switchstmt tSEMICOLON { $$ = NULL; }
+    | switchstmt tSEMICOLON { $$ = NULL; }   
     | printstmt tSEMICOLON { $$ = NULL; }
     | returnstmt tSEMICOLON { $$ = NULL; }
     | tBREAK tSEMICOLON {/*$$ = new BreakStatement();*/ $$ = NULL; }
@@ -331,11 +327,11 @@ switchstmt : tSWITCH tLBRACE case_block tRBRACE {/*$$ = new SwitchStatement($3);
 
 case_block : default_clause
     | case_clause case_block
-    | %empty
+    | %empty 
     ;
 
 switch_stmts : stmt_list
-    | %empty
+    | %empty   
     ;
 
 case_clause : tCASE exp_list tCOLON switch_stmts  { }
@@ -356,17 +352,23 @@ block_stmt: tLBRACE stmt_list tRBRACE { }
     | tLBRACE tRBRACE { }
     ;
 
-func_call : tIDENTIFIER tLPAREN exp_listpe tRPAREN { }
-    | tLPAREN tIDENTIFIER tRPAREN tLPAREN exp_listpe tRPAREN
+func_call : primary_exp tLPAREN exp_listpe tRPAREN { } 
     ;
 
-exp : tIDENTIFIER { }
+index : tLBRACKET exp tRBRACKET { }
+    | tLBRACKET exp tRBRACKET index { }
+    ;
+
+primary_exp : tIDENTIFIER { }
     | func_call { }
-    | tLPAREN exp tRPAREN
-    | exp tLBRACKET exp tRBRACKET {/*$$ = new Binary(k_exprKindIndexer, $1, $3);*/} 
+    | tIDENTIFIER index { }
+    | tLPAREN exp tRPAREN { }
+    ; 
+
+exp : primary_exp { }
     | tLEN tLPAREN exp tRPAREN {/*$$ = new Binary(k_exprKindLen, $3);*/}
     | tCAP tLPAREN exp tRPAREN {/*$$ = new Binary(k_exprKindCap, $3);*/} 
-    | exp tPLUS exp {/*$$ = new Unary(k_exprKindPlus, $2);*/}
+    | exp tPLUS exp {/*$$ = new Unary(k_exprKindPlus, $2);*/} 
     | exp tMINUS exp {/*$$ = new Unary(k_exprKindMinus, $2);*/}
     | exp tTIMES exp { } 
     | exp tDIV exp { }
@@ -393,7 +395,6 @@ exp : tIDENTIFIER { }
     | tBANG exp %prec pBANG {/*$$ = new Unary(k_exprKindBang, $2);*/}
     | tMINUS exp %prec pMINUS { }
     | tPLUS exp %prec pPLUS { }
-    | tBWXOR exp %prec pBWXOR { }
-    ; 
-
+    | tBWXOR exp %prec pBWXOR { } 
+    ;
 %%
