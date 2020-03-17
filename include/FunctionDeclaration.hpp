@@ -1,14 +1,14 @@
 #include <vector>
-#include "Instruction.hpp"
+#include <string>
 
-class FunctionDeclaration : Declaration {
+
+class FunctionDeclaration : public Declaration {
 	public:
 		std::string id;
-		std::vector<string> locals;
-		std::string type;
-		Instruction *body;
+		std::vector<std::string> locals;
+		std::string type;	
 
 	FunctionDeclaration() { }
-	FunctionDeclaration(string id, vector<string> locals, string type, Instruction *body)
-		: Declaration(k_declKindFunc), locals{locals}, type{type}, body{body};
-}
+	/*FunctionDeclaration(string id, vector<std::string> locals, string type, Instruction *body)
+		: Declaration(k_declKindFunc), locals{locals}, type{type}, body{body};*/
+};

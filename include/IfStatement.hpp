@@ -7,7 +7,7 @@
 
 class IfStatement: public Statement {
 	public:
-		Declaration decl;
+		/*Declaration decl;
 		Expression exp;
 		Instruction ins;
 	
@@ -16,7 +16,7 @@ class IfStatement: public Statement {
 		IfStatement(Expression exp, Instruction ifIns) : Statement(k_stmtKindIfStmt), exp{exp}, ins{ifIns} { }
 
 		IfStatement(Declaration decl, Expression exp, Instruction ifIns)
-			: Statement(k_stmtKindDeclIfStmt), decl{decl}, exp{exp}, ins{ifIns} { }
+			: Statement(k_stmtKindDeclIfStmt), decl{decl}, exp{exp}, ins{ifIns} { }*/
 };
 
 #endif

@@ -6,7 +6,7 @@
 
 class ForStatement : public Statement {
 	public:
-		Instruction initStmt;
+		/*Instruction initStmt;
         	Expression condition;
         	Statement postStmt;
         	Instruction body;
@@ -23,7 +23,7 @@ class ForStatement : public Statement {
 			  condition{condition},
 			  postStmt{postStmt},
 			  body{body}
-		{ }
+		{ }*/
 };
 
 #endif

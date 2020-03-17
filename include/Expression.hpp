@@ -4,7 +4,7 @@
 #include <string>
 #include "tree.h"
 
-    class Expression : public Node{
+    class Expression { //: public Node {
     public:
 	ExpressionKind kind_;
 

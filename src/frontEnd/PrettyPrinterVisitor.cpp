@@ -1,7 +1,30 @@
-#include <iostream>
-#include <PrettyPrinter.hpp>
+#ifndef PRETTYPRINTERVISITOR_CPP
+#define PRETTYPRINTERVISITOR_CPP
 
-void PrettyPrinter::printProgram(Program *program) {
+#include <iostream>
+#include "PrettyPrinterVisitor.hpp"
+#include "Program.hpp"
+
+void PrettyPrinterVisitor::visit(Program *prg) {
+	if (prg == NULL) return;
+	
+	std::cout << "package " << prg->package << std::endl;
+	/*for(auto decl : prg->declList) {
+		decl->accept(this);
+	}*/
+}
+
+/*
+virtual void PrettyPrinterVisitor::visit(TypeDeclaration *typeDecl) override {
+
+}
+
+virtual void PrettyPrinterVisitor::visit(FuncDeclaration *funcDecl) override {
+
+}*/
+
+
+/*void PrettyPrinter::printProgram(Node *program) {
 	if (program == NULL) return;
 	
 	std::cout << "package " << program->package << std::endl;
@@ -10,7 +33,7 @@ void PrettyPrinter::printProgram(Program *program) {
 }
 
 
-        /*void prettyInstruction(Instruction *ins, int numTabs) {
+        void prettyInstruction(Instruction *ins, int numTabs) {
             if(NULL == ins) {
                 return;
             }
@@ -441,3 +464,5 @@ void PrettyPrinter::printProgram(Program *program) {
             }
         }
 */
+
+#endif

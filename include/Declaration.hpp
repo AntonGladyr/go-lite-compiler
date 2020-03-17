@@ -1,9 +1,7 @@
 #ifndef DECLARATION_H
 #define DECLARATION_H
 
-#include "Node.hpp"
-
-class Declaration : public Node {
+class Declaration  {
     public:
 	Declaration() { }	
 };

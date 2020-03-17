@@ -1,7 +1,9 @@
+#ifndef MAIN_CPP
+#define MAIN_CPP
+
 #include <iostream>
 #include <string.h>
-#include <main.hpp>
-#include "PrettyPrinter.hpp"
+#include "main.hpp"
 
 int main(int argc, char *argv[]){
 	if(!strcmp(argv[1], "scan")) {
@@ -21,12 +23,15 @@ int main(int argc, char *argv[]){
         	return 0;
     	}
     	else if(!strcmp(argv[1], "pretty")) {		
-        	yyparse();			
-      		PrettyPrinter::printProgram(program);
-        	std::cout << "OK" << std::endl;	
+        	yyparse();
+		PrettyPrinterVisitor visitor;
+		program->accept(visitor);
+        	std::cout << "OK" << std::endl;
         	return 0;
     	}
 	
 	delete program->declList;
 	delete program;
 }
+
+#endif

@@ -6,7 +6,7 @@
 
 class AssignStatement : public Statement {
     public:
-	std::vector<std::string> ids;
+	/*std::vector<std::string> ids;
 	std::vector<Expression> exp_list;
 	std::string id;
 	std::string selectorId;
@@ -22,7 +22,7 @@ class AssignStatement : public Statement {
 		: Statement(k_stmtKindAssignSelector), id{id}, selectorId{selectorId}, exp{exp} { };
 
 	AssignStatement(std::string id, Expression index, Expression exp)
-		: Statement(k_stmtKindAssignIndex), id{id}, index{index}, exp{exp} { };
+		: Statement(k_stmtKindAssignIndex), id{id}, index{index}, exp{exp} { };*/
 };
 
 #endif
