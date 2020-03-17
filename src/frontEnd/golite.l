@@ -190,7 +190,7 @@ ESCAPE [abfnrtv\\'"]
 		}
 
 ([a-zA-Z]|"_")([a-zA-Z]|[0-9]|"_")* {
-    //yylval.identifier = strdup(yytext);
+    yylval.identifier = new std::string(yytext, yyleng);
     if (g_tokens) cout << "tIDENTIFIER(" << yytext << ")" << endl;
     RETURN(tIDENTIFIER);
 }

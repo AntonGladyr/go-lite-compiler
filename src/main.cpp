@@ -1,9 +1,7 @@
 #include <iostream>
 #include <string.h>
-#include <main.h>
-
-void yyparse();
-int yylex();
+#include <main.hpp>
+#include "PrettyPrinter.hpp"
 
 int main(int argc, char *argv[]){
 	if(!strcmp(argv[1], "scan")) {
@@ -22,10 +20,13 @@ int main(int argc, char *argv[]){
         	std::cout << "OK" << std::endl;
         	return 0;
     	}
-    	else if(!strcmp(argv[1], "pretty")) {
-        	yyparse();
-      		//   prettyInstruction(rootIns, 0);
-        	std::cout << "OK" << std::endl;
+    	else if(!strcmp(argv[1], "pretty")) {		
+        	yyparse();			
+      		PrettyPrinter::printProgram(program);
+        	std::cout << "OK" << std::endl;	
         	return 0;
     	}
+	
+	delete program->declList;
+	delete program;
 }

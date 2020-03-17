@@ -2,7 +2,8 @@
 #define NODE_HPP
 
 class Node {
-	public:	
+	public:
+		Node() { }	
 		int lineno;
 };
 

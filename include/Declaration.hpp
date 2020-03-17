@@ -1,18 +1,11 @@
 #ifndef DECLARATION_H
 #define DECLARATION_H
 
-#include <vector>
-#include <string>
-
-#include "tree.h"
 #include "Node.hpp"
 
-class Declaration : Node {
+class Declaration : public Node {
     public:
-        DeclarationKind kind;
-	
-	Declaration() { }
-	Declaration(DeclarationKind kind) : kind{kind} { }
+	Declaration() { }	
 };
 
 #endif 

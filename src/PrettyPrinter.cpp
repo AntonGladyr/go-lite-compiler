@@ -1,17 +1,16 @@
-#include <utility>
+#include <iostream>
+#include <PrettyPrinter.hpp>
 
-class PrettyPrinter {
-/*    public:
-        PrettyPrinter(Instruction *rootIns) : this.rootIns{rootIns}
+void PrettyPrinter::printProgram(Program *program) {
+	if (program == NULL) return;
+	
+	std::cout << "package " << program->package << std::endl;
+	//pretty
+        //prettyInstruction(rootIns, 0);
+}
 
-        void printProgram() {
-            prettyInstruction(rootIns, 0);
-        }
 
-    private: 
-        Instruction *rootIns;
-
-        void prettyInstruction(Instruction *ins, int numTabs) {
+        /*void prettyInstruction(Instruction *ins, int numTabs) {
             if(NULL == ins) {
                 return;
             }
@@ -442,4 +441,3 @@ class PrettyPrinter {
             }
         }
 */
-};
