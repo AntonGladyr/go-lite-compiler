@@ -3,9 +3,9 @@
 
 #include <string>
 //#include "Node.hpp"
-//#include "Declaration.hpp"
+#include "Declaration.hpp"
 
-class TypeDeclaration { // : public Node { , public Declaration
+class TypeDeclaration : public Declaration { // : public Node { , 
 	public:
 		std::string newType;
 		std::string existingType;

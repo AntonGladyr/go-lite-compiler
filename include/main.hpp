@@ -4,6 +4,7 @@
 #include "Program.hpp"
 #include "Node.hpp"
 #include "Visitor.hpp"
+#include "ASTTraversal.hpp"
 #include "PrettyPrinterVisitor.hpp"
 
 void yyparse();
