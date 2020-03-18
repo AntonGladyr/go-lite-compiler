@@ -5,9 +5,9 @@
 #include "Declaration.hpp"
 #include "Instruction.hpp"
 
-class IfElseStatement : Statement {
+class IfElseStatement { //: Statement {
 	public:
-		Expression exp;
+		/*Expression exp;
 		Declaration decl;
 		Instruction ifIns;
 		Instruction elseIns;
@@ -22,7 +22,7 @@ class IfElseStatement : Statement {
 				Expression exp,
 				Instruction ifIns,
 				Instruction elseIns
-		) : Statement(kind), decl(decl), exp(exp), ifIns(ifIns), elseIns(elseIns) { }	
+		) : Statement(kind), decl(decl), exp(exp), ifIns(ifIns), elseIns(elseIns) { }	*/
 };
 
 #endif

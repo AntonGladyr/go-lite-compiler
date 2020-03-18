@@ -76,7 +76,8 @@ void yyerror(const char *s) {
     	char *stringval;
 	
 	Program *program;
-        std::vector<std::shared_ptr<Declaration>> *declList;
+        //std::vector<std::shared_ptr<Declaration>> *declList;
+	std::vector<Declaration*> *declList;
 	Declaration *decl;
 	Statement *stmt;
 	Expression *exp;
@@ -227,8 +228,8 @@ program : tPACKAGE tIDENTIFIER tSEMICOLON decl_list { program = new Program(*$2,
     | tPACKAGE tIDENTIFIER tSEMICOLON { program = new Program(*$2, NULL); delete $2; }
     ;
 
-decl_list : decl { $$ = new std::vector<std::shared_ptr<Declaration>>(); $$->push_back(std::make_shared<Declaration>()); }
-    | decl_list decl { $1->push_back(std::make_shared<Declaration>()); }
+decl_list : decl { $$ = new std::vector<Declaration*>(); $$->push_back(new Declaration()); }
+    | decl_list decl { $1->push_back(new Declaration()); }
     ;
 
 decl : var_decl tSEMICOLON

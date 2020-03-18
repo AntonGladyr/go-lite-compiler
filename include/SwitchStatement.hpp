@@ -5,8 +5,8 @@
 #include <vector>
 #include <utility> 
 
-class SwitchStatement : public Statement {
-	std::vector<std::pair<Expression, Instruction>> case_list;
+class SwitchStatement { //: public Statement {
+	/*std::vector<std::pair<Expression, Instruction>> case_list;
 	Expression exp;
 	Declaration decl;
 
@@ -15,7 +15,7 @@ class SwitchStatement : public Statement {
 	SwitchStatement(Expression exp, std::vector<std::pair<Expression, Instruction>> case_list)
 		: Statement(k_stmtNoExpSwitch), exp(exp), case_list(case_list) { }
 	SwitchStatement(Declaration decl, std::vector<std::pair<Expression, Instruction>> case_list)
-		: Statement(k_stmtDeclSwitch), decl(decl), exp(exp), case_list(case_list) { }
+		: Statement(k_stmtDeclSwitch), decl(decl), exp(exp), case_list(case_list) { }*/
 };
 
 #endif

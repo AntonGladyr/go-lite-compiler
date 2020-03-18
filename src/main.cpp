@@ -20,18 +20,19 @@ int main(int argc, char *argv[]){
     	else if(!strcmp(argv[1], "parse")) {
         	yyparse();
         	std::cout << "OK" << std::endl;
+		
+		ASTTraversal::clean(program);
         	return 0;
     	}
     	else if(!strcmp(argv[1], "pretty")) {		
         	yyparse();
-		PrettyPrinterVisitor visitor;
-		ASTTraversal::traverse(program, visitor);
+		PrettyPrinterVisitor printer;
+		ASTTraversal::traverse(program, printer);
         	std::cout << "OK" << std::endl;
+		
+		ASTTraversal::clean(program);	
         	return 0;
     	}
-	
-	delete program->declList;
-	delete program;
 }
 
 #endif
