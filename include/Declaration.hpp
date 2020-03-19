@@ -4,9 +4,10 @@
 #include "Node.hpp"
 
 class Declaration : public Node {
-    public:
-	Declaration() { }	
+    public:	
 	virtual void accept(Visitor& v) { };
+	Declaration() { }
+	Declaration(int _lineno) : Node(_lineno) { }
 };
 
 #endif 

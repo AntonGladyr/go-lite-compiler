@@ -6,10 +6,12 @@
 //#include "FunctionDeclaration.hpp"
 
 class Program;
+class VariableDeclaration;
 
 class Visitor {
 	public:		
 		virtual void visit(Program *prg) = 0;
+		virtual void visit(VariableDeclaration *varDecl) = 0;
 		//virtual void visit(TypeDeclaration *typeDecl) = 0;
 		//virtual void visit(FunctionDeclaration *funcDecl) = 0;	
 };

@@ -190,33 +190,33 @@ ESCAPE [abfnrtv\\'"]
 		}
 
 ([a-zA-Z]|"_")([a-zA-Z]|[0-9]|"_")* {
-    yylval.identifier = new std::string(yytext, yyleng);
-    if (g_tokens) cout << "tIDENTIFIER(" << yytext << ")" << endl;
-    RETURN(tIDENTIFIER);
+    	yylval.identifier = new std::string(yytext, yyleng);
+    	if (g_tokens) cout << "tIDENTIFIER(" << yytext << ")" << endl;
+    	RETURN(tIDENTIFIER);
 }
 
 0|([1-9][0-9]*) {
-    //yylval.intLiteral = atof(yytext);
-    if (g_tokens) cout << "tINTVAL(" << yytext << ")" << endl;
-    RETURN(tINTVAL);
+    	//yylval.intLiteral = atoi(yytext);
+    	if (g_tokens) cout << "tINTVAL(" << yytext << ")" << endl;
+    	RETURN(tINTVAL);
 }
 
 0[0-7]* {
-    //yylval.intLiteral = atof(yytext);
-    if (g_tokens) cout << "tINTVAL(" << yytext << ")" << endl;
-    RETURN(tINTVAL);
+	//yylval.intLiteral = atoi(yytext);
+   	if (g_tokens) cout << "tINTVAL(" << yytext << ")" << endl;
+    	RETURN(tINTVAL);
 }
 
 0(x|X)[0-9a-fA-F][0-9a-fA-F]* {
-    //yylval.intLiteral = atof(yytext);
-    if (g_tokens) cout << "tINTVAL(" << yytext << ")" << endl;
-    RETURN(tINTVAL);
+	//yylval.intLiteral = atoi(yytext);
+	if (g_tokens) cout << "tINTVAL(" << yytext << ")" << endl;
+	RETURN(tINTVAL);
 }
 
 ([0-9]*\.[0-9]+)|([0-9]+\.[0-9]*) {
-    //yylval.floatLiteral = atof(yytext);
-    if (g_tokens) cout << "tFLOATVAL(" << yytext << ")" << endl;
-    RETURN(tFLOATVAL);
+	//yylval.floatLiteral = atof(yytext);
+	if (g_tokens) cout << "tFLOATVAL(" << yytext << ")" << endl;
+	RETURN(tFLOATVAL);
 }
 
 '((\\[abfnrtv\\\'])|[^\\'])\' {  
@@ -226,15 +226,15 @@ ESCAPE [abfnrtv\\'"]
 }
 
 \".*\" {
-	//yylval.string = (yytext);
+	//yylval.string = new std::string(yytext);
     	if (g_tokens) cout << "tSTRINGVAL(" << yytext << ")" << endl;
     	RETURN(tSTRINGVAL);
 }
 
 `(\\.|[^`])*` {
-    //yylval.string = (yytext);
-    if (g_tokens) cout << "tSTRINGVAL(" << yytext << ")" << endl;
-    RETURN(tSTRINGVAL);
+	//yylval.string = new std::string(yytext);
+	if (g_tokens) cout << "tSTRINGVAL(" << yytext << ")" << endl;
+	RETURN(tSTRINGVAL);
 }
 
 . { fprintf(stderr, "Error: (line %d) unexpected character '%s'\n", yylineno, yytext); exit(1); }

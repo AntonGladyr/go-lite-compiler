@@ -7,14 +7,12 @@
 
 void PrettyPrinterVisitor::visit(Program *prg) {
 	if (prg == NULL) return;
-	std::cout << "package " << prg->package << std::endl;
-		
-	/*if (prg->declList) {
-		for(auto decl : *(prg->declList)) {
-			std::cout << "test" << std::endl;
-			//decl->accept(this);
-		}
-	}*/
+	std::cout << "package " << prg->package << std::endl;		
+}
+
+void PrettyPrinterVisitor::visit(VariableDeclaration *varDecl) {
+	if (varDecl == NULL) return;
+	std::cout << "varDecl test" << std::endl;
 }
 
 /*

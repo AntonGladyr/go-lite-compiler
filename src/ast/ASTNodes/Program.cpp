@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include "Program.hpp"
+#include "Node.hpp"
 
 void Program::accept(Visitor& v) {
 	v.visit(this);

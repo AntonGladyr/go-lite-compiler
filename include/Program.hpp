@@ -4,22 +4,28 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include "Node.hpp"
+#include "Visitor.hpp"
 #include "Declaration.hpp"
+#include "Node.hpp"
+
+class Declaration;
+class Visitor;
+class Node;
 
 class Program : public Node {
 	public:
 		std::string package;
 		//std::vector<std::shared_ptr<Declaration>> *declList;
 		std::vector<Declaration*> *declList;
-		virtual void accept(Visitor& v) override;
-	
+		//virtual void accept(Visitor& v) override;
+		void accept(Visitor& v);
+			
 		Program() { }
 		~Program();
                 /*program (const std::string &_package, std::vector<std::shared_ptr<Declaration>> *_decllist) :
 			package(_package), decllist(_decllist) { }*/
-		Program(const std::string &_package, std::vector<Declaration*> *_decllist) :
-			package(_package), declList(_decllist) { }
+		Program(const std::string &_package, std::vector<Declaration*> *_declList, int _lineno) :
+			package(_package), declList(_declList), Node(_lineno) { }
 
 };
 

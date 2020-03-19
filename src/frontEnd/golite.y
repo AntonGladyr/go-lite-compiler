@@ -48,6 +48,9 @@ void yyerror(const char *s) {
 {	
 	#include "Program.hpp"
 	#include "Declaration.hpp"
+	#include "VariableDeclaration.hpp"
+	#include "FunctionDeclaration.hpp"
+	#include "TypeDeclaration.hpp"
 	#include "Statement.hpp"
 	#include "Expression.hpp"
 	#include "ForStatement.hpp"
@@ -78,6 +81,12 @@ void yyerror(const char *s) {
 	Program *program;
         //std::vector<std::shared_ptr<Declaration>> *declList;
 	std::vector<Declaration*> *declList;
+	
+	//std::string type;
+	VariableDeclaration *varDecl;
+	FunctionDeclaration *funcDecl;
+	TypeDeclaration *typeDecl;	
+	
 	Declaration *decl;
 	Statement *stmt;
 	Expression *exp;
@@ -109,8 +118,9 @@ void yyerror(const char *s) {
 %type <decl> decl var_decl func_decl type_decl
 %type <stmt> stmt ifstmt loopstmt assignstmt incdecstmt printstmt returnstmt switchstmt
 %type <exp> exp
-
+%type <id_list> id_listne
 %type <exp_list> exp_list
+
 
 %token tBREAK
 %token tCASE
@@ -180,13 +190,13 @@ void yyerror(const char *s) {
 %token tSHORTDECLARE
 %token tELLIPSIS
 %token tLBRACE
-%token tLPAREN
-%token tLBRACKET
-%token tCOMMA
-%token tPERIOD
+%token<char> tLPAREN
+%token<char> tLBRACKET
+%token<char> tCOMMA
+%token<char> tPERIOD
 %token tRBRACE
-%token tRPAREN
-%token tRBRACKET
+%token<char> tRPAREN
+%token<char> tRBRACKET
 %token tSEMICOLON
 %token tCOLON
 %token <identifier> tIDENTIFIER
@@ -224,12 +234,12 @@ void yyerror(const char *s) {
  */
 %%
 
-program : tPACKAGE tIDENTIFIER tSEMICOLON decl_list { program = new Program(*$2, $4); delete $2; }
-    | tPACKAGE tIDENTIFIER tSEMICOLON { program = new Program(*$2, NULL); delete $2; }
+program : tPACKAGE tIDENTIFIER tSEMICOLON decl_list { program = new Program(*$2, $4, yylineno); delete $2; }
+    | tPACKAGE tIDENTIFIER tSEMICOLON { program = new Program(*$2, NULL, yylineno); delete $2; }
     ;
 
-decl_list : decl { $$ = new std::vector<Declaration*>(); $$->push_back(new Declaration()); }
-    | decl_list decl { $1->push_back(new Declaration()); }
+decl_list : decl { $$ = new std::vector<Declaration*>(); $$->push_back($1); }
+    | decl_list decl { $1->push_back($2); }
     ;
 
 decl : var_decl tSEMICOLON
@@ -237,12 +247,12 @@ decl : var_decl tSEMICOLON
     | func_decl tSEMICOLON 
     ;
 
-var_decl : tVAR id_listne type { /*$$ = NULL; delete $2;*/ }
-    | tVAR id_listne tASSIGN exp_list { /*$$ = NULL; delete $2;*/ }
-    | tVAR id_listne type tASSIGN exp_list { /*$$ = NULL; delete $2;*/ }
+var_decl : tVAR id_listne type { $$ = new VariableDeclaration(*$2, "int", yylineno); /*$$->type = $3;*/ delete $2; }
+    | tVAR id_listne tASSIGN exp_list { /*$$ = new VariableDeclaration(); $$->idList = $2; delete $2;*/ }
+    | tVAR id_listne type tASSIGN exp_list { /*$$ = new VariableDeclaration(); $$->idList = $2; delete $2;*/ }
     ;
 
-type_decl : tTYPE tIDENTIFIER type { /*$$ = new TypeDeclaration($2, $3); delete $2;*/ } 
+type_decl : tTYPE tIDENTIFIER type { /*$$ = new TypeDeclaration($2, $3); delete $2;*/ }
     ;
 
 func_decl : tFUNC tIDENTIFIER tLPAREN paramspe tRPAREN block_stmt { /*$$ = NULL; delete $2;*/ }
@@ -253,13 +263,13 @@ stmt_list : stmt
     | stmt_list stmt
     ;
    
-type : tIDENTIFIER { delete $1; }
-    | tLBRACKET tINTVAL tRBRACKET type
-    | tLPAREN type tRPAREN
+type : tIDENTIFIER { /*$$.append(*$1); delete $1;*/ }
+    | tLBRACKET tINTVAL tRBRACKET type { /*$$.append($1); $$.append($2); $$.append($3); $$.append($4); */ }
+    | tLPAREN type tRPAREN { /*$$.append($1); $$.append($2); $$.append($3);*/ }
     ;
 
-id_listne : tIDENTIFIER { /*$$ = new std::vector<std::string>(); $$->push_back($1); delete $1;*/ }
-    | id_listne tCOMMA tIDENTIFIER { /*$1->push_back($3); delete $3;*/ }
+id_listne : tIDENTIFIER { $$ = new std::vector<std::string>(); $$->push_back(*$1); delete $1; }
+    | id_listne tCOMMA tIDENTIFIER { $1->push_back(*$3); delete $3; }
     ;
 
 exp_list : exp {/*$$  new std::vector<Expression*>(); $$->push_back($1);*/}
