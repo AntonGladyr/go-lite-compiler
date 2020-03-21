@@ -7,8 +7,9 @@ class Visitor;
 
 class Node {
 	public:	
-		virtual void accept(Visitor& v) = 0;
 		int lineno;
+
+		virtual void accept(Visitor& v) = 0;
 	
 		Node() { }	
 		Node(int _lineno) : lineno(_lineno) { }

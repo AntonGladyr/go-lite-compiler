@@ -196,25 +196,25 @@ ESCAPE [abfnrtv\\'"]
 }
 
 0|([1-9][0-9]*) {
-    	//yylval.intLiteral = atoi(yytext);
+    	yylval.intval = atoi(yytext);
     	if (g_tokens) cout << "tINTVAL(" << yytext << ")" << endl;
     	RETURN(tINTVAL);
 }
 
 0[0-7]* {
-	//yylval.intLiteral = atoi(yytext);
+	yylval.intval = atoi(yytext);
    	if (g_tokens) cout << "tINTVAL(" << yytext << ")" << endl;
     	RETURN(tINTVAL);
 }
 
 0(x|X)[0-9a-fA-F][0-9a-fA-F]* {
-	//yylval.intLiteral = atoi(yytext);
+	//TODO:yylval.intval = atoi(yytext);
 	if (g_tokens) cout << "tINTVAL(" << yytext << ")" << endl;
 	RETURN(tINTVAL);
 }
 
 ([0-9]*\.[0-9]+)|([0-9]+\.[0-9]*) {
-	//yylval.floatLiteral = atof(yytext);
+	yylval.floatval = atof(yytext);
 	if (g_tokens) cout << "tFLOATVAL(" << yytext << ")" << endl;
 	RETURN(tFLOATVAL);
 }
@@ -226,13 +226,13 @@ ESCAPE [abfnrtv\\'"]
 }
 
 \".*\" {
-	//yylval.string = new std::string(yytext);
+	yylval.stringval = new std::string(yytext, yyleng);
     	if (g_tokens) cout << "tSTRINGVAL(" << yytext << ")" << endl;
     	RETURN(tSTRINGVAL);
 }
 
 `(\\.|[^`])*` {
-	//yylval.string = new std::string(yytext);
+	yylval.stringval = new std::string(yytext, yyleng);
 	if (g_tokens) cout << "tSTRINGVAL(" << yytext << ")" << endl;
 	RETURN(tSTRINGVAL);
 }

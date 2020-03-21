@@ -26,6 +26,13 @@
 #include "IncDecStatement.hpp"
 #include "PrintStatement.hpp"
 #include "SwitchStatement.hpp"
+#include "IntegerExp.hpp"
+#include "FloatExp.hpp"
+#include "StringExp.hpp"
+#include "BoolExp.hpp"
+
+
+
 
 
 extern Program *program;
@@ -53,6 +60,12 @@ void yyerror(const char *s) {
 	#include "TypeDeclaration.hpp"
 	#include "Statement.hpp"
 	#include "Expression.hpp"
+	#include "IntegerExp.hpp"
+	#include "FloatExp.hpp"
+	#include "StringExp.hpp"
+	#include "BoolExp.hpp"
+
+
 	#include "ForStatement.hpp"
 	#include "AssignStatement.hpp"
 	#include "IfStatement.hpp"
@@ -76,20 +89,24 @@ void yyerror(const char *s) {
     	float floatval;
     	char runeval;
     	bool boolval;
-    	char *stringval;
+    	std::string *stringval;
+	char charval;
 	
+	//std::vector<std::shared_ptr<Declaration>> *declList;
 	Program *program;
-        //std::vector<std::shared_ptr<Declaration>> *declList;
-	std::vector<Declaration*> *declList;
-	
-	//std::string type;
+
+	std::vector<Declaration*> *declList;	
 	VariableDeclaration *varDecl;
 	FunctionDeclaration *funcDecl;
-	TypeDeclaration *typeDecl;	
+	TypeDeclaration *typeDecl;		
 	
 	Declaration *decl;
 	Statement *stmt;
 	Expression *exp;
+	IntegerExp *intExp;
+	FloatExp *floatExp;
+	StringExp *stringExp;
+	BoolExp *boolExp;
 	
 	ForStatement *forStmt;
 	AssignStatement *assignStmt;
@@ -98,11 +115,10 @@ void yyerror(const char *s) {
 	IncDecStatement *incDecStmt;
 	PrintStatement *printStmt;
 	SwitchStatement *switchStmt;
-
-	std::vector<Declaration*> *var_list;
+	
+	std::string *type;
+	std::vector<std::string> *id_list;
     	std::vector<Expression*> *exp_list;
-    	std::vector<std::string> *id_list;
-    	std::vector<std::vector<std::string>> *structdecl_list;
     	std::vector<std::pair<Expression*, Instruction*>> *case_list;
 	std::vector<std::vector<std::string>> *params_list;
 }
@@ -117,9 +133,11 @@ void yyerror(const char *s) {
 %type <declList> decl_list
 %type <decl> decl var_decl func_decl type_decl
 %type <stmt> stmt ifstmt loopstmt assignstmt incdecstmt printstmt returnstmt switchstmt
-%type <exp> exp
+%type <exp> exp 
+
+%type <type> type
 %type <id_list> id_listne
-%type <exp_list> exp_list
+%type <exp_list> exp_list exp_listpe
 
 
 %token tBREAK
@@ -190,13 +208,13 @@ void yyerror(const char *s) {
 %token tSHORTDECLARE
 %token tELLIPSIS
 %token tLBRACE
-%token<char> tLPAREN
-%token<char> tLBRACKET
-%token<char> tCOMMA
-%token<char> tPERIOD
+%token<charval> tLPAREN
+%token<charval> tLBRACKET
+%token<charval> tCOMMA
+%token<charval> tPERIOD
 %token tRBRACE
-%token<char> tRPAREN
-%token<char> tRBRACKET
+%token<charval> tRPAREN
+%token<charval> tRBRACKET
 %token tSEMICOLON
 %token tCOLON
 %token <identifier> tIDENTIFIER
@@ -247,9 +265,10 @@ decl : var_decl tSEMICOLON
     | func_decl tSEMICOLON 
     ;
 
-var_decl : tVAR id_listne type { $$ = new VariableDeclaration(*$2, "int", yylineno); /*$$->type = $3;*/ delete $2; }
-    | tVAR id_listne tASSIGN exp_list { /*$$ = new VariableDeclaration(); $$->idList = $2; delete $2;*/ }
-    | tVAR id_listne type tASSIGN exp_list { /*$$ = new VariableDeclaration(); $$->idList = $2; delete $2;*/ }
+var_decl : tVAR id_listne type { $$ = new VariableDeclaration(*$2, *$3, yylineno); delete $2; delete $3; }
+    | tVAR id_listne tASSIGN exp_list { $$ = new VariableDeclaration(*$2, *$4); delete $2; delete $4; }
+    | tVAR id_listne type tASSIGN exp_list
+    { $$ = new VariableDeclaration(*$2, *$3, *$5); delete $2; delete $3; delete $5; }
     ;
 
 type_decl : tTYPE tIDENTIFIER type { /*$$ = new TypeDeclaration($2, $3); delete $2;*/ }
@@ -263,21 +282,24 @@ stmt_list : stmt
     | stmt_list stmt
     ;
    
-type : tIDENTIFIER { /*$$.append(*$1); delete $1;*/ }
-    | tLBRACKET tINTVAL tRBRACKET type { /*$$.append($1); $$.append($2); $$.append($3); $$.append($4); */ }
-    | tLPAREN type tRPAREN { /*$$.append($1); $$.append($2); $$.append($3);*/ }
+type : tIDENTIFIER { $$ = $1; }
+    | tLBRACKET tINTVAL tRBRACKET type {	
+	$$ = new std::string();
+	$$->push_back($1); $$->append(std::to_string($2)); $$->push_back($3); $$->append(*$4); delete $4;
+    }
+    | tLPAREN type tRPAREN { $$ = new std::string(); $$->push_back($1); $$->append(*$2); $$->push_back($3); delete $2; }
     ;
 
 id_listne : tIDENTIFIER { $$ = new std::vector<std::string>(); $$->push_back(*$1); delete $1; }
     | id_listne tCOMMA tIDENTIFIER { $1->push_back(*$3); delete $3; }
     ;
 
-exp_list : exp {/*$$  new std::vector<Expression*>(); $$->push_back($1);*/}
-    | exp_list tCOMMA exp {/*$1->push_back($3);*/}
+exp_list : exp { $$ = new std::vector<Expression*>(); $$->push_back($1); delete $1; }
+    | exp_list tCOMMA exp { $1->push_back($3); }
     ;
 
-exp_listpe : exp_list
-    | %empty
+exp_listpe : exp_list { $$ = $1; delete $1; }
+    | %empty { $$ = NULL; }
     ;
 
 param : tIDENTIFIER type
@@ -403,11 +425,11 @@ exp : primary_exp { }
     | exp tLESS exp { } 
     | exp tGREATEREQ exp { } 
     | exp tLESSEQ exp { }
-    | tINTVAL {/*$$ = new Literal(k_exprKindInt, $1);*/}
-    | tFLOATVAL {/*$$ = new Literal(k_exprKindFloat, $1);*/}
-    | tRUNEVAL {/*$$ = new Literal(k_exprKindChar, $1);*/}
-    | tSTRINGVAL {/*$$ = new Literal(k_exprKindChar, $1);*/}
-    | tBOOLVAL {/*$$ = new Literal(k_exprKindBool, $1);*/} 
+    | tINTVAL { $$ = new IntegerExp($1, yylineno); }
+    | tFLOATVAL { $$ = new FloatExp($1, yylineno); }
+    | tRUNEVAL {/*TODO$$ = new RuneExp($1);*/}
+    | tSTRINGVAL { $$ = new StringExp(*$1, yylineno); delete $1; }
+    | tBOOLVAL { $$ = new BoolExp($1, yylineno); } 
     | tBANG exp %prec pBANG {/*$$ = new Unary(k_exprKindBang, $2);*/}
     | tMINUS exp %prec pMINUS { }
     | tPLUS exp %prec pPLUS { }

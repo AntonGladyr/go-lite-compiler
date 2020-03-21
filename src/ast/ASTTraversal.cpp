@@ -6,6 +6,7 @@
 #include "ASTTraversal.hpp"
 #include "Program.hpp"
 #include "VariableDeclaration.hpp"
+#include "LiteralExp.hpp"
 
 void ASTTraversal::traverse(Node *node, Visitor& visitor) {
 	if (node == NULL) return;

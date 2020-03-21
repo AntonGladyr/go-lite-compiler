@@ -18,6 +18,7 @@ class Program : public Node {
 		//std::vector<std::shared_ptr<Declaration>> *declList;
 		std::vector<Declaration*> *declList;
 		//virtual void accept(Visitor& v) override;
+		
 		void accept(Visitor& v);
 			
 		Program() { }

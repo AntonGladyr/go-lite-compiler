@@ -4,6 +4,13 @@
 #include <iostream>
 #include "PrettyPrinterVisitor.hpp"
 #include "Program.hpp"
+#include "IntegerExp.hpp"
+#include "FloatExp.hpp"
+#include "StringExp.hpp"
+#include "BoolExp.hpp"
+//#include "RuneExp.hpp"
+#include "../helpers/vectorExtension.cpp"
+
 
 void PrettyPrinterVisitor::visit(Program *prg) {
 	if (prg == NULL) return;
@@ -12,27 +19,47 @@ void PrettyPrinterVisitor::visit(Program *prg) {
 
 void PrettyPrinterVisitor::visit(VariableDeclaration *varDecl) {
 	if (varDecl == NULL) return;
-	std::cout << "varDecl test" << std::endl;
+	std::cout << "var " << varDecl->idList << varDecl->type;
+	if (!varDecl->expList.empty())
+		std::cout << " = " << varDecl->expList << std::endl;
 }
 
 /*
-virtual void PrettyPrinterVisitor::visit(TypeDeclaration *typeDecl) override {
+void PrettyPrinterVisitor::visit(TypeDeclaration *typeDecl) {
 
 }
 
-virtual void PrettyPrinterVisitor::visit(FuncDeclaration *funcDecl) override {
+void PrettyPrinterVisitor::visit(FuncDeclaration *funcDecl) {
 
 }*/
 
+void PrettyPrinterVisitor::visit(IntegerExp *intExp) {
+	if (intExp == NULL) return;
+	std::cout << intExp;
+} 
 
-/*void PrettyPrinter::printProgram(Node *program) {
-	if (program == NULL) return;
-	
-	std::cout << "package " << program->package << std::endl;
-	//pretty
-        //prettyInstruction(rootIns, 0);
+void PrettyPrinterVisitor::visit(FloatExp *floatExp) {
+	if (floatExp == NULL) return;
+	std::cout << floatExp;
+} 
+
+void PrettyPrinterVisitor::visit(StringExp *stringExp) {
+	if (stringExp == NULL) return;
+	std::cout << stringExp;
+} 
+
+void PrettyPrinterVisitor::visit(BoolExp *boolExp) {
+	if (boolExp == NULL) return;
+	std::cout << boolExp;
 }
 
+/*void PrettyPrinterVisitor::visit(RuneExp *runeExp) {
+	if (runeExp == NULL) return;
+	std::cout << runeExp->toString();
+}*/
+
+
+/*
 
         void prettyInstruction(Instruction *ins, int numTabs) {
             if(NULL == ins) {
