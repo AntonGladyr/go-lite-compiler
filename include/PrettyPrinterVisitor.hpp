@@ -7,7 +7,7 @@
 #include "Visitor.hpp"
 #include "Program.hpp"
 #include "VariableDeclaration.hpp"
-#include "IntegerExp.hpp"
+#include "Expression.hpp"
 
 class PrettyPrinterVisitor : public Visitor {
     public:
@@ -15,11 +15,7 @@ class PrettyPrinterVisitor : public Visitor {
 	
 	virtual void visit(Program *prg) override;
 	virtual void visit(VariableDeclaration *varDecl) override;
-	
-	virtual void visit(IntegerExp *intExp) override;
-	virtual void visit(FloatExp *floatExp) override;
-	virtual void visit(StringExp *strExp) override;
-	virtual void visit(BoolExp *boolExp) override;
+	virtual void visit(Expression *exp) override;
 };
 
 #endif

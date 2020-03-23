@@ -8,7 +8,7 @@
 class Expression : public Node {
 	public:
 		virtual void accept(Visitor& v) { };
-		virtual std::ostream& toString(std::ostream& o) const { };
+		virtual std::string toString() { };
 	
 		Expression() { }
 		Expression(int _lineno) : Node(_lineno) { }	

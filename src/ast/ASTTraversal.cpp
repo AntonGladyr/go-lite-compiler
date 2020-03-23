@@ -6,29 +6,32 @@
 #include "ASTTraversal.hpp"
 #include "Program.hpp"
 #include "VariableDeclaration.hpp"
+#include "Expression.hpp"
 #include "LiteralExp.hpp"
 
 void ASTTraversal::traverse(Node *node, Visitor& visitor) {
-	if (node == NULL) return;
-	
+	if (node == NULL) return;	
 	if (typeid(Program) == typeid(*node)) {
 		Program *prg = (Program*)node;
 		prg->accept(visitor);	
 		if (prg->declList) {
 			for(auto decl : *(prg->declList)) {	
-				traverse(decl, visitor);
-				//std::cout << "test" << std::endl;
-				//decl->accept(this);
+				traverse(decl, visitor);	
 			}
 		}
 		
 		return;
 	}
 
-	if (typeid(VariableDeclaration) == typeid(*node)) {
+	if (typeid(VariableDeclaration) == typeid(*node)) {	
 		VariableDeclaration *varDecl = (VariableDeclaration*)node;
 		varDecl->accept(visitor);	
-	}	
+	}
+
+	if (typeid(Expression) == typeid(*node)) {	
+		Expression *exp = (Expression*)node;
+		exp->accept(visitor);
+	}
 }
 
 void ASTTraversal::clean(Node *node) {

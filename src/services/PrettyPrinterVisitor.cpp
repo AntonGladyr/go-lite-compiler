@@ -8,6 +8,7 @@
 #include "FloatExp.hpp"
 #include "StringExp.hpp"
 #include "BoolExp.hpp"
+#include "Expression.hpp"
 //#include "RuneExp.hpp"
 #include "../helpers/vectorExtension.cpp"
 
@@ -19,9 +20,15 @@ void PrettyPrinterVisitor::visit(Program *prg) {
 
 void PrettyPrinterVisitor::visit(VariableDeclaration *varDecl) {
 	if (varDecl == NULL) return;
-	std::cout << "var " << varDecl->idList << varDecl->type;
+	std::cout << "var " << varDecl->idList;
+	if (!varDecl->type.empty()) std::cout << " " << varDecl->type;	
 	if (!varDecl->expList.empty())
-		std::cout << " = " << varDecl->expList << std::endl;
+		std::cout << " = " << varDecl->expList;
+	std::cout << std::endl;
+}
+
+void PrettyPrinterVisitor::visit(Expression *exp) {
+	std::cout << exp;
 }
 
 /*
@@ -31,7 +38,7 @@ void PrettyPrinterVisitor::visit(TypeDeclaration *typeDecl) {
 
 void PrettyPrinterVisitor::visit(FuncDeclaration *funcDecl) {
 
-}*/
+}
 
 void PrettyPrinterVisitor::visit(IntegerExp *intExp) {
 	if (intExp == NULL) return;
@@ -51,7 +58,7 @@ void PrettyPrinterVisitor::visit(StringExp *stringExp) {
 void PrettyPrinterVisitor::visit(BoolExp *boolExp) {
 	if (boolExp == NULL) return;
 	std::cout << boolExp;
-}
+}*/
 
 /*void PrettyPrinterVisitor::visit(RuneExp *runeExp) {
 	if (runeExp == NULL) return;

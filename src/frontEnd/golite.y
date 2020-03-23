@@ -26,10 +26,12 @@
 #include "IncDecStatement.hpp"
 #include "PrintStatement.hpp"
 #include "SwitchStatement.hpp"
+#include "IdentifierExp.hpp"
 #include "IntegerExp.hpp"
 #include "FloatExp.hpp"
 #include "StringExp.hpp"
 #include "BoolExp.hpp"
+#include "RuneExp.hpp"
 
 
 
@@ -60,10 +62,12 @@ void yyerror(const char *s) {
 	#include "TypeDeclaration.hpp"
 	#include "Statement.hpp"
 	#include "Expression.hpp"
+	#include "IdentifierExp.hpp"
 	#include "IntegerExp.hpp"
 	#include "FloatExp.hpp"
 	#include "StringExp.hpp"
 	#include "BoolExp.hpp"
+	#include "RuneExp.hpp"
 
 
 	#include "ForStatement.hpp"
@@ -87,7 +91,7 @@ void yyerror(const char *s) {
 	int intval;
         std::string *identifier;
     	float floatval;
-    	char runeval;
+    	std::string *runeval;
     	bool boolval;
     	std::string *stringval;
 	char charval;
@@ -107,6 +111,7 @@ void yyerror(const char *s) {
 	FloatExp *floatExp;
 	StringExp *stringExp;
 	BoolExp *boolExp;
+	RuneExp *runeExp;
 	
 	ForStatement *forStmt;
 	AssignStatement *assignStmt;
@@ -117,7 +122,7 @@ void yyerror(const char *s) {
 	SwitchStatement *switchStmt;
 	
 	std::string *type;
-	std::vector<std::string> *id_list;
+	std::vector<IdentifierExp*> *id_list;
     	std::vector<Expression*> *exp_list;
     	std::vector<std::pair<Expression*, Instruction*>> *case_list;
 	std::vector<std::vector<std::string>> *params_list;
@@ -290,11 +295,12 @@ type : tIDENTIFIER { $$ = $1; }
     | tLPAREN type tRPAREN { $$ = new std::string(); $$->push_back($1); $$->append(*$2); $$->push_back($3); delete $2; }
     ;
 
-id_listne : tIDENTIFIER { $$ = new std::vector<std::string>(); $$->push_back(*$1); delete $1; }
-    | id_listne tCOMMA tIDENTIFIER { $1->push_back(*$3); delete $3; }
+id_listne : tIDENTIFIER { $$ = new std::vector<IdentifierExp*>();
+			  $$->push_back(new IdentifierExp(*$1, yylineno)); delete $1; }
+    | id_listne tCOMMA tIDENTIFIER { $1->push_back(new IdentifierExp(*$3, yylineno)); delete $3; }
     ;
 
-exp_list : exp { $$ = new std::vector<Expression*>(); $$->push_back($1); delete $1; }
+exp_list : exp { $$ = new std::vector<Expression*>(); $$->push_back($1); }
     | exp_list tCOMMA exp { $1->push_back($3); }
     ;
 
@@ -427,7 +433,7 @@ exp : primary_exp { }
     | exp tLESSEQ exp { }
     | tINTVAL { $$ = new IntegerExp($1, yylineno); }
     | tFLOATVAL { $$ = new FloatExp($1, yylineno); }
-    | tRUNEVAL {/*TODO$$ = new RuneExp($1);*/}
+    | tRUNEVAL { $$ = new RuneExp(*$1, yylineno); delete $1; }
     | tSTRINGVAL { $$ = new StringExp(*$1, yylineno); delete $1; }
     | tBOOLVAL { $$ = new BoolExp($1, yylineno); } 
     | tBANG exp %prec pBANG {/*$$ = new Unary(k_exprKindBang, $2);*/}

@@ -27,8 +27,7 @@ int main(int argc, char *argv[]){
     	else if(!strcmp(argv[1], "pretty")) {		
         	yyparse();
 		PrettyPrinterVisitor printer;
-		ASTTraversal::traverse(program, printer);
-        	std::cout << "OK" << std::endl;
+		ASTTraversal::traverse(program, printer);	
 		
 		ASTTraversal::clean(program);	
         	return 0;

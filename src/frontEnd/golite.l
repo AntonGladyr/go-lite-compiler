@@ -219,20 +219,20 @@ ESCAPE [abfnrtv\\'"]
 	RETURN(tFLOATVAL);
 }
 
-'((\\[abfnrtv\\\'])|[^\\'])\' {  
-	//yylval.rune = (yytext);
+\'((\\[abfnrtv\\\'])|[^\'])\' {	
+	yylval.runeval = new string(yytext, yyleng);
 	if (g_tokens) cout << "tRUNEVAL(" << yytext << ")" << endl;
 	RETURN(tRUNEVAL);
 }
 
-\".*\" {
-	yylval.stringval = new std::string(yytext, yyleng);
+\"([^"]|\\\")*\" {
+	yylval.stringval = new string(yytext, yyleng);
     	if (g_tokens) cout << "tSTRINGVAL(" << yytext << ")" << endl;
     	RETURN(tSTRINGVAL);
 }
 
 `(\\.|[^`])*` {
-	yylval.stringval = new std::string(yytext, yyleng);
+	yylval.stringval = new string(yytext, yyleng);
 	if (g_tokens) cout << "tSTRINGVAL(" << yytext << ")" << endl;
 	RETURN(tSTRINGVAL);
 }

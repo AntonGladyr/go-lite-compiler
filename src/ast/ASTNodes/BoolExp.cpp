@@ -1,15 +1,15 @@
 #ifndef BOOLEXP_CPP
 #define BOOLEXP_CPP
 
-#include <iostream>
+#include <string>
 #include "BoolExp.hpp"
 
 void BoolExp::accept(Visitor& v) {
 	v.visit(this);
 }
 
-std::ostream& BoolExp::toString(std::ostream& o) const {
-	return o << value;
+std::string BoolExp::toString() {
+	return std::to_string(value);
 }
 
 #endif

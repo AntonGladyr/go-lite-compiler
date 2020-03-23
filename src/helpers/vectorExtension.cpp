@@ -1,14 +1,16 @@
+#include <string>
 #include <vector>
 #include <iostream>
 
 using std::vector;
 using std::ostream;
 
+
 template<typename T>
 ostream& operator<< (ostream& out, const vector<T>& v) {
     size_t last = v.size() - 1;
     for(size_t i = 0; i < v.size(); ++i) {
-        out << v[i];
+        out << v[i]->toString();
         if (i != last) 
             out << ", ";
     }
