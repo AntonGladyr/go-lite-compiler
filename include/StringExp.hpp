@@ -3,7 +3,7 @@
 
 #include <string>
 #include "Visitor.hpp"
-#include <Expression.hpp>
+#include "Expression.hpp"
 
 class StringExp : public Expression {
 	public:
@@ -12,9 +12,11 @@ class StringExp : public Expression {
 		virtual void accept(Visitor& v) override;
 		virtual std::string toString();
 	
-		StringExp(const std::string &_stringValue, int _lineno) : value(_stringValue), Expression(_lineno) { }
+		StringExp(const std::string &_stringValue, int _lineno);
 		StringExp() { }
 		~StringExp();
+	private:
+		void findAndReplaceAll(std::string &data, std::string toSearch, std::string replaceStr);
 };
 
 #endif

@@ -1,7 +1,6 @@
 #ifndef RUNEEXP_CPP
 #define RUNEEXP_CPP
 
-#include <string>
 #include <algorithm>
 #include "RuneExp.hpp"
 

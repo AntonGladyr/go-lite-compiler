@@ -32,7 +32,7 @@
 #include "StringExp.hpp"
 #include "BoolExp.hpp"
 #include "RuneExp.hpp"
-
+#include "BinaryOperatorExp.hpp"
 
 
 
@@ -138,7 +138,7 @@ void yyerror(const char *s) {
 %type <declList> decl_list
 %type <decl> decl var_decl func_decl type_decl
 %type <stmt> stmt ifstmt loopstmt assignstmt incdecstmt printstmt returnstmt switchstmt
-%type <exp> exp 
+%type <exp> exp primary_exp
 
 %type <type> type
 %type <id_list> id_listne
@@ -222,12 +222,12 @@ void yyerror(const char *s) {
 %token<charval> tRBRACKET
 %token tSEMICOLON
 %token tCOLON
-%token <identifier> tIDENTIFIER
-%token <intval> tINTVAL
-%token <floatval> tFLOATVAL
-%token <boolval> tBOOLVAL
-%token <runeval> tRUNEVAL
-%token <stringval> tSTRINGVAL
+%token<identifier> tIDENTIFIER
+%token<intval> tINTVAL
+%token<floatval> tFLOATVAL
+%token<boolval> tBOOLVAL
+%token<runeval> tRUNEVAL
+%token<stringval> tSTRINGVAL
 %token tNEWLINE
 
 /* Precedence directives resolve grammar ambiguities by breaking ties between shift/reduce
@@ -272,8 +272,7 @@ decl : var_decl tSEMICOLON
 
 var_decl : tVAR id_listne type { $$ = new VariableDeclaration(*$2, *$3, yylineno); delete $2; delete $3; }
     | tVAR id_listne tASSIGN exp_list { $$ = new VariableDeclaration(*$2, *$4); delete $2; delete $4; }
-    | tVAR id_listne type tASSIGN exp_list
-    { $$ = new VariableDeclaration(*$2, *$3, *$5); delete $2; delete $3; delete $5; }
+    | tVAR id_listne type tASSIGN exp_list { $$ = new VariableDeclaration(*$2, *$3, *$5); delete $2; delete $3; delete $5; }
     ;
 
 type_decl : tTYPE tIDENTIFIER type { /*$$ = new TypeDeclaration($2, $3); delete $2;*/ }
@@ -403,41 +402,41 @@ index : tLBRACKET exp tRBRACKET { }
     | tLBRACKET exp tRBRACKET index { }
     ;
 
-primary_exp : tIDENTIFIER { }
+primary_exp : tIDENTIFIER { $$ = new IdentifierExp(*$1, yylineno); delete $1; }
     | func_call { }
     | tIDENTIFIER index { }
     | tLPAREN exp tRPAREN { }
     ;
 
 exp : primary_exp { }
-    | tLEN tLPAREN exp tRPAREN {/*$$ = new Binary(k_exprKindLen, $3);*/}
-    | tCAP tLPAREN exp tRPAREN {/*$$ = new Binary(k_exprKindCap, $3);*/} 
-    | exp tPLUS exp {/*$$ = new Unary(k_exprKindPlus, $2);*/} 
-    | exp tMINUS exp {/*$$ = new Unary(k_exprKindMinus, $2);*/}
-    | exp tTIMES exp { } 
-    | exp tDIV exp { }
-    | exp tREM exp { }
-    | exp tBWAND exp { }
-    | exp tBWOR exp { } 
-    | exp tBWXOR exp {/*$$ = new Unary(k_exprKindBwxor, $2);*/}
-    | exp tLEFTSHIFT exp { }
-    | exp tRIGHTSHIFT exp { }
-    | exp tBWANDNOT exp { }
-    | exp tAND exp { } 
-    | exp tOR exp { } 
-    | exp tEQUAL exp { } 
-    | exp tNOTEQ exp { } 
-    | exp tGREATER exp { }
-    | exp tLESS exp { } 
-    | exp tGREATEREQ exp { } 
-    | exp tLESSEQ exp { }
+    | tLEN tLPAREN exp tRPAREN { }
+    | tCAP tLPAREN exp tRPAREN { } 
+    | exp tPLUS exp { $$ = new BinaryOperatorExp("+", $1, $3, yylineno); }
+    | exp tMINUS exp { $$ = new BinaryOperatorExp("-", $1, $3, yylineno); }
+    | exp tTIMES exp { $$ = new BinaryOperatorExp("*", $1, $3, yylineno); }
+    | exp tDIV exp { $$ = new BinaryOperatorExp("/", $1, $3, yylineno); }
+    | exp tREM exp { $$ = new BinaryOperatorExp("%", $1, $3, yylineno); }
+    | exp tBWAND exp { $$ = new BinaryOperatorExp("&", $1, $3, yylineno); }
+    | exp tBWOR exp { $$ = new BinaryOperatorExp("|", $1, $3, yylineno); }
+    | exp tBWXOR exp { $$ = new BinaryOperatorExp("^", $1, $3, yylineno); }
+    | exp tLEFTSHIFT exp { $$ = new BinaryOperatorExp("<<", $1, $3, yylineno); }
+    | exp tRIGHTSHIFT exp { $$ = new BinaryOperatorExp(">>", $1, $3, yylineno); }
+    | exp tBWANDNOT exp { $$ = new BinaryOperatorExp("&^", $1, $3, yylineno); }
+    | exp tAND exp { $$ = new BinaryOperatorExp("&&", $1, $3, yylineno); }
+    | exp tOR exp { $$ = new BinaryOperatorExp("||", $1, $3, yylineno); }
+    | exp tEQUAL exp { $$ = new BinaryOperatorExp("==", $1, $3, yylineno); }
+    | exp tNOTEQ exp { $$ = new BinaryOperatorExp("!=", $1, $3, yylineno); }
+    | exp tGREATER exp { $$ = new BinaryOperatorExp(">", $1, $3, yylineno); }
+    | exp tLESS exp { $$ = new BinaryOperatorExp("<", $1, $3, yylineno); }
+    | exp tGREATEREQ exp { $$ = new BinaryOperatorExp(">=", $1, $3, yylineno); }
+    | exp tLESSEQ exp { $$ = new BinaryOperatorExp("<=", $1, $3, yylineno); }
     | tINTVAL { $$ = new IntegerExp($1, yylineno); }
     | tFLOATVAL { $$ = new FloatExp($1, yylineno); }
     | tRUNEVAL { $$ = new RuneExp(*$1, yylineno); delete $1; }
     | tSTRINGVAL { $$ = new StringExp(*$1, yylineno); delete $1; }
     | tBOOLVAL { $$ = new BoolExp($1, yylineno); } 
     | tBANG exp %prec pBANG {/*$$ = new Unary(k_exprKindBang, $2);*/}
-    | tMINUS exp %prec pMINUS { }
+    | tMINUS exp %prec pMINUS { /*$$ = new Unary(k_exprKindPlus, $2);*/ }
     | tPLUS exp %prec pPLUS { }
     | tBWXOR exp %prec pBWXOR { } 
     ;
