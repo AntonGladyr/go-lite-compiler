@@ -4,12 +4,7 @@
 #include <iostream>
 #include "PrettyPrinterVisitor.hpp"
 #include "Program.hpp"
-#include "IntegerExp.hpp"
-#include "FloatExp.hpp"
-#include "StringExp.hpp"
-#include "BoolExp.hpp"
 #include "Expression.hpp"
-//#include "RuneExp.hpp"
 #include "../helpers/vectorExtension.cpp"
 
 
@@ -20,19 +15,27 @@ void PrettyPrinterVisitor::visit(Program *prg) {
 
 void PrettyPrinterVisitor::visit(VariableDeclaration *varDecl) {
 	if (varDecl == NULL) return;
-	std::cout << "var " << varDecl->idList;
-	if (!varDecl->type.empty()) std::cout << " " << varDecl->type;	
+	std::cout << "var " << varDecl->idList << " ";
+
+	if (!varDecl->type.second.empty()) {	
+		for(auto const& value: varDecl->type.second) {
+			std::cout << "[" << std::to_string(value) << "]";
+		}	
+	}
+
+	std::cout << varDecl->type.first;
+
 	if (!varDecl->expList.empty())
 		std::cout << " = " << varDecl->expList;
 	std::cout << std::endl;
 }
 
 void PrettyPrinterVisitor::visit(Expression *exp) {
-	std::cout << exp;
+	std::cout << exp->toString();
 }
 
-/*
-void PrettyPrinterVisitor::visit(TypeDeclaration *typeDecl) {
+
+/*void PrettyPrinterVisitor::visit(TypeDeclaration *typeDecl) {
 
 }
 

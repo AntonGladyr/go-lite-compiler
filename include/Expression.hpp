@@ -7,11 +7,11 @@
 
 class Expression : public Node {
 	public:
-		virtual void accept(Visitor& v) { };
+		virtual void accept(Visitor& v) { };	
 		virtual std::string toString() { };
 	
 		Expression() { }
-		Expression(int _lineno) : Node(_lineno) { }	
+		Expression(int _lineno) : Node(_lineno) { }
 };
 
 #endif

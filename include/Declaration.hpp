@@ -1,5 +1,5 @@
-#ifndef DECLARATION_H
-#define DECLARATION_H
+#ifndef DECLARATION_HPP
+#define DECLARATION_HPP
 
 #include "Node.hpp"
 

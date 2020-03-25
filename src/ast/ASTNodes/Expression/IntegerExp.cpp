@@ -9,7 +9,7 @@ void IntegerExp::accept(Visitor& v) {
 }
 
 std::string IntegerExp::toString() {
-	return std::to_string(value);
+	return std::to_string(value);	
 }
 
 #endif

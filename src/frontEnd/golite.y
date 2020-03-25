@@ -33,8 +33,10 @@
 #include "BoolExp.hpp"
 #include "RuneExp.hpp"
 #include "BinaryOperatorExp.hpp"
-
-
+#include "UnaryExp.hpp"
+#include "BuiltinsExp.hpp"
+#include "FunctionCallExp.hpp"
+#include "ArrayExp.hpp"
 
 
 extern Program *program;
@@ -121,7 +123,8 @@ void yyerror(const char *s) {
 	PrintStatement *printStmt;
 	SwitchStatement *switchStmt;
 	
-	std::string *type;
+	//std::string *type;
+	std::pair<std::string, std::vector<int>> *type;
 	std::vector<IdentifierExp*> *id_list;
     	std::vector<Expression*> *exp_list;
     	std::vector<std::pair<Expression*, Instruction*>> *case_list;
@@ -138,11 +141,11 @@ void yyerror(const char *s) {
 %type <declList> decl_list
 %type <decl> decl var_decl func_decl type_decl
 %type <stmt> stmt ifstmt loopstmt assignstmt incdecstmt printstmt returnstmt switchstmt
-%type <exp> exp primary_exp
+%type <exp> exp primary_exp func_call
 
 %type <type> type
 %type <id_list> id_listne
-%type <exp_list> exp_list exp_listpe
+%type <exp_list> exp_list exp_listpe index
 
 
 %token tBREAK
@@ -286,12 +289,17 @@ stmt_list : stmt
     | stmt_list stmt
     ;
    
-type : tIDENTIFIER { $$ = $1; }
+type : tIDENTIFIER { /*$$ = $1; TODO: clean memory*/
+	$$ = new std::pair<std::string, std::vector<int>>; $$->first = *$1; delete $1; }
     | tLBRACKET tINTVAL tRBRACKET type {	
-	$$ = new std::string();
-	$$->push_back($1); $$->append(std::to_string($2)); $$->push_back($3); $$->append(*$4); delete $4;
+	//$$ = new std::string();
+	$$ = new std::pair<std::string, std::vector<int>>;
+	//$$->push_back($1); $$->append(std::to_string($2)); $$->push_back($3); $$->append(*$4); delete $4;
+	$$->first = $4->first; $$->second.push_back($2);
+	$$->second.insert($$->second.end(), $4->second.begin(), $4->second.end());
     }
-    | tLPAREN type tRPAREN { $$ = new std::string(); $$->push_back($1); $$->append(*$2); $$->push_back($3); delete $2; }
+    | tLPAREN type tRPAREN { //$$ = new std::string(); $$->push_back($1); $$->append(*$2); $$->push_back($3); delete $2;
+			    $$ = new std::pair<std::string, std::vector<int>>; $$ = $2; }
     ;
 
 id_listne : tIDENTIFIER { $$ = new std::vector<IdentifierExp*>();
@@ -395,22 +403,23 @@ block_stmt: tLBRACE stmt_list tRBRACE { }
     | tLBRACE tRBRACE { }
     ;
 
-func_call : primary_exp tLPAREN exp_listpe tRPAREN { } 
+func_call : primary_exp tLPAREN exp_listpe tRPAREN { $$ = new FunctionCallExp($1, *$3, yylineno); delete $3; }
     ;
 
-index : tLBRACKET exp tRBRACKET { }
-    | tLBRACKET exp tRBRACKET index { }
+index : tLBRACKET exp tRBRACKET { $$ = new std::vector<Expression*>(); $$->push_back($2); }
+    | tLBRACKET exp tRBRACKET index { $$ = new std::vector<Expression*>(); $$->push_back($2); 
+				      $$->insert($$->end(), $4->begin(), $4->end()); }
     ;
 
 primary_exp : tIDENTIFIER { $$ = new IdentifierExp(*$1, yylineno); delete $1; }
-    | func_call { }
-    | tIDENTIFIER index { }
-    | tLPAREN exp tRPAREN { }
+    | func_call { $$ = $1; }
+    | tIDENTIFIER index { $$ = new ArrayExp(*$1, *$2, yylineno); delete $1; delete $2; }
+    | tLPAREN exp tRPAREN { $$ = $2; }
     ;
 
-exp : primary_exp { }
-    | tLEN tLPAREN exp tRPAREN { }
-    | tCAP tLPAREN exp tRPAREN { } 
+exp : primary_exp
+    | tLEN tLPAREN exp tRPAREN { $$ = new BuiltinsExp("len", $3, yylineno); }
+    | tCAP tLPAREN exp tRPAREN { $$ = new BuiltinsExp("cap", $3, yylineno); }
     | exp tPLUS exp { $$ = new BinaryOperatorExp("+", $1, $3, yylineno); }
     | exp tMINUS exp { $$ = new BinaryOperatorExp("-", $1, $3, yylineno); }
     | exp tTIMES exp { $$ = new BinaryOperatorExp("*", $1, $3, yylineno); }
@@ -435,9 +444,9 @@ exp : primary_exp { }
     | tRUNEVAL { $$ = new RuneExp(*$1, yylineno); delete $1; }
     | tSTRINGVAL { $$ = new StringExp(*$1, yylineno); delete $1; }
     | tBOOLVAL { $$ = new BoolExp($1, yylineno); } 
-    | tBANG exp %prec pBANG {/*$$ = new Unary(k_exprKindBang, $2);*/}
-    | tMINUS exp %prec pMINUS { /*$$ = new Unary(k_exprKindPlus, $2);*/ }
-    | tPLUS exp %prec pPLUS { }
-    | tBWXOR exp %prec pBWXOR { } 
+    | tBANG exp %prec pBANG { $$ = new UnaryExp("!", $2, yylineno); }
+    | tMINUS exp %prec pMINUS { $$ = new UnaryExp("-", $2, yylineno); }
+    | tPLUS exp %prec pPLUS { $$ = new UnaryExp("+", $2, yylineno); }
+    | tBWXOR exp %prec pBWXOR { $$ = new UnaryExp("^", $2, yylineno); } 
     ;
 %%

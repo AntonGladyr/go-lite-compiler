@@ -2,6 +2,7 @@
 #define STRINGEXP_CPP
 
 #include <algorithm>
+#include <sstream>
 #include "StringExp.hpp"
 
 void StringExp::findAndReplaceAll(std::string & data, std::string toSearch, std::string replaceStr) {
@@ -19,8 +20,10 @@ void StringExp::findAndReplaceAll(std::string & data, std::string toSearch, std:
 
 StringExp::StringExp(const std::string &_stringValue, int _lineno) : value(_stringValue), Expression(_lineno) {
 	if (value.front() == '\"' && value.back() == '\"')
+		// interpreted string ("string")
 		value.erase(remove(value.begin(), value.end(), '\"'), value.end());
-	else /* `raw string` */{
+	else {
+		// raw string  (`string`)
 		value.erase(remove(value.begin(), value.end(), '`'), value.end());
 		findAndReplaceAll(value, "\\", "\\\\");
 		findAndReplaceAll(value, "\"", "\\\"");
@@ -40,11 +43,9 @@ void StringExp::accept(Visitor& v) {
 }
 
 std::string StringExp::toString() {
-	std::string res;
-	res.append("\"");
-	res.append(value);
-	res.append("\"");
-	return res;
+	std::stringstream ss;
+	ss << "\"" << value << "\"";
+	return ss.str();
 }
 
 #endif

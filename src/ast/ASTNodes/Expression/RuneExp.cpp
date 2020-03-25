@@ -2,6 +2,7 @@
 #define RUNEEXP_CPP
 
 #include <algorithm>
+#include <sstream>
 #include "RuneExp.hpp"
 
 RuneExp::RuneExp(const std::string &_runeValue, int _lineno) : value(_runeValue), Expression(_lineno) {
@@ -14,10 +15,9 @@ void RuneExp::accept(Visitor& v) {
 }
 
 std::string RuneExp::toString() {
-	std::string s = "\'";
-	s.append(value);
-	s.append("\'");
-	return s;
+	std::stringstream ss;
+	ss << "\'" << value << "\'";
+	return ss.str();
 }
 
 #endif

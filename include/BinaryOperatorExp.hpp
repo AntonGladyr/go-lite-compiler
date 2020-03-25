@@ -11,7 +11,6 @@ class BinaryOperatorExp : public Expression {
 		Expression *lhs;
 		Expression *rhs;
 		
-
 		virtual void accept(Visitor& v) override;
 		virtual std::string toString();
 		
