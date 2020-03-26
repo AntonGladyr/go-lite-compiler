@@ -3,7 +3,7 @@
 
 #include <algorithm>
 #include <sstream>
-#include "RuneExp.hpp"
+#include "AST/Expression/RuneExp.hpp"
 
 RuneExp::RuneExp(const std::string &_runeValue, int _lineno) : value(_runeValue), Expression(_lineno) {
 	value.erase(remove(value.begin(), value.end(), '\''), value.end());
@@ -11,7 +11,7 @@ RuneExp::RuneExp(const std::string &_runeValue, int _lineno) : value(_runeValue)
 
 
 void RuneExp::accept(Visitor& v) {
-	v.visit(this);
+	//v.visit(this);
 }
 
 std::string RuneExp::toString() {

@@ -16,27 +16,27 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include "Program.hpp"
-#include "Statement.hpp"
-#include "Declaration.hpp"
-#include "ForStatement.hpp"
-#include "AssignStatement.hpp"
-#include "IfStatement.hpp"
-#include "IfElseStatement.hpp"
-#include "IncDecStatement.hpp"
-#include "PrintStatement.hpp"
-#include "SwitchStatement.hpp"
-#include "IdentifierExp.hpp"
-#include "IntegerExp.hpp"
-#include "FloatExp.hpp"
-#include "StringExp.hpp"
-#include "BoolExp.hpp"
-#include "RuneExp.hpp"
-#include "BinaryOperatorExp.hpp"
-#include "UnaryExp.hpp"
-#include "BuiltinsExp.hpp"
-#include "FunctionCallExp.hpp"
-#include "ArrayExp.hpp"
+#include "AST/Program/Program.hpp"
+#include "AST/Statement/Statement.hpp"
+#include "AST/Declaration/Declaration.hpp"
+#include "AST/Statement/ForStatement.hpp"
+#include "AST/Statement/AssignStatement.hpp"
+#include "AST/Statement/IfStatement.hpp"
+#include "AST/Statement/IfElseStatement.hpp"
+#include "AST/Statement/IncDecStatement.hpp"
+#include "AST/Statement/PrintStatement.hpp"
+#include "AST/Statement/SwitchStatement.hpp"
+#include "AST/Expression/IdentifierExp.hpp"
+#include "AST/Expression/IntegerExp.hpp"
+#include "AST/Expression/FloatExp.hpp"
+#include "AST/Expression/StringExp.hpp"
+#include "AST/Expression/BoolExp.hpp"
+#include "AST/Expression/RuneExp.hpp"
+#include "AST/Expression/BinaryOperatorExp.hpp"
+#include "AST/Expression/UnaryExp.hpp"
+#include "AST/Expression/BuiltinsExp.hpp"
+#include "AST/Expression/FunctionCallExp.hpp"
+#include "AST/Expression/ArrayExp.hpp"
 
 
 extern Program *program;
@@ -57,28 +57,28 @@ void yyerror(const char *s) {
 
 %code requires
 {	
-	#include "Program.hpp"
-	#include "Declaration.hpp"
-	#include "VariableDeclaration.hpp"
-	#include "FunctionDeclaration.hpp"
-	#include "TypeDeclaration.hpp"
-	#include "Statement.hpp"
-	#include "Expression.hpp"
-	#include "IdentifierExp.hpp"
-	#include "IntegerExp.hpp"
-	#include "FloatExp.hpp"
-	#include "StringExp.hpp"
-	#include "BoolExp.hpp"
-	#include "RuneExp.hpp"
+	#include "AST/Program/Program.hpp"
+	#include "AST/Declaration/Declaration.hpp"
+	#include "AST/Declaration/VariableDeclaration.hpp"
+	#include "AST/Declaration/FunctionDeclaration.hpp"
+	#include "AST/Declaration/TypeDeclaration.hpp"
+	#include "AST/Statement/Statement.hpp"
+	#include "AST/Expression/Expression.hpp"
+	#include "AST/Expression/IdentifierExp.hpp"
+	#include "AST/Expression/IntegerExp.hpp"
+	#include "AST/Expression/FloatExp.hpp"
+	#include "AST/Expression/StringExp.hpp"
+	#include "AST/Expression/BoolExp.hpp"
+	#include "AST/Expression/RuneExp.hpp"
 
 
-	#include "ForStatement.hpp"
-	#include "AssignStatement.hpp"
-	#include "IfStatement.hpp"
-	#include "IfElseStatement.hpp"
-	#include "IncDecStatement.hpp"
-	#include "PrintStatement.hpp"
-	#include "SwitchStatement.hpp"
+	#include "AST/Statement/ForStatement.hpp"
+	#include "AST/Statement/AssignStatement.hpp"
+	#include "AST/Statement/IfStatement.hpp"
+	#include "AST/Statement/IfElseStatement.hpp"
+	#include "AST/Statement/IncDecStatement.hpp"
+	#include "AST/Statement/PrintStatement.hpp"
+	#include "AST/Statement/SwitchStatement.hpp"
 	#include <vector>
         #include <string>
 	#include <memory>
@@ -127,7 +127,7 @@ void yyerror(const char *s) {
 	std::pair<std::string, std::vector<int>> *type;
 	std::vector<IdentifierExp*> *id_list;
     	std::vector<Expression*> *exp_list;
-    	std::vector<std::pair<Expression*, Instruction*>> *case_list;
+    	//std::vector<std::pair<Expression*, Instruction*>> *case_list;
 	std::vector<std::vector<std::string>> *params_list;
 }
 

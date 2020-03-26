@@ -26,7 +26,7 @@ int main(int argc, char *argv[]){
     	}
     	else if(!strcmp(argv[1], "pretty")) {		
         	yyparse();
-		PrettyPrinterVisitor printer;
+		PrettyPrinter printer;
 		ASTTraversal::traverse(program, printer);	
 		
 		ASTTraversal::clean(program);	

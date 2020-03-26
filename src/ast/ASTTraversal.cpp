@@ -2,12 +2,16 @@
 #define ASTTRAVERSAL_CPP
 
 #include <typeinfo>   // operator typeid
-#include "ASTTraversal.hpp"
-#include "Program.hpp"
-#include "VariableDeclaration.hpp"
+#include "AST/ASTTraversal.hpp"
+#include "AST/Program/Program.hpp"
+#include "AST/Declaration/VariableDeclaration.hpp"
+#include "AST/Declaration/TypeDeclaration.hpp"
+#include "AST/Declaration/FunctionDeclaration.hpp"
+#include "AST/Statement/Statement.hpp"
 
 void ASTTraversal::traverse(Node *node, Visitor& visitor) {
-	if (node == NULL) return;	
+	if (node == NULL) return;
+	
 	if (typeid(Program) == typeid(*node)) {
 		Program *prg = (Program*)node;
 		prg->accept(visitor);	
@@ -19,16 +23,26 @@ void ASTTraversal::traverse(Node *node, Visitor& visitor) {
 		
 		return;
 	}
-
+	
 	if (typeid(VariableDeclaration) == typeid(*node)) {	
 		VariableDeclaration *varDecl = (VariableDeclaration*)node;
-		varDecl->accept(visitor);	
+		varDecl->accept(visitor);
 	}
 
-	/*if (typeid(Expression) == typeid(*node)) {	
-		Expression *exp = (Expression*)node;
-		exp->accept(visitor);
+	/*if (typeid(TypeDeclaration) == typeid(*node)) {
+		TypeDeclaration *typeDecl = (TypeDeclaration*)node;
+		typeDecl->accept(visitor);	
+	}
+
+	if (typeid(FunctionDeclaration) == typeid(*node)) {
+		FunctionDeclaration *funcDecl = (FunctionDeclaration*)node;
+		funcDecl->accept(visitor);
+		//traverse(blockstmt);
 	}*/
+	
+	if (typeid(Statement) == typeid(*node)) {
+		Statement *stmt = (Statement*)node;
+	}	
 }
 
 void ASTTraversal::clean(Node *node) {

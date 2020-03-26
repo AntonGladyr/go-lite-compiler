@@ -1,11 +1,11 @@
 #ifndef MAIN_HPP 
 #define MAIN_HPP
 
-#include "Program.hpp"
-#include "Node.hpp"
-#include "Visitor.hpp"
-#include "ASTTraversal.hpp"
-#include "PrettyPrinterVisitor.hpp"
+#include "AST/Program/Program.hpp"
+#include "AST/Node.hpp"
+#include "Services/Visitor.hpp"
+#include "AST/ASTTraversal.hpp"
+#include "Services/PrettyPrinter.hpp"
 
 void yyparse();
 int yylex();

@@ -3,7 +3,7 @@
 
 #include <algorithm>
 #include <sstream>
-#include "StringExp.hpp"
+#include "AST/Expression/StringExp.hpp"
 
 void StringExp::findAndReplaceAll(std::string & data, std::string toSearch, std::string replaceStr) {
 	// Get the first occurrence
@@ -39,7 +39,7 @@ StringExp::StringExp(const std::string &_stringValue, int _lineno) : value(_stri
 }
 
 void StringExp::accept(Visitor& v) {
-	v.visit(this);
+	//v.visit(this);
 }
 
 std::string StringExp::toString() {

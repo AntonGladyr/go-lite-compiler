@@ -1,10 +1,10 @@
 #ifndef IDENTIFIEREXP_CPP
 #define IDENTIFIEREXP_CPP
 
-#include "IdentifierExp.hpp"
+#include "AST/Expression/IdentifierExp.hpp"
 
 void IdentifierExp::accept(Visitor& v) {
-	v.visit(this);
+	//v.visit(this);
 }
 
 std::string IdentifierExp::toString() {
