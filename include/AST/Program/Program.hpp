@@ -19,7 +19,7 @@ class Program : public Node {
 		
 		void accept(Visitor& v);
 		virtual std::string toString();
-			
+	
 		Program(
 			const std::string &_package,
 			std::vector<Declaration*> *_declList,

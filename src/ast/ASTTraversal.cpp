@@ -7,7 +7,8 @@
 #include "AST/Declaration/VariableDeclaration.hpp"
 #include "AST/Declaration/TypeDeclaration.hpp"
 #include "AST/Declaration/FunctionDeclaration.hpp"
-#include "AST/Statement/Statement.hpp"
+#include "AST/Statement/BlockStatement.hpp"
+#include "AST/Statement/ReturnStatement.hpp"
 
 void ASTTraversal::traverse(Node *node, Visitor& visitor) {
 	if (node == NULL) return;
@@ -29,20 +30,37 @@ void ASTTraversal::traverse(Node *node, Visitor& visitor) {
 		varDecl->accept(visitor);
 	}
 
-	/*if (typeid(TypeDeclaration) == typeid(*node)) {
+	if (typeid(TypeDeclaration) == typeid(*node)) {
 		TypeDeclaration *typeDecl = (TypeDeclaration*)node;
 		typeDecl->accept(visitor);	
 	}
 
 	if (typeid(FunctionDeclaration) == typeid(*node)) {
 		FunctionDeclaration *funcDecl = (FunctionDeclaration*)node;
-		funcDecl->accept(visitor);
-		//traverse(blockstmt);
-	}*/
+		funcDecl->accept(visitor);	
+		traverse(funcDecl->blockStmt, visitor);
+	}
 	
-	if (typeid(Statement) == typeid(*node)) {
-		Statement *stmt = (Statement*)node;
-	}	
+	if (typeid(BlockStatement) == typeid(*node)) {	
+		BlockStatement *blockStmt = (BlockStatement*)node;
+		visitor.openScope();	
+		blockStmt->accept(visitor);
+		for(auto const& stmt : *(blockStmt->stmtList)) {
+			traverse(stmt, visitor);
+		}
+		visitor.closeScope();
+		blockStmt->accept(visitor);
+	}
+
+	if (typeid(ReturnStatement) == typeid(*node)) {	
+		ReturnStatement *returnStmt = (ReturnStatement*)node;
+		returnStmt->accept(visitor);
+	}
+
+	if (typeid(EmptyStatement) == typeid(*node)) {
+		EmptyStatement *emptyStmt = (EmptyStatement*)node;
+		emptyStmt->accept(visitor);
+	}
 }
 
 void ASTTraversal::clean(Node *node) {

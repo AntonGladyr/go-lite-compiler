@@ -18,7 +18,7 @@ std::string VariableDeclaration::toString() {
 	if (!type.second.empty()) {	
 		for(auto const& value: type.second) {
 			ss << "[" << std::to_string(value) << "]";
-		}	
+		}
 	}
 
 	ss << type.first;

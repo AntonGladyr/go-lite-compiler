@@ -1,6 +1,7 @@
 #ifndef PRETTYPRINTER_CPP
 #define PRETTYPRINTER_CPP
 
+#include <sstream>
 #include <iostream>
 #include "Services/PrettyPrinter.hpp"
 
@@ -11,22 +12,45 @@ void PrettyPrinter::visit(Program *prg) {
 
 void PrettyPrinter::visit(VariableDeclaration *varDecl) {
 	if (varDecl == NULL) return;
-	std::cout << varDecl->toString();
+	std::cout << getTabs() << varDecl->toString();
 }
 
 void PrettyPrinter::visit(TypeDeclaration *typeDecl) {
 	if (typeDecl == NULL) return;
+	std::cout << getTabs() << typeDecl->toString();
 }
 
 void PrettyPrinter::visit(FunctionDeclaration *funcDecl) {
 	if (funcDecl == NULL) return;
+	std::cout << getTabs() << funcDecl->toString();
 }
 
-/*void PrettyPrinter::visit(Statement *stmt) {
-
+void PrettyPrinter::visit(BlockStatement *blockStmt) {
+	if (blockStmt == NULL) return;
+	
+	if (isScopeOpened) {
+		std::cout << getTabs() << "{" << std::endl;
+		numTabs++;
+	} else {
+		numTabs--;
+		std::cout << getTabs() << "}" << std::endl;
+	}
 }
 
-void PrettyPrinterVisitor::visit(IntegerExp *intExp) {
+void PrettyPrinter::visit(ReturnStatement *returnStmt) {
+	if (returnStmt == NULL) return;
+	std::cout << getTabs() << returnStmt->toString();
+}
+
+std::string PrettyPrinter::getTabs() {
+	std::stringstream ss;
+	for(int i = 0; i < numTabs; i++) {
+		ss << "\t";
+	}
+	return ss.str();
+}
+
+/*void PrettyPrinterVisitor::visit(IntegerExp *intExp) {
 	if (intExp == NULL) return;
 	std::cout << intExp;
 } 
@@ -44,9 +68,9 @@ void PrettyPrinterVisitor::visit(StringExp *stringExp) {
 void PrettyPrinterVisitor::visit(BoolExp *boolExp) {
 	if (boolExp == NULL) return;
 	std::cout << boolExp;
-}*/
+}
 
-/*void PrettyPrinterVisitor::visit(RuneExp *runeExp) {
+void PrettyPrinterVisitor::visit(RuneExp *runeExp) {
 	if (runeExp == NULL) return;
 	std::cout << runeExp->toString();
 }*/
@@ -479,11 +503,6 @@ void PrettyPrinterVisitor::visit(BoolExp *boolExp) {
 
         }
 
-        void printTabs(int numTabs) {
-            for(int i = 0; i < numTabs; i++) {
-                printf("    "); //4 spaces per tab;
-            }
-        }
 */
 
 #endif

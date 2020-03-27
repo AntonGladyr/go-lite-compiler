@@ -3,9 +3,10 @@
 
 #include "AST/Node.hpp"
 
-class Statement : Node {
+class Statement : public Node {
 	public:	
 		virtual void accept(Visitor& v) { };
+		virtual std::string toString() { };
 		
 		Statement(int _lineno) : Node(_lineno) { }
 		Statement() { }	

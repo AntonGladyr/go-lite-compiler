@@ -17,8 +17,8 @@
 #include <vector>
 #include <memory>
 #include "AST/Program/Program.hpp"
-#include "AST/Statement/Statement.hpp"
 #include "AST/Declaration/Declaration.hpp"
+#include "AST/Statement/Statement.hpp"
 #include "AST/Statement/ForStatement.hpp"
 #include "AST/Statement/AssignStatement.hpp"
 #include "AST/Statement/IfStatement.hpp"
@@ -62,7 +62,7 @@ void yyerror(const char *s) {
 	#include "AST/Declaration/VariableDeclaration.hpp"
 	#include "AST/Declaration/FunctionDeclaration.hpp"
 	#include "AST/Declaration/TypeDeclaration.hpp"
-	#include "AST/Statement/Statement.hpp"
+	#include "AST/Statement/Statement.hpp"	
 	#include "AST/Expression/Expression.hpp"
 	#include "AST/Expression/IdentifierExp.hpp"
 	#include "AST/Expression/IntegerExp.hpp"
@@ -71,7 +71,7 @@ void yyerror(const char *s) {
 	#include "AST/Expression/BoolExp.hpp"
 	#include "AST/Expression/RuneExp.hpp"
 
-
+	#include "AST/Statement/BlockStatement.hpp"
 	#include "AST/Statement/ForStatement.hpp"
 	#include "AST/Statement/AssignStatement.hpp"
 	#include "AST/Statement/IfStatement.hpp"
@@ -79,9 +79,11 @@ void yyerror(const char *s) {
 	#include "AST/Statement/IncDecStatement.hpp"
 	#include "AST/Statement/PrintStatement.hpp"
 	#include "AST/Statement/SwitchStatement.hpp"
+	#include "AST/Statement/ReturnStatement.hpp"
+	#include "AST/Statement/EmptyStatement.hpp"
 	#include <vector>
         #include <string>
-	#include <memory>
+	#include <memory>	
 }
 
 
@@ -114,7 +116,9 @@ void yyerror(const char *s) {
 	StringExp *stringExp;
 	BoolExp *boolExp;
 	RuneExp *runeExp;
-	
+
+	BlockStatement *blockStmt;	
+	std::vector<Statement*> *stmtList;
 	ForStatement *forStmt;
 	AssignStatement *assignStmt;
 	IfStatement *ifStmt;
@@ -122,13 +126,14 @@ void yyerror(const char *s) {
 	IncDecStatement *incDecStmt;
 	PrintStatement *printStmt;
 	SwitchStatement *switchStmt;
-	
-	//std::string *type;
+	EmptyStatement *emptyStmt;
+		
 	std::pair<std::string, std::vector<int>> *type;
 	std::vector<IdentifierExp*> *id_list;
     	std::vector<Expression*> *exp_list;
     	//std::vector<std::pair<Expression*, Instruction*>> *case_list;
-	std::vector<std::vector<std::string>> *params_list;
+	param_type *param;
+	std::vector<param_type> *params_list;
 }
 
 /* Token directives define the token types to be returned by the scanner (excluding character
@@ -140,13 +145,16 @@ void yyerror(const char *s) {
 %type <program> program
 %type <declList> decl_list
 %type <decl> decl var_decl func_decl type_decl
-%type <stmt> stmt ifstmt loopstmt assignstmt incdecstmt printstmt returnstmt switchstmt
+%type <stmt> stmt ifstmt loopstmt assignstmt incdecstmt printstmt returnstmt switchstmt simplestmt emptystmt
+%type <blockStmt> blockstmt
 %type <exp> exp primary_exp func_call
+%type <param> param
 
 %type <type> type
 %type <id_list> id_listne
 %type <exp_list> exp_list exp_listpe index
-
+%type <params_list> paramspe paramsne
+%type <stmtList> stmt_list
 
 %token tBREAK
 %token tCASE
@@ -274,19 +282,22 @@ decl : var_decl tSEMICOLON
     ;
 
 var_decl : tVAR id_listne type { $$ = new VariableDeclaration(*$2, *$3, yylineno); delete $2; delete $3; }
-    | tVAR id_listne tASSIGN exp_list { $$ = new VariableDeclaration(*$2, *$4); delete $2; delete $4; }
-    | tVAR id_listne type tASSIGN exp_list { $$ = new VariableDeclaration(*$2, *$3, *$5); delete $2; delete $3; delete $5; }
+    | tVAR id_listne tASSIGN exp_list { $$ = new VariableDeclaration(*$2, *$4, yylineno); delete $2; delete $4; }
+    | tVAR id_listne type tASSIGN exp_list
+	{ $$ = new VariableDeclaration(*$2, *$3, *$5, yylineno); delete $2; delete $3; delete $5; }
     ;
 
-type_decl : tTYPE tIDENTIFIER type { /*$$ = new TypeDeclaration($2, $3); delete $2;*/ }
+type_decl : tTYPE tIDENTIFIER type { $$ = new TypeDeclaration(*$2, *$3, yylineno); delete $2; delete $3; }
     ;
 
-func_decl : tFUNC tIDENTIFIER tLPAREN paramspe tRPAREN block_stmt { /*$$ = NULL; delete $2;*/ }
-    | tFUNC tIDENTIFIER tLPAREN paramspe tRPAREN type block_stmt { /*$$ = NULL; delete $2;*/ }
+func_decl : tFUNC tIDENTIFIER tLPAREN paramspe tRPAREN blockstmt
+	{ $$ = new FunctionDeclaration(*$2, $4, $6, yylineno); delete $2; }
+    | tFUNC tIDENTIFIER tLPAREN paramspe tRPAREN type blockstmt
+	{ $$ = new FunctionDeclaration(*$2, $4, *$6, $7, yylineno); delete $2; delete $6;}
     ;
 
-stmt_list : stmt
-    | stmt_list stmt
+stmt_list : stmt { $$ = new std::vector<Statement*>(); $$->push_back($1); }
+    | stmt_list stmt { $1->push_back($2); }
     ;
    
 type : tIDENTIFIER { /*$$ = $1; TODO: clean memory*/
@@ -315,61 +326,61 @@ exp_listpe : exp_list { $$ = $1; delete $1; }
     | %empty { $$ = NULL; }
     ;
 
-param : tIDENTIFIER type
+param : tIDENTIFIER type { $$ = new param_type(); $$->first = *$1; $$->second = *$2; delete $2; }
     ;
 
-paramsne : param
-    | paramsne tCOMMA param 
+paramsne : param { $$ = new std::vector<param_type>(); $$->push_back(*$1); delete $1; }
+    | paramsne tCOMMA param { $1->push_back(*$3);  delete $3; }
     ;
 
-paramspe : paramsne
-    | %empty
+paramspe : paramsne { $$ = $1; }
+    | %empty { $$ = new std::vector<param_type>(); }
     ;
 
-stmt : block_stmt tSEMICOLON { $$ = NULL; }
+stmt : blockstmt tSEMICOLON { $$ = $1; }
     | stmt_decl tSEMICOLON { $$ = NULL; }
     | loopstmt tSEMICOLON { $$ = NULL; }
     | ifstmt tSEMICOLON { $$ = NULL; }
     | switchstmt tSEMICOLON { $$ = NULL; }   
     | printstmt tSEMICOLON { $$ = NULL; }
-    | returnstmt tSEMICOLON { $$ = NULL; }
+    | returnstmt tSEMICOLON { $$ = $1; }
     | tBREAK tSEMICOLON {/*$$ = new BreakStatement();*/ $$ = NULL; }
     | tCONTINUE tSEMICOLON {/*$$ = new ContinueStatement();*/ $$ = NULL; } 
-    | simplestmt tSEMICOLON { } 
+    | simplestmt tSEMICOLON { $$ = $1; }
     ;
 
-emptystmt : %empty
+emptystmt : %empty { }
     ;
 
-expstmt : exp
+expstmt : exp { }
     | %empty 
     ;
 
-stmt_decl : var_decl
+stmt_decl : var_decl { }
     | type_decl 
     ;
 
-returnstmt : tRETURN {/*&$$ = new ReturnStatement();*/}
-    | tRETURN exp {/*$$ = new ReturnStatement(exp);*/} 
+returnstmt : tRETURN { $$ = new ReturnStatement(yylineno); }
+    | tRETURN exp { $$ = new ReturnStatement($2, yylineno); } 
     ;
 
-loopstmt : tFOR simplestmt tSEMICOLON expstmt tSEMICOLON simplestmt block_stmt { $$ = NULL; }
-    | tFOR exp block_stmt {/*$$ = new ForStatement($2, $4);*/ $$ = NULL; }
-    | tFOR block_stmt {/*$$ = new ForStatement($3);*/ $$ = NULL; }
+loopstmt : tFOR simplestmt tSEMICOLON expstmt tSEMICOLON simplestmt blockstmt { $$ = NULL; }
+    | tFOR exp blockstmt {/*$$ = new ForStatement($2, $4);*/ $$ = NULL; }
+    | tFOR blockstmt {/*$$ = new ForStatement($3);*/ $$ = NULL; }
     ;
 
-simplestmt : emptystmt
-    | exp
-    | incdecstmt
-    | assignstmt
+simplestmt : emptystmt { $$ = new EmptyStatement(yylineno); }
+    | exp { }
+    | incdecstmt { }
+    | assignstmt { }
     ;
 
 assignstmt : exp_list tASSIGN exp_list { } 
     ;
 
-ifstmt : tIF exp block_stmt {/*$$ = new IfStatement($2, $4);*/} 
-    | tIF exp block_stmt tELSE block_stmt {/*$$ = new IfElseStatement(k_stmtKindIfElse, $2, $4, $7);*/} 
-    | tIF exp block_stmt tELSE ifstmt {/*$$ = new IfElseStatement(k_stmtKindIfElseNested, $2, $4, $8);*/} 
+ifstmt : tIF exp blockstmt {/*$$ = new IfStatement($2, $4);*/} 
+    | tIF exp blockstmt tELSE blockstmt {/*$$ = new IfElseStatement(k_stmtKindIfElse, $2, $4, $7);*/} 
+    | tIF exp blockstmt tELSE ifstmt {/*$$ = new IfElseStatement(k_stmtKindIfElseNested, $2, $4, $8);*/} 
     ;
 
 switchstmt : tSWITCH tLBRACE case_block tRBRACE {/*$$ = new SwitchStatement($3);*/ $$ = NULL; }
@@ -399,8 +410,8 @@ printstmt : tPRINT tLPAREN exp_listpe tRPAREN {/*$$ = new PrintStatement(k_stmtK
     | tPRINTLN tLPAREN exp_listpe tRPAREN {/*$$ = new PrintStatement(k_stmtKindPrintLn, $3);*/}
     ;
 
-block_stmt: tLBRACE stmt_list tRBRACE { }
-    | tLBRACE tRBRACE { }
+blockstmt: tLBRACE stmt_list tRBRACE { $$ = new BlockStatement($2, yylineno); }
+    | tLBRACE tRBRACE { $$ = new BlockStatement(new std::vector<Statement*>(), yylineno); } 
     ;
 
 func_call : primary_exp tLPAREN exp_listpe tRPAREN { $$ = new FunctionCallExp($1, *$3, yylineno); delete $3; }

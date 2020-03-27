@@ -1,25 +1,29 @@
-#ifndef RETURNSTATEMENT_HPP
-#define RETURNSTATEMENT_HPP
+#ifndef RETURNSTMT_HPP
+#define RETURNSTMT_HPP
 
-//#include "Statement.hpp"
-//#include "Expression.hpp"
-//#include "treeEnums.h"
-
-#include "AST/Statement/Statement.hpp"
+#include <string>
+#include <vector>
 #include "Services/Visitor.hpp"
+#include "AST/Expression/Expression.hpp"
 
 class ReturnStatement : public Statement {
 	public:
-		virtual void accept(Visitor& v) override;
+		Expression *exp;	
 		
+		virtual void accept(Visitor& v) override;
+		virtual std::string toString();
+
+		ReturnStatement(
+			Expression *_exp,
+			int _lineno
+		) : exp(_exp), Statement(_lineno) { }
+
+		ReturnStatement(
+			int _lineno
+		) : Statement(_lineno) { }
+	
 		ReturnStatement() { }
 		~ReturnStatement();
-		
-		/*Expression exp;
-
-		ReturnStatement() : kind(k_stmtKindReturn) { }
-		ReturnStatement(Expression exp) : kind(k_stmtKindReturnExp), exp(exp) { }
-		*/
 };
 
 #endif
