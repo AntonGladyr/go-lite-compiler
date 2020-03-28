@@ -20,6 +20,7 @@ std::string ReturnStatement::toString() {
 
 
 ReturnStatement::~ReturnStatement() {
+	if (exp) delete exp;
 	std::cout << "ReturnStatement destroyed" << std::endl;
 }
 

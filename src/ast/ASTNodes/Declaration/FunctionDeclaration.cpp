@@ -38,8 +38,7 @@ std::string FunctionDeclaration::toString() {
 	//function type
 	//indexes
 	if (type) {
-		if (type->second) {
-			std::cout << "inside if" << std::endl;
+		if (type->second) {	
 			for(auto const& index : *(type->second)) {
 				ss << "[" << std::to_string(index) << "]";
 			}	
@@ -53,6 +52,21 @@ std::string FunctionDeclaration::toString() {
 
 
 FunctionDeclaration::~FunctionDeclaration() {
+	if (params) {
+		for(auto const& param : *params) {
+			delete param->second->second;
+			delete param->second;
+			delete param;
+		}
+		delete params;
+	}
+
+	if (type) {
+		if (type->second) delete type->second;
+		delete type;
+	}
+	
+	delete blockStmt;
 	std::cout << "FunctionDeclaration destroyed" << std::endl;
 }
 

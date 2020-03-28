@@ -21,6 +21,9 @@ std::string BlockStatement::toString() {
 
 
 BlockStatement::~BlockStatement() {
+	for(auto const& stmt : *stmtList) {
+		delete stmt;
+	}
 	std::cout << "BlockStatement destroyed" << std::endl;
 }
 
