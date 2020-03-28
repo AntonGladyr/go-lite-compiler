@@ -15,4 +15,12 @@ std::string FunctionCallExp::toString() {
 	return ss.str();
 }
 
+FunctionCallExp::~FunctionCallExp() {
+	delete exp;
+	for(auto const& exp : *expList) {
+		delete exp;
+	}
+	std::cout << "FunctionCallExp destroyed" << std::endl;
+}
+
 #endif

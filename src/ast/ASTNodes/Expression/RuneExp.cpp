@@ -20,4 +20,8 @@ std::string RuneExp::toString() {
 	return ss.str();
 }
 
+RuneExp::~RuneExp() {	
+	std::cout << "RuneExp destroyed" << std::endl;
+}
+
 #endif

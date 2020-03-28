@@ -14,21 +14,23 @@ void TypeDeclaration::accept(Visitor& v) {
 std::string TypeDeclaration::toString() {
 	std::stringstream ss;	
 	ss << "type " << id << " ";
-
-	if (!type.second.empty()) {	
-		for(auto const& value: type.second) {
-			ss << "[" << std::to_string(value) << "]";
-		}	
+	if (type->second) {
+		for(auto const& index: *(type->second)) {
+			ss << "[" << std::to_string(index) << "]";
+		}
 	}
-
-	ss << type.first;
-
+	
+	ss << type->first;
+	
 	ss << std::endl;
 	return ss.str();
 }
 
 
 TypeDeclaration::~TypeDeclaration() {
+	if (type->second) delete type->second;
+	
+	delete type;
 	std::cout << "TypeDeclaration destroyed" << std::endl;
 }
 

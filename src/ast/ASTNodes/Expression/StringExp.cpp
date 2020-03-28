@@ -5,6 +5,16 @@
 #include <sstream>
 #include "AST/Expression/StringExp.hpp"
 
+void StringExp::accept(Visitor& v) {
+	//v.visit(this);
+}
+
+std::string StringExp::toString() {
+	std::stringstream ss;
+	ss << "\"" << value << "\"";
+	return ss.str();
+}
+
 void StringExp::findAndReplaceAll(std::string & data, std::string toSearch, std::string replaceStr) {
 	// Get the first occurrence
 	size_t pos = data.find(toSearch);
@@ -38,14 +48,8 @@ StringExp::StringExp(const std::string &_stringValue, int _lineno) : value(_stri
 	}
 }
 
-void StringExp::accept(Visitor& v) {
-	//v.visit(this);
-}
-
-std::string StringExp::toString() {
-	std::stringstream ss;
-	ss << "\"" << value << "\"";
-	return ss.str();
+StringExp::~StringExp() {	
+	std::cout << "StringExp destroyed" << std::endl;
 }
 
 #endif

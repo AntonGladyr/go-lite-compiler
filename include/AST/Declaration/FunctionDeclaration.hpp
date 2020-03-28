@@ -10,13 +10,13 @@
 #include "AST/Statement/BlockStatement.hpp"
 
 class BlockStatement;
-typedef std::pair<std::string, std::pair<std::string, std::vector<int>>> param_type;
+typedef std::pair<std::string, std::pair<std::string, std::vector<int>*>*> param_type;
 
 class FunctionDeclaration : public Declaration {
 	public:
 		std::string id;
-		std::vector<param_type> *params;	
-		std::pair<std::string, std::vector<int>> type;
+		std::vector<param_type*> *params;	
+		std::pair<std::string, std::vector<int>*> *type;
 		BlockStatement *blockStmt;
 
 		virtual void accept(Visitor& v) override;
@@ -24,15 +24,15 @@ class FunctionDeclaration : public Declaration {
 		
 		FunctionDeclaration(
 			const std::string &_id,
-			std::vector<param_type> *_params,
+			std::vector<param_type*> *_params,
 			BlockStatement *_blockStmt,
 			int _lineno
 		) : id(_id), params{_params}, blockStmt{_blockStmt}, Declaration(_lineno) { }
 		
 		FunctionDeclaration(
 			const std::string &_id,
-			std::vector<param_type> *_params,
-			std::pair<std::string, std::vector<int>> _type,
+			std::vector<param_type*> *_params,
+			std::pair<std::string, std::vector<int>*> *_type,
 			BlockStatement *_blockStmt,
 			int _lineno
 		) : id(_id), params{_params}, type(_type), blockStmt{_blockStmt}, Declaration(_lineno) { }

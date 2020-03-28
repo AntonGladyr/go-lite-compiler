@@ -12,7 +12,7 @@ class IdentifierExp : public Expression {
 		virtual void accept(Visitor& v) override;
 		virtual std::string toString();
 	
-		IdentifierExp(std::string _idValue, int _lineno) : value(_idValue), Expression(_lineno) { }
+		IdentifierExp(const std::string &_idValue, int _lineno) : value(_idValue), Expression(_lineno) { }
 		IdentifierExp() { }
 		~IdentifierExp();
 };

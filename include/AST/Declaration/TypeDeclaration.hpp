@@ -9,14 +9,14 @@
 class TypeDeclaration : public Declaration {
 	public:
 		std::string id;
-		std::pair<std::string, std::vector<int>> type;
+		std::pair<std::string, std::vector<int>*> *type;
 		
 		virtual void accept(Visitor& v) override;
 		virtual std::string toString();
 
 		TypeDeclaration(
 			std::string _id,
-			std::pair<std::string, std::vector<int>> _type,
+			std::pair<std::string, std::vector<int>*> *_type,
 			int _lineno
 		) : id(_id), type(_type), Declaration(_lineno) { }
 		

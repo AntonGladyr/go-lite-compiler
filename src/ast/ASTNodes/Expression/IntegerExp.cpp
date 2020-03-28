@@ -12,4 +12,8 @@ std::string IntegerExp::toString() {
 	return std::to_string(value);	
 }
 
+IntegerExp::~IntegerExp() {	
+	std::cout << "IntegerExp destroyed" << std::endl;
+}
+
 #endif

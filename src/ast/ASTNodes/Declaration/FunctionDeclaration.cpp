@@ -16,18 +16,18 @@ std::string FunctionDeclaration::toString() {
 	ss << "func " << id;
 	ss << "(";
 	
-	//parameters
-	if (!params->empty()) {
-		for(auto const& param : *params) {	
-			ss << param.first << " ";
-			
-			if (!param.second.second.empty()) {
-				for(auto const& value : param.second.second) {
-					ss << "[" << std::to_string(value) << "]";
+	//parameters	
+	if (params) {
+		for(auto const& param : *params) {
+			ss << param->first << " ";
+				
+			if (param->second->second) {
+				for(auto const& index : *(param->second->second)) {
+					ss << "[" << std::to_string(index) << "]";
 				}	
 			}
 			
-			ss << param.second.first;
+			ss << param->second->first;
 			if (&param != &params->back())
 				ss << ", ";
 		}
@@ -36,16 +36,17 @@ std::string FunctionDeclaration::toString() {
 	ss << ") ";
 	
 	//function type
-	//indexes	
-	if (!type.second.empty()) {	
-		for(auto const& value : type.second) {
-			ss << "[" << std::to_string(value) << "]";
-		}	
+	//indexes
+	if (type) {
+		if (type->second) {
+			std::cout << "inside if" << std::endl;
+			for(auto const& index : *(type->second)) {
+				ss << "[" << std::to_string(index) << "]";
+			}	
+		}
+		//type id
+		ss << type->first << " ";
 	}
-	
-	//type id
-	if (!type.first.empty())
-		ss << type.first << " ";	
 
 	return ss.str();
 }

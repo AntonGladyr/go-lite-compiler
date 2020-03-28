@@ -13,24 +13,42 @@ void VariableDeclaration::accept(Visitor& v) {
 
 std::string VariableDeclaration::toString() {
 	std::stringstream ss;	
-	ss << "var " << idList << " ";
+	ss << "var " << *idList << " ";
 
-	if (!type.second.empty()) {	
-		for(auto const& value: type.second) {
-			ss << "[" << std::to_string(value) << "]";
+	if (type) {
+		if (type->second) {	
+			for(auto const& index : *(type->second)) {
+				ss << "[" << std::to_string(index) << "]";
+			}
 		}
-	}
+		ss << type->first << " ";
+	}	
 
-	ss << type.first;
-
-	if (!expList.empty())
-		ss << " = " << expList;
+	if (expList)
+		ss << "= " << *expList;
 	ss << std::endl;
 	return ss.str();
 }
 
 
 VariableDeclaration::~VariableDeclaration() {
+	for(auto const& id : *idList) {
+		delete id;
+	}
+	delete idList;
+
+	if (expList) {
+		for(auto const& exp : *expList) {
+			delete exp;
+		}
+		delete expList;
+	}
+
+	if (type) {
+		if (type->second) delete type->second;
+		delete type;
+	}
+		
 	std::cout << "VariableDeclaration destroyed" << std::endl;
 }
 

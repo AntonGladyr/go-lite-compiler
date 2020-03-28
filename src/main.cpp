@@ -21,15 +21,15 @@ int main(int argc, char *argv[]){
         	yyparse();
         	std::cout << "OK" << std::endl;
 		
-		ASTTraversal::clean(program);
+		delete program;	
         	return 0;
     	}
     	else if(!strcmp(argv[1], "pretty")) {		
         	yyparse();
-		PrettyPrinter printer;
+		PrettyPrinter printer;	
 		ASTTraversal::traverse(program, printer);	
 		
-		ASTTraversal::clean(program);	
+		delete program;
         	return 0;
     	}
 }

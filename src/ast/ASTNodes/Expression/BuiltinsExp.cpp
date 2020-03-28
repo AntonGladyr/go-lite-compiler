@@ -14,4 +14,9 @@ std::string BuiltinsExp::toString() {
 	return ss.str();
 }
 
+BuiltinsExp::~BuiltinsExp() {
+	delete exp;
+	std::cout << "BuiltinsExp destroyed" << std::endl;
+}
+
 #endif

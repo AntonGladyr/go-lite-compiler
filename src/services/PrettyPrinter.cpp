@@ -16,7 +16,7 @@ void PrettyPrinter::visit(VariableDeclaration *varDecl) {
 }
 
 void PrettyPrinter::visit(TypeDeclaration *typeDecl) {
-	if (typeDecl == NULL) return;
+	if (typeDecl == NULL) return;	
 	std::cout << getTabs() << typeDecl->toString();
 }
 

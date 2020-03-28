@@ -9,8 +9,8 @@ class Statement : public Node {
 		virtual std::string toString() { };
 		
 		Statement(int _lineno) : Node(_lineno) { }
-		Statement() { }	
+		Statement() { }
+		virtual ~Statement() { }
 };
-
 
 #endif

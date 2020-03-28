@@ -17,6 +17,12 @@ std::string Program::toString() {
 }
 
 Program::~Program() {
+	if (declList) {
+		for(auto const& decl : *declList) {
+			delete decl;
+		}
+		delete declList;
+	}
 	std::cout << "Program destroyed" << std::endl;
 }
 

@@ -128,12 +128,12 @@ void yyerror(const char *s) {
 	SwitchStatement *switchStmt;
 	EmptyStatement *emptyStmt;
 		
-	std::pair<std::string, std::vector<int>> *type;
+	std::pair<std::string, std::vector<int>*> *type;
 	std::vector<IdentifierExp*> *id_list;
     	std::vector<Expression*> *exp_list;
     	//std::vector<std::pair<Expression*, Instruction*>> *case_list;
 	param_type *param;
-	std::vector<param_type> *params_list;
+	std::vector<param_type*> *params_list;
 }
 
 /* Token directives define the token types to be returned by the scanner (excluding character
@@ -269,7 +269,7 @@ void yyerror(const char *s) {
 %%
 
 program : tPACKAGE tIDENTIFIER tSEMICOLON decl_list { program = new Program(*$2, $4, yylineno); delete $2; }
-    | tPACKAGE tIDENTIFIER tSEMICOLON { program = new Program(*$2, NULL, yylineno); delete $2; }
+    | tPACKAGE tIDENTIFIER tSEMICOLON { program = new Program(*$2, new std::vector<Declaration*>(), yylineno); delete $2; }
     ;
 
 decl_list : decl { $$ = new std::vector<Declaration*>(); $$->push_back($1); }
@@ -281,36 +281,33 @@ decl : var_decl tSEMICOLON
     | func_decl tSEMICOLON 
     ;
 
-var_decl : tVAR id_listne type { $$ = new VariableDeclaration(*$2, *$3, yylineno); delete $2; delete $3; }
-    | tVAR id_listne tASSIGN exp_list { $$ = new VariableDeclaration(*$2, *$4, yylineno); delete $2; delete $4; }
-    | tVAR id_listne type tASSIGN exp_list
-	{ $$ = new VariableDeclaration(*$2, *$3, *$5, yylineno); delete $2; delete $3; delete $5; }
+var_decl : tVAR id_listne type { $$ = new VariableDeclaration($2, $3, yylineno); }
+    | tVAR id_listne tASSIGN exp_list { $$ = new VariableDeclaration($2, $4, yylineno); }
+    | tVAR id_listne type tASSIGN exp_list { $$ = new VariableDeclaration($2, $3, $5, yylineno); }
     ;
 
-type_decl : tTYPE tIDENTIFIER type { $$ = new TypeDeclaration(*$2, *$3, yylineno); delete $2; delete $3; }
+type_decl : tTYPE tIDENTIFIER type { $$ = new TypeDeclaration(*$2, $3, yylineno); delete $2; }
     ;
 
 func_decl : tFUNC tIDENTIFIER tLPAREN paramspe tRPAREN blockstmt
 	{ $$ = new FunctionDeclaration(*$2, $4, $6, yylineno); delete $2; }
     | tFUNC tIDENTIFIER tLPAREN paramspe tRPAREN type blockstmt
-	{ $$ = new FunctionDeclaration(*$2, $4, *$6, $7, yylineno); delete $2; delete $6;}
+	{ $$ = new FunctionDeclaration(*$2, $4, $6, $7, yylineno); delete $2; }
     ;
 
 stmt_list : stmt { $$ = new std::vector<Statement*>(); $$->push_back($1); }
     | stmt_list stmt { $1->push_back($2); }
     ;
    
-type : tIDENTIFIER { /*$$ = $1; TODO: clean memory*/
-	$$ = new std::pair<std::string, std::vector<int>>; $$->first = *$1; delete $1; }
+type : tIDENTIFIER { $$ = new std::pair<std::string, std::vector<int>*>;  
+		     $$->second = new std::vector<int>(); $$->first = *$1; delete $1; }
     | tLBRACKET tINTVAL tRBRACKET type {	
-	//$$ = new std::string();
-	$$ = new std::pair<std::string, std::vector<int>>;
-	//$$->push_back($1); $$->append(std::to_string($2)); $$->push_back($3); $$->append(*$4); delete $4;
-	$$->first = $4->first; $$->second.push_back($2);
-	$$->second.insert($$->second.end(), $4->second.begin(), $4->second.end());
+	$$ = new std::pair<std::string, std::vector<int>*>;		
+	$$->first = $4->first;  $$->second = new std::vector<int>();
+	$$->second->push_back($2);	
+	$$->second->insert($$->second->end(), $4->second->begin(), $4->second->end());	
     }
-    | tLPAREN type tRPAREN { //$$ = new std::string(); $$->push_back($1); $$->append(*$2); $$->push_back($3); delete $2;
-			    $$ = new std::pair<std::string, std::vector<int>>; $$ = $2; }
+    | tLPAREN type tRPAREN { $$ = new std::pair<std::string, std::vector<int>*>; $$ = $2; }
     ;
 
 id_listne : tIDENTIFIER { $$ = new std::vector<IdentifierExp*>();
@@ -322,19 +319,19 @@ exp_list : exp { $$ = new std::vector<Expression*>(); $$->push_back($1); }
     | exp_list tCOMMA exp { $1->push_back($3); }
     ;
 
-exp_listpe : exp_list { $$ = $1; delete $1; }
+exp_listpe : exp_list { $$ = $1; }
+    | %empty { $$ = new std::vector<Expression*>(); }
+    ;
+
+param : tIDENTIFIER type { $$ = new param_type(); $$->first = *$1; $$->second = $2; delete $1; }
+    ;
+
+paramsne : param { $$ = new std::vector<param_type*>(); $$->push_back($1); }
+    | paramsne tCOMMA param { $1->push_back($3); }
+    ;
+
+paramspe : paramsne 
     | %empty { $$ = NULL; }
-    ;
-
-param : tIDENTIFIER type { $$ = new param_type(); $$->first = *$1; $$->second = *$2; delete $2; }
-    ;
-
-paramsne : param { $$ = new std::vector<param_type>(); $$->push_back(*$1); delete $1; }
-    | paramsne tCOMMA param { $1->push_back(*$3);  delete $3; }
-    ;
-
-paramspe : paramsne { $$ = $1; }
-    | %empty { $$ = new std::vector<param_type>(); }
     ;
 
 stmt : blockstmt tSEMICOLON { $$ = $1; }
@@ -414,7 +411,7 @@ blockstmt: tLBRACE stmt_list tRBRACE { $$ = new BlockStatement($2, yylineno); }
     | tLBRACE tRBRACE { $$ = new BlockStatement(new std::vector<Statement*>(), yylineno); } 
     ;
 
-func_call : primary_exp tLPAREN exp_listpe tRPAREN { $$ = new FunctionCallExp($1, *$3, yylineno); delete $3; }
+func_call : primary_exp tLPAREN exp_listpe tRPAREN { $$ = new FunctionCallExp($1, $3, yylineno); }
     ;
 
 index : tLBRACKET exp tRBRACKET { $$ = new std::vector<Expression*>(); $$->push_back($2); }
@@ -424,7 +421,7 @@ index : tLBRACKET exp tRBRACKET { $$ = new std::vector<Expression*>(); $$->push_
 
 primary_exp : tIDENTIFIER { $$ = new IdentifierExp(*$1, yylineno); delete $1; }
     | func_call { $$ = $1; }
-    | tIDENTIFIER index { $$ = new ArrayExp(*$1, *$2, yylineno); delete $1; delete $2; }
+    | tIDENTIFIER index { $$ = new ArrayExp(*$1, $2, yylineno); delete $1; }
     | tLPAREN exp tRPAREN { $$ = $2; }
     ;
 

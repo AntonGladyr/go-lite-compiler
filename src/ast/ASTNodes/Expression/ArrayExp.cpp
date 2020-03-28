@@ -11,10 +11,17 @@ void ArrayExp::accept(Visitor& v) {
 std::string ArrayExp::toString() {
 	std::stringstream ss;
 	ss << id;
-	for(auto const& value: expList) {
-		ss << "[" << value->toString() << "]";
+	for(auto const& exp: *expList) {
+		ss << "[" << exp->toString() << "]";
 	}
 	return ss.str();
+}
+
+ArrayExp::~ArrayExp() {
+	for(auto const& exp: *expList) {
+		delete exp;
+	}
+	std::cout << "ArrayExp destroyed" << std::endl;
 }
 
 #endif

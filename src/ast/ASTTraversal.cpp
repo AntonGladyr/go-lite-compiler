@@ -12,12 +12,11 @@
 
 void ASTTraversal::traverse(Node *node, Visitor& visitor) {
 	if (node == NULL) return;
-	
 	if (typeid(Program) == typeid(*node)) {
 		Program *prg = (Program*)node;
-		prg->accept(visitor);	
-		if (prg->declList) {
-			for(auto decl : *(prg->declList)) {	
+		prg->accept(visitor);
+		if (prg->declList) {	
+			for(auto const& decl : *(prg->declList)) {	
 				traverse(decl, visitor);	
 			}
 		}
@@ -25,7 +24,7 @@ void ASTTraversal::traverse(Node *node, Visitor& visitor) {
 		return;
 	}
 	
-	if (typeid(VariableDeclaration) == typeid(*node)) {	
+	if (typeid(VariableDeclaration) == typeid(*node)) {
 		VariableDeclaration *varDecl = (VariableDeclaration*)node;
 		varDecl->accept(visitor);
 	}
@@ -43,7 +42,7 @@ void ASTTraversal::traverse(Node *node, Visitor& visitor) {
 	
 	if (typeid(BlockStatement) == typeid(*node)) {	
 		BlockStatement *blockStmt = (BlockStatement*)node;
-		visitor.openScope();	
+		visitor.openScope();
 		blockStmt->accept(visitor);
 		for(auto const& stmt : *(blockStmt->stmtList)) {
 			traverse(stmt, visitor);
@@ -60,24 +59,6 @@ void ASTTraversal::traverse(Node *node, Visitor& visitor) {
 	if (typeid(EmptyStatement) == typeid(*node)) {
 		EmptyStatement *emptyStmt = (EmptyStatement*)node;
 		emptyStmt->accept(visitor);
-	}
-}
-
-void ASTTraversal::clean(Node *node) {
-	if (node == NULL) return;
-
-	if (typeid(Program) == typeid(*node)) {
-		Program *prg = (Program*)node;
-		if (prg->declList) {
-			for(auto decl : *(prg->declList)) {
-				//TODO: destructors for Declaration and VariableDeclaration
-				delete decl;
-			}
-		}
-		
-		
-		delete prg->declList;
-		delete prg;	
 	}
 }
 

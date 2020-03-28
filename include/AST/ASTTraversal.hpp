@@ -7,8 +7,7 @@
 class ASTTraversal {
 	public:
 		ASTTraversal() { }
-		static void traverse(Node *node, Visitor& visitor);
-		static void clean(Node *node);
+		static void traverse(Node *node, Visitor& visitor);	
 };
 
 #endif

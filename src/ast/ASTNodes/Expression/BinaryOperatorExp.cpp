@@ -14,4 +14,10 @@ std::string BinaryOperatorExp::toString() {
 	return ss.str();
 }
 
+BinaryOperatorExp::~BinaryOperatorExp() {
+	delete lhs;
+	delete rhs;
+	std::cout << "BinaryOperatorExp destroyed" << std::endl;
+}
+
 #endif
