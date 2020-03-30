@@ -12,7 +12,9 @@ void FunctionDeclaration::accept(Visitor& v) {
 }
 
 std::string FunctionDeclaration::toString() {
-	std::stringstream ss;	
+	std::stringstream ss;
+
+	//TODO: fix block output
 	ss << "func " << id;
 	ss << "(";
 	
@@ -36,15 +38,15 @@ std::string FunctionDeclaration::toString() {
 	ss << ") ";
 	
 	//function type
-	//indexes
+	//indexes	
 	if (type) {
 		if (type->second) {	
 			for(auto const& index : *(type->second)) {
 				ss << "[" << std::to_string(index) << "]";
 			}	
-		}
+		}	
 		//type id
-		ss << type->first << " ";
+		ss << type->first << " ";	
 	}
 
 	return ss.str();

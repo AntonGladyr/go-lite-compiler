@@ -15,14 +15,16 @@ std::string BlockStatement::toString() {
 	for(auto const& stmt : *stmtList) {
 		ss << stmt->toString();
 	}
-	ss << "}" << std::endl;
+	ss << "}"; 
 	return ss.str();
 }
 
 
 BlockStatement::~BlockStatement() {
-	for(auto const& stmt : *stmtList) {
-		delete stmt;
+	if (stmtList) {	
+		for(auto const& stmt : *stmtList) {	
+			delete stmt;
+		}
 	}
 	std::cout << "BlockStatement destroyed" << std::endl;
 }

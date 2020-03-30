@@ -8,7 +8,7 @@
 class BuiltinsExp : public Expression {
 	public:
 		std::string name;
-		Expression *exp;
+		Expression *exp = NULL;
 		
 		virtual void accept(Visitor& v) override;
 		virtual std::string toString();

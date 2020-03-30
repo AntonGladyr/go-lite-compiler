@@ -8,7 +8,7 @@
 
 class ReturnStatement : public Statement {
 	public:
-		Expression *exp;	
+		Expression *exp = NULL;
 		
 		virtual void accept(Visitor& v) override;
 		virtual std::string toString();

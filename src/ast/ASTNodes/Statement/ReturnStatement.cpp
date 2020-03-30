@@ -14,7 +14,6 @@ std::string ReturnStatement::toString() {
 	ss << "return";
 	if (exp)
 		ss << " " << exp->toString();
-	ss << std::endl;
 	return ss.str();
 }
 

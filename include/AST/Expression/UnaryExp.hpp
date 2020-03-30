@@ -8,7 +8,7 @@
 class UnaryExp : public Expression {
 	public:
 		std::string op;
-		Expression *exp;	
+		Expression *exp = NULL;
 		
 		virtual void accept(Visitor& v) override;
 		virtual std::string toString();

@@ -8,7 +8,20 @@
 #include "AST/Declaration/TypeDeclaration.hpp"
 #include "AST/Declaration/FunctionDeclaration.hpp"
 #include "AST/Statement/BlockStatement.hpp"
+#include "AST/Statement/DeclarationStatement.hpp"
+#include "AST/Statement/TypeDeclarationStatement.hpp"
+#include "AST/Statement/AssignStatement.hpp"
+#include "AST/Statement/ExpressionStatement.hpp"
+#include "AST/Statement/ForStatement.hpp"
+#include "AST/Statement/IfElseStatement.hpp"
+#include "AST/Statement/IfStatement.hpp"
+#include "AST/Statement/SwitchStatement.hpp"
+#include "AST/Statement/PrintStatement.hpp"
+#include "AST/Statement/BreakStatement.hpp"
+#include "AST/Statement/ContinueStatement.hpp"
+#include "AST/Statement/IncDecStatement.hpp"
 #include "AST/Statement/ReturnStatement.hpp"
+#include "AST/Statement/EmptyStatement.hpp"
 
 void ASTTraversal::traverse(Node *node, Visitor& visitor) {
 	if (node == NULL) return;
@@ -37,18 +50,82 @@ void ASTTraversal::traverse(Node *node, Visitor& visitor) {
 	if (typeid(FunctionDeclaration) == typeid(*node)) {
 		FunctionDeclaration *funcDecl = (FunctionDeclaration*)node;
 		funcDecl->accept(visitor);	
-		traverse(funcDecl->blockStmt, visitor);
+		traverse(funcDecl->blockStmt, visitor);	
 	}
 	
-	if (typeid(BlockStatement) == typeid(*node)) {	
+	if (typeid(BlockStatement) == typeid(*node)) {
 		BlockStatement *blockStmt = (BlockStatement*)node;
 		visitor.openScope();
 		blockStmt->accept(visitor);
-		for(auto const& stmt : *(blockStmt->stmtList)) {
-			traverse(stmt, visitor);
+		if (blockStmt->stmtList) {	
+			for(auto const& stmt : *(blockStmt->stmtList)) {	
+				traverse(stmt, visitor);
+			}
 		}
 		visitor.closeScope();
 		blockStmt->accept(visitor);
+	}
+
+	if (typeid(DeclarationStatement) == typeid(*node)) {
+		DeclarationStatement *declStmt = (DeclarationStatement*)node;
+		declStmt->accept(visitor);
+	}
+
+	if (typeid(TypeDeclarationStatement) == typeid(*node)) {
+		TypeDeclarationStatement *typeDeclStmt = (TypeDeclarationStatement*)node;
+		typeDeclStmt->accept(visitor);
+	}
+
+	if (typeid(AssignStatement) == typeid(*node)) {
+		AssignStatement *assignStmt = (AssignStatement*)node;
+		assignStmt->accept(visitor);
+	}
+
+	if (typeid(ExpressionStatement) == typeid(*node)) {
+		ExpressionStatement *expStmt = (ExpressionStatement*)node;
+		expStmt->accept(visitor);
+	}
+
+	if (typeid(ForStatement) == typeid(*node)) {
+		ForStatement *forStmt = (ForStatement*)node;
+		forStmt->accept(visitor);
+		traverse(forStmt->blockStmt, visitor);
+	}
+
+	if (typeid(IfElseStatement) == typeid(*node)) {
+		IfElseStatement *ifElseStmt = (IfElseStatement*)node;
+		ifElseStmt->accept(visitor);
+	}
+
+	if (typeid(IfStatement) == typeid(*node)) {
+		IfStatement *ifStmt = (IfStatement*)node;
+		ifStmt->accept(visitor);
+		traverse(ifStmt->blockStmt, visitor);
+	}
+
+	if(typeid(SwitchStatement) == typeid(*node)) {	
+		SwitchStatement *switchStmt = (SwitchStatement*)node;
+		switchStmt->accept(visitor);
+	}
+
+	if (typeid(PrintStatement) == typeid(*node)) {
+		PrintStatement *printStmt = (PrintStatement*)node;
+		printStmt->accept(visitor);
+	}
+
+	if (typeid(BreakStatement) == typeid(*node)) {
+		BreakStatement *breakStmt = (BreakStatement*)node;
+		breakStmt->accept(visitor);
+	}
+
+	if (typeid(ContinueStatement) == typeid(*node)) {
+		ContinueStatement *continueStmt = (ContinueStatement*)node;
+		continueStmt->accept(visitor);
+	}
+
+	if (typeid(IncDecStatement) == typeid(*node)) {
+		IncDecStatement *incDecStmt = (IncDecStatement*)node;
+		incDecStmt->accept(visitor);
 	}
 
 	if (typeid(ReturnStatement) == typeid(*node)) {	

@@ -1,29 +1,34 @@
 #ifndef SWITCHSTATEMENT_HPP
 #define SWITCHSTATEMENT_HPP
 
+#include <string>
 #include "Services/Visitor.hpp"
 #include "AST/Statement/Statement.hpp"
 #include "AST/Expression/Expression.hpp"
+#include "AST/Statement/BlockStatement.hpp"
 #include <vector>
 #include <utility> 
 
+enum class SWITCH_CLAUSE { CASE, DEFAULT };
+typedef std::pair<std::vector<Expression*>*, BlockStatement*> case_clause;
+typedef std::vector<std::pair<case_clause*, SWITCH_CLAUSE>*> clause_list;
+
 class SwitchStatement : public Statement {
 	public:
+		Expression *exp = NULL;		
+		clause_list *clauseList = NULL;
+		
 		virtual void accept(Visitor& v) override;
+		virtual std::string toString();
+
+		SwitchStatement(
+			Expression *_exp,
+			clause_list *_clauseList,
+			int _lineno
+		) : exp(_exp), clauseList(_clauseList), Statement(_lineno) { }
 		
 		SwitchStatement() { }
-		~SwitchStatement();
-		
-	/*std::vector<std::pair<Expression, Instruction>> case_list;
-	Expression exp;
-	Declaration decl;
-
-	SwitchStatement();
-	SwitchStatement(std::vector<std::pair<Expression, Instruction>> case_list) : Statement(k_stmtSwitch), case_list(case_list) { }
-	SwitchStatement(Expression exp, std::vector<std::pair<Expression, Instruction>> case_list)
-		: Statement(k_stmtNoExpSwitch), exp(exp), case_list(case_list) { }
-	SwitchStatement(Declaration decl, std::vector<std::pair<Expression, Instruction>> case_list)
-		: Statement(k_stmtDeclSwitch), decl(decl), exp(exp), case_list(case_list) { }*/
+		~SwitchStatement();		
 };
 
 #endif

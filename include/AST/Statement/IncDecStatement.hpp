@@ -5,18 +5,24 @@
 #include "AST/Statement/Statement.hpp"
 #include "AST/Expression/Expression.hpp"
 
-class IncDecStatement : public Statement {
-	//std::string id;
-	//Expression exp;
+enum class IncDecOp { INC, DEC };
 
+class IncDecStatement : public Statement {	
 	public:
+		Expression *exp = NULL;
+		IncDecOp op;
+
 		virtual void accept(Visitor& v) override;
+		virtual std::string toString();
 		
+		IncDecStatement(
+			Expression *_exp,
+			IncDecOp _op,
+			int _lineno
+		) : exp(_exp), op(_op), Statement(_lineno) { }
+
 		IncDecStatement() { }
-		~IncDecStatement();
-		
-		/*IncDecStatement(StatementKind kind, std::string id) : Statement(kind), id{id} { }
-		IncDecStatement(StatementKind kind, std::string id, Expression exp) : Statement(kind), id{id}, exp{exp} { }*/
+		~IncDecStatement();		
 };
 
 #endif

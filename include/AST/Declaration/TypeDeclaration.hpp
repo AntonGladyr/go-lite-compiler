@@ -9,7 +9,7 @@
 class TypeDeclaration : public Declaration {
 	public:
 		std::string id;
-		std::pair<std::string, std::vector<int>*> *type;
+		std::pair<std::string, std::vector<int>*> *type = NULL;
 		
 		virtual void accept(Visitor& v) override;
 		virtual std::string toString();

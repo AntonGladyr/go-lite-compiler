@@ -12,9 +12,9 @@ class IdentifierExp;
 
 class VariableDeclaration : public Declaration {
 	public:		
-		std::vector<IdentifierExp*> *idList;
-		std::vector<Expression*> *expList;
-		std::pair<std::string, std::vector<int>*> *type;
+		std::vector<IdentifierExp*> *idList = NULL;
+		std::vector<Expression*> *expList = NULL;
+		std::pair<std::string, std::vector<int>*> *type = NULL;
 		
 		virtual void accept(Visitor& v) override;
 		virtual std::string toString();

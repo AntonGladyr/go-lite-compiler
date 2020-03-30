@@ -8,8 +8,8 @@
 class BinaryOperatorExp : public Expression {
 	public:
 		std::string op;
-		Expression *lhs;
-		Expression *rhs;
+		Expression *lhs = NULL;
+		Expression *rhs = NULL;
 		
 		virtual void accept(Visitor& v) override;
 		virtual std::string toString();

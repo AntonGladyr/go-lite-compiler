@@ -22,7 +22,6 @@ std::string TypeDeclaration::toString() {
 	
 	ss << type->first;
 	
-	ss << std::endl;
 	return ss.str();
 }
 

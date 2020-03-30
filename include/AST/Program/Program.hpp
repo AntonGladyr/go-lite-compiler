@@ -15,7 +15,7 @@ class Program : public Node {
 	public:
 		std::string package;
 		//std::vector<std::shared_ptr<Declaration>> *declList;
-		std::vector<Declaration*> *declList;
+		std::vector<Declaration*> *declList = NULL;
 		
 		void accept(Visitor& v);
 		virtual std::string toString();

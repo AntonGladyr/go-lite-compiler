@@ -20,7 +20,10 @@
 #include "AST/Declaration/Declaration.hpp"
 #include "AST/Statement/Statement.hpp"
 #include "AST/Statement/ForStatement.hpp"
+#include "AST/Statement/TypeDeclarationStatement.hpp"
+#include "AST/Statement/DeclarationStatement.hpp"
 #include "AST/Statement/AssignStatement.hpp"
+#include "AST/Statement/ExpressionStatement.hpp"
 #include "AST/Statement/IfStatement.hpp"
 #include "AST/Statement/IfElseStatement.hpp"
 #include "AST/Statement/IncDecStatement.hpp"
@@ -74,6 +77,7 @@ void yyerror(const char *s) {
 	#include "AST/Statement/BlockStatement.hpp"
 	#include "AST/Statement/ForStatement.hpp"
 	#include "AST/Statement/AssignStatement.hpp"
+	#include "AST/Statement/ExpressionStatement.hpp"
 	#include "AST/Statement/IfStatement.hpp"
 	#include "AST/Statement/IfElseStatement.hpp"
 	#include "AST/Statement/IncDecStatement.hpp"
@@ -121,17 +125,19 @@ void yyerror(const char *s) {
 	std::vector<Statement*> *stmtList;
 	ForStatement *forStmt;
 	AssignStatement *assignStmt;
+	ExpressionStatement *expStmt;
 	IfStatement *ifStmt;
 	IfElseStatement *ifElseStmt;
 	IncDecStatement *incDecStmt;
 	PrintStatement *printStmt;
 	SwitchStatement *switchStmt;
+	clause_list *caseBlock;
+	case_clause *caseClause;
 	EmptyStatement *emptyStmt;
 		
 	std::pair<std::string, std::vector<int>*> *type;
 	std::vector<IdentifierExp*> *id_list;
-    	std::vector<Expression*> *exp_list;
-    	//std::vector<std::pair<Expression*, Instruction*>> *case_list;
+    	std::vector<Expression*> *exp_list;	
 	param_type *param;
 	std::vector<param_type*> *params_list;
 }
@@ -145,16 +151,19 @@ void yyerror(const char *s) {
 %type <program> program
 %type <declList> decl_list
 %type <decl> decl var_decl func_decl type_decl
-%type <stmt> stmt ifstmt loopstmt assignstmt incdecstmt printstmt returnstmt switchstmt simplestmt emptystmt
+%type <stmt> stmt ifstmt loopstmt assignstmt stmt_decl incdecstmt printstmt returnstmt switchstmt simplestmt emptystmt
 %type <blockStmt> blockstmt
+%type <expStmt> expstmt
 %type <exp> exp primary_exp func_call
 %type <param> param
+%type <caseBlock> case_block
+%type <caseClause> case_clause default_clause
 
 %type <type> type
 %type <id_list> id_listne
 %type <exp_list> exp_list exp_listpe index
 %type <params_list> paramspe paramsne
-%type <stmtList> stmt_list
+%type <stmtList> stmt_list switch_stmts
 
 %token tBREAK
 %token tCASE
@@ -301,11 +310,11 @@ stmt_list : stmt { $$ = new std::vector<Statement*>(); $$->push_back($1); }
    
 type : tIDENTIFIER { $$ = new std::pair<std::string, std::vector<int>*>;  
 		     $$->second = new std::vector<int>(); $$->first = *$1; delete $1; }
-    | tLBRACKET tINTVAL tRBRACKET type {	
-	$$ = new std::pair<std::string, std::vector<int>*>;		
+    | tLBRACKET tINTVAL tRBRACKET type {
+	$$ = new std::pair<std::string, std::vector<int>*>;
 	$$->first = $4->first;  $$->second = new std::vector<int>();
-	$$->second->push_back($2);	
-	$$->second->insert($$->second->end(), $4->second->begin(), $4->second->end());	
+	$$->second->push_back($2);
+	$$->second->insert($$->second->end(), $4->second->begin(), $4->second->end());
     }
     | tLPAREN type tRPAREN { $$ = new std::pair<std::string, std::vector<int>*>; $$ = $2; }
     ;
@@ -335,76 +344,88 @@ paramspe : paramsne
     ;
 
 stmt : blockstmt tSEMICOLON { $$ = $1; }
-    | stmt_decl tSEMICOLON { $$ = NULL; }
-    | loopstmt tSEMICOLON { $$ = NULL; }
-    | ifstmt tSEMICOLON { $$ = NULL; }
-    | switchstmt tSEMICOLON { $$ = NULL; }   
-    | printstmt tSEMICOLON { $$ = NULL; }
+    | stmt_decl tSEMICOLON { $$ = $1; }
+    | loopstmt tSEMICOLON { $$ = $1; }
+    | ifstmt tSEMICOLON { $$ = $1; }
+    | switchstmt tSEMICOLON { $$ = $1; } 
+    | printstmt tSEMICOLON { $$ = $1; }
     | returnstmt tSEMICOLON { $$ = $1; }
-    | tBREAK tSEMICOLON {/*$$ = new BreakStatement();*/ $$ = NULL; }
-    | tCONTINUE tSEMICOLON {/*$$ = new ContinueStatement();*/ $$ = NULL; } 
+    | tBREAK tSEMICOLON { $$ = new BreakStatement(yylineno); }
+    | tCONTINUE tSEMICOLON { $$ = new ContinueStatement(yylineno); } 
     | simplestmt tSEMICOLON { $$ = $1; }
     ;
 
 emptystmt : %empty { }
     ;
 
-expstmt : exp { }
-    | %empty 
+expstmt : exp { $$ = new ExpressionStatement($1, yylineno); }
+    | %empty { $$ = NULL; } 
     ;
 
-stmt_decl : var_decl { }
-    | type_decl 
+stmt_decl : var_decl { $$ = new DeclarationStatement((VariableDeclaration*)$1, yylineno); }
+    | type_decl { $$ = new TypeDeclarationStatement((TypeDeclaration*)$1, yylineno); }
     ;
 
 returnstmt : tRETURN { $$ = new ReturnStatement(yylineno); }
     | tRETURN exp { $$ = new ReturnStatement($2, yylineno); } 
     ;
 
-loopstmt : tFOR simplestmt tSEMICOLON expstmt tSEMICOLON simplestmt blockstmt { $$ = NULL; }
-    | tFOR exp blockstmt {/*$$ = new ForStatement($2, $4);*/ $$ = NULL; }
-    | tFOR blockstmt {/*$$ = new ForStatement($3);*/ $$ = NULL; }
+loopstmt : tFOR simplestmt tSEMICOLON expstmt tSEMICOLON simplestmt blockstmt
+	{ $$ = new ForStatement($2, $4, $6, $7, yylineno); }
+    | tFOR expstmt blockstmt { $$ = new ForStatement($2, $3, yylineno); } 
     ;
 
 simplestmt : emptystmt { $$ = new EmptyStatement(yylineno); }
-    | exp { }
-    | incdecstmt { }
-    | assignstmt { }
+    | exp { $$ = new ExpressionStatement($1, yylineno); }
+    | incdecstmt { $$ = $1; }
+    | assignstmt { $$ = $1; }
     ;
 
-assignstmt : exp_list tASSIGN exp_list { } 
+assignstmt : exp_list tASSIGN exp_list { $$ = new AssignStatement($1, $3, yylineno); } 
     ;
 
-ifstmt : tIF exp blockstmt {/*$$ = new IfStatement($2, $4);*/} 
-    | tIF exp blockstmt tELSE blockstmt {/*$$ = new IfElseStatement(k_stmtKindIfElse, $2, $4, $7);*/} 
-    | tIF exp blockstmt tELSE ifstmt {/*$$ = new IfElseStatement(k_stmtKindIfElseNested, $2, $4, $8);*/} 
+ifstmt : tIF exp blockstmt { $$ = new IfStatement($2, $3, yylineno); }
+    | tIF exp blockstmt tELSE blockstmt { $$ = new IfElseStatement($2, $3, $5, yylineno); }
+    | tIF exp blockstmt tELSE ifstmt { $$ = new IfElseStatement($2, $3, $5, yylineno); }
     ;
 
-switchstmt : tSWITCH tLBRACE case_block tRBRACE {/*$$ = new SwitchStatement($3);*/ $$ = NULL; }
-    | tSWITCH exp tLBRACE case_block tRBRACE {/*$$ = new SwitchStatement($2, $4);*/ $$ = NULL; }
+switchstmt : tSWITCH tLBRACE case_block tRBRACE { $$ = new SwitchStatement(NULL, $3, yylineno); }
+    | tSWITCH exp tLBRACE case_block tRBRACE { $$ = new SwitchStatement($2, $4, yylineno); }
     ;
 
-case_block : default_clause
+case_block : default_clause 
+	{ $$ = new clause_list(); 
+	std::pair<case_clause*, SWITCH_CLAUSE> *clausePair = new std::pair<case_clause*, SWITCH_CLAUSE>();
+	clausePair->first = $1; clausePair->second = SWITCH_CLAUSE::DEFAULT;
+	$$->push_back(clausePair); }	
     | case_clause case_block
-    | %empty 
+	{ 
+	  $$ = new clause_list();
+	  std::pair<case_clause*, SWITCH_CLAUSE> *clausePair = new std::pair<case_clause*, SWITCH_CLAUSE>();
+	  clausePair->first = $1; clausePair->second = SWITCH_CLAUSE::CASE;
+	  $$->push_back(clausePair);
+	  $$->insert($$->end(), $2->begin(), $2->end()); } 
+    | %empty { $$ = new clause_list(); }
     ;
 
 switch_stmts : stmt_list
-    | %empty   
+    | %empty { $$ = NULL; } 
     ;
 
-case_clause : tCASE exp_list tCOLON switch_stmts  { }
+case_clause : tCASE exp_list tCOLON switch_stmts 
+	{  $$ = new case_clause(); $$->first = $2; $$->second = new BlockStatement($4, yylineno); }
     ; 
 
-default_clause : tDEFAULT tCOLON switch_stmts { }
+default_clause : tDEFAULT tCOLON switch_stmts
+	{ $$ = new case_clause(); $$->first = NULL; $$->second = new BlockStatement($3, yylineno); }
     ;
 
-incdecstmt : exp tINC {/*$$ = new IncDecStatement(k_stmtKindInc, $$1);*/} 
-    | exp tDEC {/*$$ = new IncDecStatement(k_stmtKindDec, $$1);*/}
+incdecstmt : exp tINC { $$ = new IncDecStatement($1, IncDecOp::INC, yylineno); } 
+    | exp tDEC { $$ = new IncDecStatement($1, IncDecOp::DEC, yylineno); }
     ;
 
-printstmt : tPRINT tLPAREN exp_listpe tRPAREN {/*$$ = new PrintStatement(k_stmtKindPrint, $3);*/}
-    | tPRINTLN tLPAREN exp_listpe tRPAREN {/*$$ = new PrintStatement(k_stmtKindPrintLn, $3);*/}
+printstmt : tPRINT tLPAREN exp_listpe tRPAREN { $$ = new PrintStatement($3, yylineno); }
+    | tPRINTLN tLPAREN exp_listpe tRPAREN { $$ = new PrintStatement($3, yylineno); }
     ;
 
 blockstmt: tLBRACE stmt_list tRBRACE { $$ = new BlockStatement($2, yylineno); }

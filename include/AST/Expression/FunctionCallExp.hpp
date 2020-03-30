@@ -9,8 +9,8 @@
 
 class FunctionCallExp : public Expression {
 	public:	
-		Expression *exp;
-		std::vector<Expression*> *expList;
+		Expression *exp = NULL;
+		std::vector<Expression*> *expList = NULL;
 
 		virtual void accept(Visitor& v) override;
 		virtual std::string toString();

@@ -10,7 +10,7 @@
 class ArrayExp : public Expression {
 	public:	
 		std::string id;
-		std::vector<Expression*> *expList;
+		std::vector<Expression*> *expList = NULL;
 
 		virtual void accept(Visitor& v) override;
 		virtual std::string toString();

@@ -4,20 +4,22 @@
 #include <sstream>
 #include <iostream>
 #include "Services/PrettyPrinter.hpp"
+#include "AST/ASTTraversal.hpp"
+#include "../helpers/vectorExtension.cpp"
 
 void PrettyPrinter::visit(Program *prg) {
 	if (prg == NULL) return;
-	std::cout << prg->toString();	
+	std::cout << prg->toString() << std::endl;
 }
 
 void PrettyPrinter::visit(VariableDeclaration *varDecl) {
 	if (varDecl == NULL) return;
-	std::cout << getTabs() << varDecl->toString();
+	std::cout << getTabs() << varDecl->toString() << std::endl;
 }
 
 void PrettyPrinter::visit(TypeDeclaration *typeDecl) {
 	if (typeDecl == NULL) return;	
-	std::cout << getTabs() << typeDecl->toString();
+	std::cout << getTabs() << typeDecl->toString() << std::endl;
 }
 
 void PrettyPrinter::visit(FunctionDeclaration *funcDecl) {
@@ -29,7 +31,7 @@ void PrettyPrinter::visit(BlockStatement *blockStmt) {
 	if (blockStmt == NULL) return;
 	
 	if (isScopeOpened) {
-		std::cout << getTabs() << "{" << std::endl;
+		std::cout << "{" << std::endl;
 		numTabs++;
 	} else {
 		numTabs--;
@@ -37,9 +39,116 @@ void PrettyPrinter::visit(BlockStatement *blockStmt) {
 	}
 }
 
+void PrettyPrinter::visit(DeclarationStatement *declStmt) {	
+	if (declStmt == NULL) return;
+	std::cout << getTabs() << declStmt->toString() << std::endl;
+}
+
+void PrettyPrinter::visit(TypeDeclarationStatement *typeDeclStmt) {
+	if (typeDeclStmt == NULL) return;
+	std::cout << getTabs() << typeDeclStmt->toString() << std::endl;
+}
+
+void PrettyPrinter::visit(AssignStatement *assignStmt) {
+	if (assignStmt == NULL) return;
+	std::cout << getTabs() << assignStmt->toString() << std::endl;
+}
+
+void PrettyPrinter::visit(ExpressionStatement *expStmt) {
+	if (expStmt == NULL) return;
+	std::cout << getTabs() << expStmt->toString() << std::endl;
+}
+
+void PrettyPrinter::visit(ForStatement *forStmt) {
+	if (forStmt == NULL) return;
+	std::cout << getTabs() << forStmt->toString();
+}
+
+void PrettyPrinter::visit(IfElseStatement *ifElseStmt) {	
+	if (ifElseStmt == NULL) return;
+	
+	std::cout << getTabs() << "if " << ifElseStmt->exp->toString() << " ";
+	ASTTraversal::traverse(ifElseStmt->blockStmt, *this);
+	
+	if (ifElseStmt->ifStmt) {
+		std::cout << getTabs() << "else ";
+		ASTTraversal::traverse(ifElseStmt->ifStmt, *this);
+	}
+	
+	if (ifElseStmt->elseBlockStmt ) {
+		std::cout << getTabs() << "else ";
+		ASTTraversal::traverse(ifElseStmt->elseBlockStmt, *this);
+	}
+}
+
+void PrettyPrinter::visit(IfStatement *ifStmt) {
+	if (ifStmt == NULL) return;
+	std::cout << getTabs() << ifStmt->toString();
+}
+
+void PrettyPrinter::visit(SwitchStatement *switchStmt) {
+	if (switchStmt == NULL) return;
+	
+	std::cout << getTabs() << "switch";
+	if (switchStmt->exp) std::cout << " " << switchStmt->exp->toString();
+	std::cout << " {" << std::endl;
+	numTabs++;
+	if (switchStmt->clauseList) {	
+		for(auto const& clause : *(switchStmt->clauseList)) {
+			if (clause->second == SWITCH_CLAUSE::CASE) {
+				std::cout << getTabs() << "case";
+			}
+
+			if (clause->second == SWITCH_CLAUSE::DEFAULT) {	
+				std::cout << getTabs() << "default";
+			}
+			
+			if (clause->first) {
+				if (clause->first->first) {
+					std::cout << " " << *(clause->first->first);
+				}
+
+				std::cout << ":";
+
+				if (clause->first->second) {
+					ASTTraversal::traverse(clause->first->second, *this);
+				}
+			}
+		}
+	}
+	
+	numTabs--;
+	std::cout << getTabs() << "}" << std::endl;
+}
+
+void PrettyPrinter::visit(PrintStatement *printStmt) {
+	if (printStmt == NULL) return;
+	std::cout << getTabs() << printStmt->toString() << std::endl;
+}
+
+void PrettyPrinter::visit(BreakStatement *breakStmt) {
+	if (breakStmt == NULL) return;
+	std::cout << getTabs() << breakStmt->toString() << std::endl;
+}
+
+void PrettyPrinter::visit(ContinueStatement *continueStmt) {
+	if (continueStmt == NULL) return;
+	std::cout << getTabs() << continueStmt->toString() << std::endl;
+}
+
+void PrettyPrinter::visit(IncDecStatement *incDecStmt) {
+	if (incDecStmt == NULL) return;
+	std::cout << getTabs() << incDecStmt->toString() << std::endl;
+}
+
 void PrettyPrinter::visit(ReturnStatement *returnStmt) {
 	if (returnStmt == NULL) return;
-	std::cout << getTabs() << returnStmt->toString();
+	std::cout << getTabs() << returnStmt->toString() << std::endl;
+}
+
+void PrettyPrinter::visit(EmptyStatement *emptyStmt) {
+	if (emptyStmt == NULL) return;
+	//std::cout << getTabs() << emptyStmt->toString() << std::endl;
 }
 
 std::string PrettyPrinter::getTabs() {
@@ -49,460 +158,5 @@ std::string PrettyPrinter::getTabs() {
 	}
 	return ss.str();
 }
-
-/*void PrettyPrinterVisitor::visit(IntegerExp *intExp) {
-	if (intExp == NULL) return;
-	std::cout << intExp;
-} 
-
-void PrettyPrinterVisitor::visit(FloatExp *floatExp) {
-	if (floatExp == NULL) return;
-	std::cout << floatExp;
-} 
-
-void PrettyPrinterVisitor::visit(StringExp *stringExp) {
-	if (stringExp == NULL) return;
-	std::cout << stringExp;
-} 
-
-void PrettyPrinterVisitor::visit(BoolExp *boolExp) {
-	if (boolExp == NULL) return;
-	std::cout << boolExp;
-}
-
-void PrettyPrinterVisitor::visit(RuneExp *runeExp) {
-	if (runeExp == NULL) return;
-	std::cout << runeExp->toString();
-}*/
-
-
-/*
-
-        void prettyInstruction(Instruction *ins, int numTabs) {
-            if(NULL == ins) {
-                return;
-            }
-
-            printTabs(numTabs);
-            switch(ins->kind) {
-                case k_insKindDecl: prettyDeclaration(ins->val.decl); break; 
-                case k_insKindStmt: prettyStatement(ins->val.stmt, numTabs); break;
-                case k_insKindBlock: 
-                    cout << "{" << endl;
-                    prettyInstruction(ins->val.block, numTabs + 1); 
-                    printTabs(numTabs);
-                    cout << "}" << endl;
-                    break;
-            }
-
-            prettyInstruction(ins->next, numTabs);
-        } 
-
-        void prettyDeclaration(Declaration *d, int numTabs) {
-            printTabs(numTabs);
-            switch(d->kind) {
-                case k_declKindDeclare: 
-                    cout << "var " << d->val.declareDecl.ids << " " << d->val.declareDecl.type << ";" << endl;
-                    break;
-                case k_declKindAssign: 
-                    cout << "var " << d->val.assignDecl.ids << " = " << prettyExpression(d->val.assignDecl.rhs, 0) << endl;
-                    break;
-                case k_declKindFactor: 
-                    for(const auto& decl : d->val.factorDecl.decls) {
-                        prettyDeclaration(d, numTabs);
-                    }
-                    break;
-                case k_declKindFunc: 
-                    cout << "func " << d->val.funcDecl.id << "(" << d->val.funcDecl.locals << ")" << d->val.funcDecl.type << "{" << endl;
-                    prettyInstruction(d->val.funcDecl.body, numTabs + 1);
-                    cout << "}" << endl;
-                    break;
-                case k_declKindShortDec: 
-                    cout << d->val.shortDecl.id << " := " << prettyExpression(d->val.shortDecl.rhs, 0);
-                    break;
-                case k_declKindType: 
-                    cout << "type " << d->val.typeDecl.alias1 << " " << d->val.typeDecl.alias2 << endl;
-                    break;
-                case k_declKindTypeStruct: 
-                    cout << "type " << d->val.typeStructDecl.alias << " struct {\n";
-                    // need to fix grammar
-                    break;
-            }
-        }
-
-        void prettyStatement(Statement *s, int numTabs) {
-		printTabs(numTabs);
-		switch(s.kind) {
-			case k_stmtKindForInfinite:
-				cout << "for ";
-				prettyInstruction(s.body, numTabs + 1);
-				break;
-			case k_stmtKindForWhile:
-				cout << "for " << prettyExpression(s.exp, numTabs);
-				prettyInstruction(s.body, numTabs + 1);
-				break;
-			case k_stmtKindForThreePart:
-				cout << "for ";
-				prettyInstruction(s.initStmt, numTabs);
-				cout << ";" << prettyExpression(s.condition, numTabs) << ";"
-				     << prettyStatement(s.postStmt, numbTabs) << " ";
-				prettyInstruction(s.body, numTabs + 1);
-				// need to fix grammar (parentheses) 
-				break;
-			case k_stmtKindAssignTuple:
-				cout << s.ids << " = " ;
-				for(const auto& exp : s.exp_list) {
-                        		prettyExpression(exp, numTabs);
-					cout  << ", ";
-                    		}
-				cout << ";" << endl;
-				break;
-			case k_stmtKindAssignSelector:
-				cout << s.id << "." << s.selectorId << " = " 
-				     << prettyExpression(s.exp, numTabs) << ";" << endl;
-				// need to fix grammar (multiple selectors)
-				break;
-			case k_stmtKindAssignIndex:
-				cout << s.id << "[" << prettyExpression(s.index, numTabs) << "]"
-				     << " = " << prettyExpression(s.exp, numTabs) << ";" << endl;
-				// need to fix grammar (multiple indexes)
-				break;
-			case k_stmtKindPrint:
-				cout << "print(";
-				for(const auto& exp : s.exp_list) {
-                        		prettyExpression(exp, numTabs);
-					if (exp != s.exp_list.end()) cout  << ", ";
-                    		}
-				cout << ")"
-				break;
-			case k_stmtKindPrintLn:
-				cout << "println(";
-				for(const auto& exp : s.exp_list) {
-                        		prettyExpression(exp, numTabs);
-					if (exp != s.exp_list.end()) cout  << ", ";
-                    		}
-				cout << ")"
-				break;
-			case k_stmtKindReturn:
-				cout << "return;" << endl;
-				break;
-			case k_stmtKindReturnExp:
-				cout << "return " << prettyExpression(s.exp, numTabs) << ";" << endl;
-				break;
-			case k_stmtKindBreak:
-				cout << "break;" << endl;
-				break;
-			case k_stmtKindContinue:
-				cout << "continue;" << endl;
-				break;
-			case k_stmtKindInc:
-				cout << s.id << "++;" << endl;
-				break;
-			case k_stmtKindDec:
-				cout << s.id << "--;" << 
-;
-				break;
-			case k_stmtKindIncExp:
-				cout << s.id << " += " << prettyExpression(s.exp, numTabs) << ";" << endl;
-				break;
-			case k_stmtKindDecExp:
-				cout << s.id << " -= " << prettyExpression(s.exp, numTabs) << ";" << endl;
-				break;
-			case k_stmtNoExpSwitch:	
-				cout << "switch {" << endl;
-				for(const auto& caseItem: s.case_list) {
-					printTabs(numTabs + 1);
-					cout << "case " << prettyExpression(std::get<0>(caseItem)) << " : "
-					     << prettyInstruction(std::get<1>(caseItem)) << end;
-                    		}
-				cout << "}" << endl;
-				//TODO fix default clause
-				//need to fix grammar (mutiple expressions in case)
-				break;
-			case k_stmtSwitch:
-				cout << "switch " << prettyExpression(s.exp) << " {" << endl;
-				for(const auto& caseItem: s.case_list) {
-					printTabs(numTabs + 1);
-					cout << "case " << prettyExpression(std::get<0>(caseItem)) << " : "
-					     << prettyInstruction(std::get<1>(caseItem)) << endl;
-                    		}
-				cout << "}" << endl;
-				//TODO fix default clause
-				//need to fix grammar (mutiple expressions in case)
-				break;
-			case k_stmtDeclSwitch:
-				cout << "switch " << prettyDeclaration(s.decl) << " {" << endl;
-				for(const auto& caseItem: s.case_list) {
-					printTabs(numTabs + 1);
-					cout << "case " << prettyExpression(std::get<0>(caseItem)) << " : "
-					     << prettyInstruction(std::get<1>(caseItem)) << endl;
-                    		}
-				cout << "}" << endl;
-				//TODO fix default clause
-				//need to fix grammar (mutiple expressions in case)
-				break;
-			case k_stmtKindIfStmt:
-				cout << "if " << prettyExpression(s.exp, numTabs);
-				prettyInstruction(s.ins);
-				break;
-			case k_stmtKindDeclIfStmt:
-				cout << "if " << prettyDeclaration(s.decl, numTabs);
-				prettyInstruction(s.ins);
-				break;
-			case k_stmtKindIfElse:
-				cout << "if " << prettyExpression(s.exp, numTabs);
-				prettyInstruction(s.ins);
-				cout << "else ";
-				prettyInstruction(s.elseIns);
-				break;
-			case k_stmtKindDeclIfElse:
-				cout << "if " << prettyExpression(s.expm);
-				break;
-			case k_stmtKindIfElseNested:
-				break;
-			case k_stmtKindDeclIfElseNested:
-				break;
-		}
-        }
-
-        void prettyExpression(Expression *e) {
-		switch (e->kind_): 
-			case k_expKindMinus:
-				cout << "("
-				prettyExpression(e.left_operand_);
-				cout << "-";
-				prettyExpression(e.right_operand_)
-				cout << ")"
-				break;
-
-			case k_expKindPlus:
-
-				cout << "("
-				prettyExpression(e.left_operand_);
-				cout << "+";
-				prettyExpression(e.right_operand_)
-				cout << ")"
-				break;
-
-            		case k_expKindMultiply:
-				
-				cout << "("
-				prettyExpression(e.left_operand_);
-				cout << "*";
-				prettyExpression(e.right_operand_)
-				cout << ")"
-				break;
-
-            		case k_expKindDivide:
-				
-				cout << "("
-				prettyExpression(e.left_operand_);
-				cout << "/";
-				prettyExpression(e.right_operand_)
-				cout << ")"
-				break;
-
-           		case k_expKindModulo:
-				
-				cout << "("
-				prettyExpression(e.left_operand_);
-				cout << "%";
-				prettyExpression(e.right_operand_)
-				cout << ")"
-				break;
-
-            		case k_expKindBitAnd:
-				
-				cout << "("
-				prettyExpression(e->left_operand_);
-				cout << "&";
-				prettyExpression(e->right_operand_)
-				cout << ")"
-				break;;
-
-            		case k_expKindBitOr:
-				
-				cout << "("
-				prettyExpression(e.left_operand_);
-				cout << "|";
-				prettyExpression(e.right_operand_)
-				cout << ")"
-				break;
-
-           		case k_expKindBitXor:
-				
-				cout << "("
-				prettyExpression(e.left_operand_);
-				cout << "^";
-				prettyExpression(e.right_operand_)
-				cout << ")"
-				break;
-
-           		case k_expKindBitClear:
-				
-				cout << "("
-				prettyExpression(e.left_operand_);
-				cout << "&^";
-				prettyExpression(e.right_operand_)
-				cout << ")"
-				break;
-            		case k_expKindLeftShift:
-				
-				cout << "("
-				prettyExpression(e.left_operand_);
-				cout << "<<";
-				prettyExpression(e.right_operand_)
-				cout << ")"
-				break;
-
-            		case k_expKindRightShift:
-				
-				cout << "("
-				prettyExpression(e.left_operand_);
-				cout << ">>";
-				prettyExpression(e.right_operand_)
-				cout << ")"
-				break;
-           		case k_expKindIsEqual:
-				
-				cout << "("
-				prettyExpression(e.left_operand_);
-				cout << "==";
-				prettyExpression(e.right_operand_)
-				cout << ")"
-				break;
-
-            		case k_expKindIsNotEqual:
-				
-				cout << "("
-				prettyExpression(e.left_operand_);
-				cout << "!=";
-				prettyExpression(e.right_operand_)
-				cout << ")"
-				break;
-
-           		case  k_expKindLessThan:
-				
-				cout << "("
-				prettyExpression(e.left_operand_);
-				cout << "<";
-				prettyExpression(e.right_operand_)
-				cout << ")"
-				break;
-
-            		case k_expKindLessThanEqual:
-
-				cout << "("
-				prettyExpression(e.left_operand_);
-				cout << "<=";
-				prettyExpression(e.right_operand_)
-				cout << ")"
-				break;
-
-            		case k_expKindGreaterThan:
-				
-				cout << "("
-				prettyExpression(e.left_operand_);
-				cout << ">";
-				prettyExpression(e.right_operand_)
-				cout << ")"
-				break;
-
-            		case k_expKindGreaterThanEqual:
-
-				cout << "("
-				prettyExpression(e.left_operand_);
-				cout << ">=";
-				prettyExpression(e.right_operand_)
-				cout << ")"
-				break;
-
-           		case k_expKindAnd:
-
-				cout << "("
-				prettyExpression(e.left_operand_);
-				cout << "&&";
-				prettyExpression(e.right_operand_)
-				cout << ")"
-				break;
-
-           		case  k_expKindOr:
-
-				cout << "("
-				prettyExpression(e.left_operand_);
-				cout << "||";
-				prettyExpression(e.right_operand_)
-				cout << ")"
-				break;
-
- 	    		case k_expKindUMinus:
-				cout << "("
-				cout << "-";
-				prettyExpression(e.operand_)
-				cout << ")"
-				break;
-            		case k_expKindUNot:
-				cout << "("
-				cout << "!";
-				prettyExpression(e.operand_)
-				cout << ")"
-				break;
-           		case k_expKindUPLUS:
-				cout << "("
-				cout << "+";
-				prettyExpression(e.operand_)
-				cout << ")"
-				break;
-            		case k_expKindUXOR:
-				cout << "("
-				cout << "^";
-				prettyExpression(e.operand_)
-				cout << ")"
-				break;
-			//literals
-			case k_expKindBoolean:
-				
-				cout << (e.valueBool)
-				break;
-
-	   		case k_expKindInteger:
-				cout << (e.valueInt)
-				break;
- 	    		case k_expKindString:
-				cout << (e.valueChar)
-				break;
-	    		case k_expKindRune:
-				cout << (e.valueChar)
-				break;
-	    		case k_expKindFloat:
-				cout << (e.valueFloat)
-				break;
-				//Buildins 
-		
-	    		case k_expKindAppend:
-				cout << "append"
-				cout << "(";
-				prettyExpression(e.val.left_expression_)
-				cout << ",";
-				prettyExpression(e.val.right_expression_)
-				cout << ")"
-				break;
-	    		case k_expKindLen:
-				cout << "len"
-				cout << "(";
-				prettyExpression(e.expression_)
-				cout << ")"
-				break;
-	    		case k_expKindCap:
-				cout << "cap";
-				cout << "("; ;
-				prettyExpression(e.expression_)
-				cout << ")" ;
-				break;
- };
-
-        }
-
-*/
 
 #endif

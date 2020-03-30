@@ -1,34 +1,40 @@
 #ifndef FORSTATEMENT_HPP
 #define FORSTATEMENT_HPP
 
+#include <string>
 #include "Services/Visitor.hpp"
 #include "AST/Statement/Statement.hpp"
-#include "AST/Expression/Expression.hpp"
+#include "AST/Statement/ExpressionStatement.hpp"
+#include "AST/Statement/BlockStatement.hpp"
+
+class ExpressionStatement;
 
 class ForStatement : public Statement {
-	public:
+	public:	
+		Statement *initStmt = NULL;
+		Statement *postStmt = NULL;
+        	ExpressionStatement *exp = NULL;
+		BlockStatement *blockStmt = NULL;
+
 		virtual void accept(Visitor& v) override;
+		virtual std::string toString();
+		
+		ForStatement(
+			ExpressionStatement *_exp,
+			BlockStatement *_blockStmt,
+			int _lineno
+		) : exp(_exp), blockStmt(_blockStmt), Statement(_lineno) { }
+
+		ForStatement(
+			Statement *_initStmt,
+			ExpressionStatement *_exp,
+			Statement *_postStmt,
+			BlockStatement *_blockStmt,
+			int _lineno
+		) : initStmt(_initStmt), exp(_exp), postStmt(_postStmt), blockStmt(_blockStmt), Statement(_lineno) { }
 		
 		ForStatement() { }
-		~ForStatement();
-		/*Instruction initStmt;
-        	Expression condition;
-        	Statement postStmt;
-        	Instruction body;
-		
-		ForStatement();
-
-		ForStatement(Instruction body) : Statement(k_stmtKindForInfinite), body{body} { }
-
-		ForStatement(Expression exp, Instruction body) : Statement(k_stmtKindForWhile), condition{exp}, body{body} { }
-
-		ForStatement(Instruction initStmt, Expression condition, Statement postStmt, Instruction body)
-			: Statement(k_stmtKindForThreePart),
-			  initStmt{initStmt},
-			  condition{condition},
-			  postStmt{postStmt},
-			  body{body}
-		{ }*/
+		~ForStatement();		
 };
 
 #endif

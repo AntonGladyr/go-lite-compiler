@@ -13,20 +13,22 @@ void VariableDeclaration::accept(Visitor& v) {
 
 std::string VariableDeclaration::toString() {
 	std::stringstream ss;	
-	ss << "var " << *idList << " ";
+	ss << "var " << *idList;
 
 	if (type) {
+		ss << " ";
 		if (type->second) {	
 			for(auto const& index : *(type->second)) {
 				ss << "[" << std::to_string(index) << "]";
 			}
 		}
-		ss << type->first << " ";
-	}	
-
+		
+		ss << type->first;	
+	}
+		
 	if (expList)
-		ss << "= " << *expList;
-	ss << std::endl;
+		ss << " = " << *expList;
+		
 	return ss.str();
 }
 

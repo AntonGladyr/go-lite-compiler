@@ -8,13 +8,18 @@
 
 class PrintStatement : public Statement {
 	public:
-		std::vector<Expression> exp_list;
+		std::vector<Expression*> *expList = NULL;
 
 		virtual void accept(Visitor& v) override;
+		virtual std::string toString();
 		
+		PrintStatement(
+			std::vector<Expression*> *expList,
+			int _lineno	
+		) : expList(expList), Statement(_lineno) { }
+
 		PrintStatement() { }
-		~PrintStatement();
-		//PrintStatement(std::vector<Expression> exp_list) : exp_list(exp_list) { }
+		~PrintStatement();	
 };
 
 #endif

@@ -15,9 +15,9 @@ typedef std::pair<std::string, std::pair<std::string, std::vector<int>*>*> param
 class FunctionDeclaration : public Declaration {
 	public:
 		std::string id;
-		std::vector<param_type*> *params;	
-		std::pair<std::string, std::vector<int>*> *type;
-		BlockStatement *blockStmt;
+		std::vector<param_type*> *params = NULL;
+		std::pair<std::string, std::vector<int>*> *type = NULL;
+		BlockStatement *blockStmt = NULL;
 
 		virtual void accept(Visitor& v) override;
 		virtual std::string toString();

@@ -11,8 +11,9 @@ void Program::accept(Visitor& v) {
 }
 
 std::string Program::toString() {
+	//TODO: fix declarations output
 	std::stringstream ss;
-	ss << "package " << package << std::endl;
+	ss << "package " << package; 
 	return ss.str();
 }
 

@@ -1,35 +1,27 @@
 #ifndef ASSIGNSTATEMENT_HPP
 #define ASSIGNSTATEMENT_HPP
 
+#include <vector>
 #include "Services/Visitor.hpp"
 #include "AST/Expression/Expression.hpp"
 #include "AST/Statement/Statement.hpp"
-#include <vector>
 
 class AssignStatement : public Statement {
 	public:	
+		std::vector<Expression*> *lhs = NULL;
+		std::vector<Expression*> *rhs = NULL;
+		
 		virtual void accept(Visitor& v) override;
+		virtual std::string toString();
+
+		AssignStatement(
+			std::vector<Expression*> *_lhs,
+			std::vector<Expression*> *_rhs,
+			int _lineno
+		) : lhs(_lhs), rhs(_rhs), Statement(_lineno) { }
 
 		AssignStatement() { }
-		~AssignStatement();
-
-	/*std::vector<std::string> ids;
-	std::vector<Expression> exp_list;
-	std::string id;
-	std::string selectorId;
-	Expression exp;	
-	Expression index;
-	
-	AssignStatement();
-		
-        AssignStatement(std::vector<std::string> ids, std::vector<Expression> exp_list)
-		: Statement(k_stmtKindAssignTuple), ids{ids}, exp_list{exp_list} { };
-
-	AssignStatement(std::string id, std::string selectorId, Expression exp)
-		: Statement(k_stmtKindAssignSelector), id{id}, selectorId{selectorId}, exp{exp} { };
-
-	AssignStatement(std::string id, Expression index, Expression exp)
-		: Statement(k_stmtKindAssignIndex), id{id}, index{index}, exp{exp} { };*/
+		~AssignStatement();	
 };
 
 #endif

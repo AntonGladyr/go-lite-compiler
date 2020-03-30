@@ -1,6 +1,6 @@
 package main
 
-func switch_stmts() {
+func switch_stmt() {
 	var x int
 
 	// no expression

@@ -7,7 +7,7 @@
 class EmptyStatement : public Statement {
 	public:	
 		virtual void accept(Visitor& v) override;
-		virtual std::string toString() { }
+		virtual std::string toString() { return std::string(); }
 
 		EmptyStatement(	
 			int _lineno
