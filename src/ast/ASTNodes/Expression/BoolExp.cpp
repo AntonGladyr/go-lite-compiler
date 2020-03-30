@@ -13,8 +13,9 @@ std::string BoolExp::toString() {
 	return boolVal;
 }
 
-BoolExp::~BoolExp() {	
-	std::cout << "BoolExp destroyed" << std::endl;
+BoolExp::~BoolExp() {
+	// for testing purposes
+	// std::cout << "BoolExp destroyed" << std::endl;
 }
 
 #endif

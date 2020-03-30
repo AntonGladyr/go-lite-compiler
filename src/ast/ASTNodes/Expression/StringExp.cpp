@@ -48,8 +48,9 @@ StringExp::StringExp(const std::string &_stringValue, int _lineno) : value(_stri
 	}
 }
 
-StringExp::~StringExp() {	
-	std::cout << "StringExp destroyed" << std::endl;
+StringExp::~StringExp() {
+	// for testing purposes
+	// std::cout << "StringExp destroyed" << std::endl;
 }
 
 #endif

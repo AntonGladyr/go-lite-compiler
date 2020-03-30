@@ -20,7 +20,9 @@ FunctionCallExp::~FunctionCallExp() {
 	for(auto const& exp : *expList) {
 		delete exp;
 	}
-	std::cout << "FunctionCallExp destroyed" << std::endl;
+	
+	// for testing purposes
+	// std::cout << "FunctionCallExp destroyed" << std::endl;
 }
 
 #endif

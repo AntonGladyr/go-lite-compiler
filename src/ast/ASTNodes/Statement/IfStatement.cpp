@@ -20,7 +20,9 @@ std::string IfStatement::toString() {
 IfStatement::~IfStatement() {
 	delete exp;
 	delete blockStmt;
-	std::cout << "IfStatement destroyed" << std::endl;
+	
+	// for testing purposes
+	// std::cout << "IfStatement destroyed" << std::endl;
 }
 
 #endif

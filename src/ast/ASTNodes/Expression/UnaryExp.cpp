@@ -15,8 +15,10 @@ std::string UnaryExp::toString() {
 }
 
 UnaryExp::~UnaryExp() {
-	delete exp;	
-	std::cout << "UnaryExp destroyed" << std::endl;
+	delete exp;
+	
+	// for testing purposes
+	// std::cout << "UnaryExp destroyed" << std::endl;
 }
 
 #endif

@@ -10,7 +10,8 @@ void EmptyStatement::accept(Visitor& v) {
 }
 
 EmptyStatement::~EmptyStatement() {
-	std::cout << "EmptyStatement destroyed" << std::endl;
+	// for testing purposes
+	// std::cout << "EmptyStatement destroyed" << std::endl;
 }
 
 #endif

@@ -16,7 +16,9 @@ std::string BuiltinsExp::toString() {
 
 BuiltinsExp::~BuiltinsExp() {
 	delete exp;
-	std::cout << "BuiltinsExp destroyed" << std::endl;
+
+	// for testing purposes
+	// std::cout << "BuiltinsExp destroyed" << std::endl;
 }
 
 #endif

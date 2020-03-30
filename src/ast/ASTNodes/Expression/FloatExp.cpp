@@ -12,8 +12,9 @@ std::string FloatExp::toString(){
 	return std::to_string(value);
 }
 
-FloatExp::~FloatExp() {	
-	std::cout << "FloatExp destroyed" << std::endl;
+FloatExp::~FloatExp() {
+	// for testing purposes
+	// std::cout << "FloatExp destroyed" << std::endl;
 }
 
 #endif

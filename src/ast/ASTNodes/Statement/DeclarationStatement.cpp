@@ -19,7 +19,9 @@ std::string DeclarationStatement::toString() {
 
 DeclarationStatement::~DeclarationStatement() {
 	delete decl;
-	std::cout << "DeclarationStatement destroyed" << std::endl;
+	
+	// for testing purposes
+	//std::cout << "DeclarationStatement destroyed" << std::endl;
 }
 
 #endif

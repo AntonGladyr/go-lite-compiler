@@ -12,7 +12,8 @@ std::string IdentifierExp::toString() {
 }
 
 IdentifierExp::~IdentifierExp() {
-	std::cout << "IdentifierExp destroyed" << std::endl;
+	// for testing purposes
+	// std::cout << "IdentifierExp destroyed" << std::endl;
 }
 
 #endif

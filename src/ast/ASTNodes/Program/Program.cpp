@@ -24,7 +24,9 @@ Program::~Program() {
 		}
 		delete declList;
 	}
-	std::cout << "Program destroyed" << std::endl;
+	
+	//for testing purposes
+	//std::cout << "Program destroyed" << std::endl;
 }
 
 #endif

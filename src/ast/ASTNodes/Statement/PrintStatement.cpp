@@ -21,7 +21,9 @@ PrintStatement::~PrintStatement() {
 		delete exp;
 	}
 	delete expList;
-	std::cout << "PrintStatement destroyed" << std::endl;
+	
+	// for testing purposes
+	// std::cout << "PrintStatement destroyed" << std::endl;
 }
 
 #endif

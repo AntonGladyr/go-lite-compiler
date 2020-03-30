@@ -21,7 +21,9 @@ ArrayExp::~ArrayExp() {
 	for(auto const& exp: *expList) {
 		delete exp;
 	}
-	std::cout << "ArrayExp destroyed" << std::endl;
+	
+	// for testing purposes
+	// std::cout << "ArrayExp destroyed" << std::endl;
 }
 
 #endif

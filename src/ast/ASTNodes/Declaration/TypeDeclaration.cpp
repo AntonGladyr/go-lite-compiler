@@ -30,7 +30,9 @@ TypeDeclaration::~TypeDeclaration() {
 	if (type->second) delete type->second;
 	
 	delete type;
-	std::cout << "TypeDeclaration destroyed" << std::endl;
+	
+	// for testing purposes
+	// std::cout << "TypeDeclaration destroyed" << std::endl;
 }
 
 #endif

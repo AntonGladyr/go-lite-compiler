@@ -17,7 +17,9 @@ std::string BinaryOperatorExp::toString() {
 BinaryOperatorExp::~BinaryOperatorExp() {
 	delete lhs;
 	delete rhs;
-	std::cout << "BinaryOperatorExp destroyed" << std::endl;
+	
+	// for testing purposes
+	// std::cout << "BinaryOperatorExp destroyed" << std::endl;
 }
 
 #endif

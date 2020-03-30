@@ -42,7 +42,8 @@ SwitchStatement::~SwitchStatement() {
 		delete clauseList;
 	}
 	
-	std::cout << "SwitchStatement destroyed" << std::endl;
+	// for testing purposes	
+	// std::cout << "SwitchStatement destroyed" << std::endl;
 }
 
 #endif

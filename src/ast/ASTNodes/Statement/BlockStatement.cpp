@@ -26,7 +26,9 @@ BlockStatement::~BlockStatement() {
 			delete stmt;
 		}
 	}
-	std::cout << "BlockStatement destroyed" << std::endl;
+	
+	// for testing purposes
+	// std::cout << "BlockStatement destroyed" << std::endl;
 }
 
 #endif

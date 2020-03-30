@@ -17,7 +17,8 @@ std::string ContinueStatement::toString() {
 
 
 ContinueStatement::~ContinueStatement() {
-	std::cout << "ContinueStatement destroyed" << std::endl;
+	// for testing purposes
+	//std::cout << "ContinueStatement destroyed" << std::endl;
 }
 
 #endif

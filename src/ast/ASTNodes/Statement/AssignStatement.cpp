@@ -27,7 +27,9 @@ AssignStatement::~AssignStatement() {
 
 	delete lhs;
 	delete rhs;
-	std::cout << "AssignStatement destroyed" << std::endl;
+	
+	// for testing purposes
+	// std::cout << "AssignStatement destroyed" << std::endl;
 }
 
 #endif

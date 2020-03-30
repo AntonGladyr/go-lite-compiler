@@ -28,7 +28,9 @@ ForStatement::~ForStatement() {
 	if (exp) delete exp;
 	if (postStmt) delete postStmt;
 	delete blockStmt;
-	std::cout << "ForStatement destroyed" << std::endl;
+
+	// for testing purposes
+	// std::cout << "ForStatement destroyed" << std::endl;
 }
 
 #endif

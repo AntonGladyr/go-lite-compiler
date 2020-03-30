@@ -19,7 +19,9 @@ std::string TypeDeclarationStatement::toString() {
 
 TypeDeclarationStatement::~TypeDeclarationStatement() {	
 	delete typeDecl;
-	std::cout << "TypeDeclarationStatement destroyed" << std::endl;
+
+	// for testing purposes
+	// std::cout << "TypeDeclarationStatement destroyed" << std::endl;
 }
 
 #endif

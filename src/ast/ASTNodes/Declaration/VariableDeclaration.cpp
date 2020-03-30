@@ -50,8 +50,9 @@ VariableDeclaration::~VariableDeclaration() {
 		if (type->second) delete type->second;
 		delete type;
 	}
-		
-	std::cout << "VariableDeclaration destroyed" << std::endl;
+	
+	// for testing purposes	
+	// std::cout << "VariableDeclaration destroyed" << std::endl;
 }
 
 #endif

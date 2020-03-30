@@ -17,7 +17,9 @@ std::string ExpressionStatement::toString() {
 
 ExpressionStatement::~ExpressionStatement() {
 	delete exp;
-	std::cout << "ExpressionStatement destroyed" << std::endl;
+
+	// for testing purposes
+	// std::cout << "ExpressionStatement destroyed" << std::endl;
 }
 
 #endif

@@ -23,7 +23,9 @@ IfElseStatement::~IfElseStatement() {
 	delete blockStmt;
 	delete elseBlockStmt;
 	delete ifStmt;
-	std::cout << "IfElseStatement destroyed" << std::endl;
+	
+	// for testing purposes
+	// std::cout << "IfElseStatement destroyed" << std::endl;
 }
 
 #endif

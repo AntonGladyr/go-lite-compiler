@@ -69,7 +69,9 @@ FunctionDeclaration::~FunctionDeclaration() {
 	}
 	
 	delete blockStmt;
-	std::cout << "FunctionDeclaration destroyed" << std::endl;
+	
+	// for testing purposes
+	// std::cout << "FunctionDeclaration destroyed" << std::endl;
 }
 
 #endif

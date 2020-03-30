@@ -17,7 +17,8 @@ std::string BreakStatement::toString() {
 
 
 BreakStatement::~BreakStatement() {
-	std::cout << "BreakStatement destroyed" << std::endl;
+	// for testing purposes
+	// std::cout << "BreakStatement destroyed" << std::endl;
 }
 
 #endif

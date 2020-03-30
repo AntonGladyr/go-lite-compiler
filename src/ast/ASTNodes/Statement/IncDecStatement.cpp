@@ -17,7 +17,9 @@ std::string IncDecStatement::toString() {
 
 IncDecStatement::~IncDecStatement() {
 	delete exp;
-	std::cout << "IncDecStatement destroyed" << std::endl;
+
+	// for testing purposes
+	// std::cout << "IncDecStatement destroyed" << std::endl;
 }
 
 #endif
