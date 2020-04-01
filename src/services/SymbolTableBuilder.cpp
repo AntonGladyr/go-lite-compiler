@@ -38,6 +38,13 @@ SymbolTable *SymbolTableBuilder::build(Program *prg) {
 	return symbolTable;
 }
 
+void SymbolTableBuilder::resolveType(SymbolTable *symbolTable, const std::string &type, int lineno) {
+	if (symbolTable->getSymbol(symbolTable, type)) return;
+	std::cerr << ss.str();
+	std::cerr << "Error: (line " << lineno << ") type \"" << type << "\" is not declared" << std::endl;
+	exit(1);		
+}
+
 void SymbolTableBuilder::visit(Program *prg) {
 	if (prg == NULL) return;
 	
@@ -61,6 +68,9 @@ void SymbolTableBuilder::visit(VariableDeclaration *varDecl) {
 		ss << getTabs() << (*var)->value << " [" << CATEGORY_VAR << "]" << " = ";	
 		
 		if (varDecl->type) {
+			//check if type exists
+			resolveType(symbolTable, varDecl->type->first, varDecl->lineno);
+			
 			if (varDecl->type->second) {
 				for(auto const& index : *(varDecl->type->second)) {
 					type << "[" << std::to_string(index) << "]";
@@ -85,7 +95,12 @@ void SymbolTableBuilder::visit(VariableDeclaration *varDecl) {
 }
 
 void SymbolTableBuilder::visit(TypeDeclaration *typeDecl) {
-	if (typeDecl == NULL) return;	
+	if (typeDecl == NULL) return;
+	
+	//check if type exists
+	if (typeDecl->type)
+		resolveType(symbolTable, typeDecl->type->first, typeDecl->lineno);
+	
 	Symbol *symbol = symbolTable->putSymbol(
 		typeDecl->id,
 		CATEGORY_TYPE,
@@ -98,7 +113,17 @@ void SymbolTableBuilder::visit(TypeDeclaration *typeDecl) {
 
 void SymbolTableBuilder::visit(FunctionDeclaration *funcDecl) {
 	if (funcDecl == NULL) return;
-
+	
+	//check if return type exists
+	if (funcDecl->type)
+		resolveType(symbolTable, funcDecl->type->first, funcDecl->lineno);
+	//check if parameter types exist
+	if (funcDecl->params) {
+		for (auto const& param : *(funcDecl->params)) {
+			resolveType(symbolTable, param->second->first, funcDecl->lineno);
+		}
+	}
+	
 	Symbol *symbol = symbolTable->putSymbol(
 		funcDecl->id,
 		CATEGORY_FUNC,

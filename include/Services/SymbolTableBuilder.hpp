@@ -32,7 +32,8 @@ class SymbolTableBuilder : public Visitor {
 		int numTabs = 0;
 		std::stringstream ss; // for printing symbol table
 	public:	
-		SymbolTable *build(Program *prg);	
+		SymbolTable *build(Program *prg);
+		void resolveType(SymbolTable *symbolTable, const std::string &type, int lineno);
 		virtual void visit(Program *prg) override;
 		virtual void visit(VariableDeclaration *varDecl) override;
 		virtual void visit(TypeDeclaration *typeDecl) override;

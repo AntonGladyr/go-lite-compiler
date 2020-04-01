@@ -10,6 +10,7 @@
 #include "AST/Statement/BlockStatement.hpp"
 
 class BlockStatement;
+//pair<id, pair<type, indexes>>
 typedef std::pair<std::string, std::pair<std::string, std::vector<int>*>*> param_type;
 
 class FunctionDeclaration : public Declaration {
