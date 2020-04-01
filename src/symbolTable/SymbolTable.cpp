@@ -11,6 +11,7 @@
 SymbolTable *SymbolTable::scopeSymbolTable() {
 	SymbolTable *t = new SymbolTable();
 	t->parent = this;
+	t->headParent = headParent;
 	// copy pointer to the child for memory deallocation
 	this->childList.push_back(t);
 	// copy a string stream for a symbol table printer
@@ -50,7 +51,7 @@ Symbol *SymbolTable::getSymbol(SymbolTable *t, const std::string &name) {
 	int i = Hash(name);
 
 	 // Check the current scope
-	for (Symbol *s = t->table[i]; s; s = s->next) {
+	for (Symbol *s = t->table[i]; s; s = s->next) {	
 		if (s->name.compare(name) == 0) return s;
 	}
 
@@ -68,7 +69,19 @@ std::string SymbolTable::toString() {
 }
 
 SymbolTable::~SymbolTable() {
-	
+	//TODO: fix memory deallocation
+	/*for (auto &child : headParent->childList) {
+		if (child) {	
+			for (int i = 0; i < HashSize; i++) {
+				if (table[i]) { 
+					delete table[i];
+					table[i] = NULL;
+				}
+			}
+			delete child;
+			child = NULL;
+		}
+	}*/
 }
 
 #endif

@@ -8,9 +8,13 @@
 #include "AST/ASTTraversal.hpp"
 
 SymbolTable *SymbolTableBuilder::build(Program *prg) {
+	//copy program pointer for deallocation
+	program  = prg;	
+	
 	ss << "{" << std::endl;
 	numTabs++;
 	symbolTable = new SymbolTable();
+	symbolTable->headParent = symbolTable; // for memory deallocation
 	Symbol *symb = NULL;
 	
 	// pre-declared mappings
@@ -40,8 +44,11 @@ SymbolTable *SymbolTableBuilder::build(Program *prg) {
 
 void SymbolTableBuilder::resolveType(SymbolTable *symbolTable, const std::string &type, int lineno) {
 	if (symbolTable->getSymbol(symbolTable, type)) return;
+	
 	std::cerr << ss.str();
 	std::cerr << "Error: (line " << lineno << ") type \"" << type << "\" is not declared" << std::endl;
+	delete symbolTable;
+	delete program;
 	exit(1);		
 }
 

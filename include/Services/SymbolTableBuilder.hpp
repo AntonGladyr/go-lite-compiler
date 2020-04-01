@@ -28,6 +28,7 @@
 
 class SymbolTableBuilder : public Visitor {
 	private:
+		Program *program = NULL;
 		SymbolTable *symbolTable = NULL;
 		int numTabs = 0;
 		std::stringstream ss; // for printing symbol table

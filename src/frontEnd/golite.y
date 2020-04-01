@@ -53,7 +53,8 @@ int yylex();
 // Otherwise it takes no arguments and it is up to the user to format the error using a minimal
 // description provided in yytext.
 void yyerror(const char *s) {
-	fprintf(stderr, "Error: (line %d) %s\n", yylineno, s);
+	std::cerr << "Error: (line " << yylineno << ") " << s << std::endl;
+	delete program;
 	exit(1);
 }
 %}
