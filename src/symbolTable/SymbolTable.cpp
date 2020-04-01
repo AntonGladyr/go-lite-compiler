@@ -68,20 +68,21 @@ std::string SymbolTable::toString() {
 	return ss.str(); 
 }
 
-SymbolTable::~SymbolTable() {
-	//TODO: fix memory deallocation
-	/*for (auto &child : headParent->childList) {
-		if (child) {	
-			for (int i = 0; i < HashSize; i++) {
-				if (table[i]) { 
-					delete table[i];
-					table[i] = NULL;
-				}
-			}
+SymbolTable::~SymbolTable() {	
+	for (auto &child : headParent->childList) {	
+		if (child) {
+			child->headParent = child;
 			delete child;
 			child = NULL;
 		}
-	}*/
+	}
+		
+	for (int i = 0; i < HashSize; i++) {
+		if (table[i]) { 
+			delete table[i];
+			table[i] = NULL;
+		}
+	}
 }
 
 #endif
