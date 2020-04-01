@@ -12,6 +12,8 @@ class TypeDeclaration : public Declaration {
 		std::pair<std::string, std::vector<int>*> *type = NULL;
 		
 		virtual void accept(Visitor& v) override;
+		virtual std::string symbolToStr() override ;
+		virtual std::string symbolTypeToStr() override;
 		virtual std::string toString();
 
 		TypeDeclaration(

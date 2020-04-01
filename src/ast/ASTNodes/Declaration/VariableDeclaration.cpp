@@ -32,6 +32,9 @@ std::string VariableDeclaration::toString() {
 	return ss.str();
 }
 
+std::string VariableDeclaration::symbolToStr() { }
+
+std::string VariableDeclaration::symbolTypeToStr() { }
 
 VariableDeclaration::~VariableDeclaration() {
 	for(auto const& id : *idList) {

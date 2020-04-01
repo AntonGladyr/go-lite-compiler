@@ -1,7 +1,8 @@
-#ifndef PRETTYPRINTER_HPP
-#define PRETTYPRINTER_HPP
+#ifndef SYMBOLTABLEBUILDER_HPP
+#define SYMBOLTABLEBUILDER_HPP
 
 #include <iostream>
+#include <sstream>
 #include <utility>
 #include "Services/Visitor.hpp"
 #include "AST/Program/Program.hpp"
@@ -23,11 +24,15 @@
 #include "AST/Statement/IncDecStatement.hpp"
 #include "AST/Statement/ReturnStatement.hpp"
 #include "AST/Statement/EmptyStatement.hpp"
+#include "SymbolTable/SymbolTable.hpp"
 
-class PrettyPrinter : public Visitor {
+class SymbolTableBuilder : public Visitor {
 	private:
+		SymbolTable *symbolTable = NULL;
 		int numTabs = 0;
+		std::stringstream ss; // for printing symbol table
 	public:	
+		SymbolTable *build(Program *prg);	
 		virtual void visit(Program *prg) override;
 		virtual void visit(VariableDeclaration *varDecl) override;
 		virtual void visit(TypeDeclaration *typeDecl) override;
@@ -51,9 +56,9 @@ class PrettyPrinter : public Visitor {
 		virtual void openScope() override { isScopeOpened = true; }
 		virtual void closeScope() override { isScopeOpened = false; }
 		std::string getTabs();
-
-		PrettyPrinter() { }
-		~PrettyPrinter() { }
+		
+		SymbolTableBuilder() { }
+		~SymbolTableBuilder() { }
 };
 
-#endif
+#endif	

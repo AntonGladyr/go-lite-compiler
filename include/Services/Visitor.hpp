@@ -67,7 +67,7 @@ class Visitor {
 		virtual void visit(EmptyStatement *emptyStmt) = 0;
 
 		virtual void openScope() = 0;
-		virtual void closeScope() = 0;	
+		virtual void closeScope() = 0;
 };
 
 #endif

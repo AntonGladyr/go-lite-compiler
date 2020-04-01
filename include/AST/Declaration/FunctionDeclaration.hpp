@@ -18,8 +18,12 @@ class FunctionDeclaration : public Declaration {
 		std::vector<param_type*> *params = NULL;
 		std::pair<std::string, std::vector<int>*> *type = NULL;
 		BlockStatement *blockStmt = NULL;
-
+		
+		std::pair<std::string, std::vector<int>*> getType() { return *type; }
+		std::string symbolSignatureToStr();
 		virtual void accept(Visitor& v) override;
+		virtual std::string symbolToStr() override ;
+		virtual std::string symbolTypeToStr() override;
 		virtual std::string toString();
 		
 		FunctionDeclaration(

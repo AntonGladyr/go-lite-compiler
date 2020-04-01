@@ -9,7 +9,10 @@
 
 void PrettyPrinter::visit(Program *prg) {
 	if (prg == NULL) return;
-	std::cout << prg->toString() << std::endl;
+	
+	if (isScopeOpened) {
+		std::cout << prg->toString() << std::endl;
+	}
 }
 
 void PrettyPrinter::visit(VariableDeclaration *varDecl) {

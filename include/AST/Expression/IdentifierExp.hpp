@@ -7,6 +7,7 @@
 
 class IdentifierExp : public Expression {
 	public:
+		Symbol *symbol = NULL;
 		std::string value;
 
 		virtual void accept(Visitor& v) override;

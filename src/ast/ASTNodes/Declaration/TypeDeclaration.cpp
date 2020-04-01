@@ -25,6 +25,24 @@ std::string TypeDeclaration::toString() {
 	return ss.str();
 }
 
+std::string TypeDeclaration::symbolToStr() {
+	std::stringstream ss;
+	ss << id << " [" << CATEGORY_TYPE << "]" << " = ";
+	ss << symbolTypeToStr();
+	return ss.str();
+}
+
+std::string TypeDeclaration::symbolTypeToStr() {
+	std::stringstream ss;
+	ss << id << " -> ";
+	if (type->second) {
+		for(auto const& index: *(type->second)) {
+			ss << "[" << std::to_string(index) << "]";
+		}
+	}
+	ss << type->first;
+	return ss.str();
+}
 
 TypeDeclaration::~TypeDeclaration() {
 	if (type->second) delete type->second;

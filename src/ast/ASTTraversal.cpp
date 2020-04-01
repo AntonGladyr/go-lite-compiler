@@ -27,13 +27,17 @@ void ASTTraversal::traverse(Node *node, Visitor& visitor) {
 	if (node == NULL) return;
 	if (typeid(Program) == typeid(*node)) {
 		Program *prg = (Program*)node;
+		visitor.openScope();
 		prg->accept(visitor);
+		
 		if (prg->declList) {	
 			for(auto const& decl : *(prg->declList)) {	
 				traverse(decl, visitor);	
 			}
 		}
 		
+		visitor.closeScope();
+		prg->accept(visitor);
 		return;
 	}
 	
