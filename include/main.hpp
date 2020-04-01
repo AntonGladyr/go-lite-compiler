@@ -2,11 +2,12 @@
 #define MAIN_HPP
 
 #include "AST/Program/Program.hpp"
-#include "Services/SymbolTableBuilder.hpp"
 #include "AST/Node.hpp"
 #include "Services/Visitor.hpp"
 #include "AST/ASTTraversal.hpp"
 #include "Services/PrettyPrinter.hpp"
+#include "Services/SymbolTableBuilder.hpp"
+#include "Services/TypeChecker.hpp"
 
 void yyparse();
 int yylex();

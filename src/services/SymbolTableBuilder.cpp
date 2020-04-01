@@ -134,7 +134,7 @@ void SymbolTableBuilder::visit(FunctionDeclaration *funcDecl) {
 	Symbol *symbol = symbolTable->putSymbol(
 		funcDecl->id,
 		CATEGORY_FUNC,
-		funcDecl->symbolSignatureToStr(),
+		funcDecl->symbolTypeToStr(),
 		funcDecl);
 	funcDecl->symbol = symbol;
 	ss << getTabs() << funcDecl->symbolToStr() << std::endl;

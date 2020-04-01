@@ -58,9 +58,14 @@ int main(int argc, char *argv[]){
 	}
 	else if(!strcmp(argv[1], "typecheck")) {
 		yyparse();
-		
+		SymbolTableBuilder builder;
+		symbolTable = builder.build(program);
+		TypeChecker checker;
+		checker.typecheck(program, symbolTable);		
+			
 		std::cout << "OK" << std::endl;
 		delete program;
+		delete symbolTable;
 		return 0;
 	}
 	else {	

@@ -86,18 +86,15 @@ std::string FunctionDeclaration::symbolSignatureToStr() {
 	if (params) {
 		for(auto const& param : *params) {
 			// for each id print type
-			for (auto const& id : param->first)
-			{		
-				if (param->second->second) {
-					for(auto const& index : *(param->second->second)) {
-						ss << "[" << std::to_string(index) << "]";
-					}	
-				}
-			
-				ss << param->second->first;
-				if (&param != &params->back())
-					ss << ", ";
+			if (param->second->second) {
+				for(auto const& index : *(param->second->second)) {
+					ss << "[" << std::to_string(index) << "]";
+				}	
 			}
+			
+			ss << param->second->first;
+			if (&param != &params->back())
+				ss << " ";	
 		}
 
 	}
