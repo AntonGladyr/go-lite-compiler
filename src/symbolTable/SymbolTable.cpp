@@ -5,24 +5,19 @@
 #include <sstream>
 #include <vector>
 #include "SymbolTable/SymbolTable.hpp"
-//#include "../helpers/HashFunction.cpp"
 #include "SymbolTable/HashFunction.h"
+#include "AST/Declaration/FunctionDeclaration.hpp"
 
 SymbolTable *SymbolTable::scopeSymbolTable() {
 	SymbolTable *t = new SymbolTable();
-	t->parent = this;
-	t->headParent = headParent;
+	t->parent = this;	
 	// copy pointer to the child for memory deallocation
 	this->childList.push_back(t);
-	// copy a string stream for a symbol table printer
-	//t->ss = this->ss;
 	return t;
 }
 
 SymbolTable *SymbolTable::unscopeSymbolTable() {
-	if (this->parent) {
-		// copy a string stream for a symbol table printer
-		//this->parent->ss = this->ss;
+	if (this->parent) {	
 		return this->parent;
 	}
 	return NULL;
@@ -34,13 +29,26 @@ Symbol *SymbolTable::putSymbol(
 	const std::string &type,
 	Node *node
 ) {
+	FunctionDeclaration *funcDecl = NULL;
+	if (node != NULL) {
+		if (typeid(FunctionDeclaration) == typeid(*node))
+			funcDecl = (FunctionDeclaration*)node;
+	}
+
 	int i = Hash(name);	
 	for (Symbol *s = this->table[i]; s; s = s->next) {
+		// check if init function, so we allow to declare init function multiple times at the top-level scope
+		if(funcDecl) {	
+			if(funcDecl->id.compare(SPECIALFUNC_INIT) == 0) break;
+		}
+		
 		if (s->name.compare(name) == 0) {
+			std::cerr << ss.str();
 			std::cerr << "Error:";
 			if (node) std::cerr << " (line " <<  node->lineno << ")";
-			std::cerr << " identifier" << name << "already declared" << std::endl;
-			exit(1);
+			std::cerr << " identifier " << name << " already declared on line "
+				  << s->node->lineno << std::endl;
+			return NULL;
 		}
 	}
 	this->table[i] = new Symbol(name, category, type, this->table[i], node);
@@ -68,21 +76,23 @@ std::string SymbolTable::toString() {
 	return ss.str(); 
 }
 
-SymbolTable::~SymbolTable() {	
-	for (auto &child : headParent->childList) {	
+SymbolTable::~SymbolTable() {
+	//TODO: fix for parent nodes
+	
+	/*for (auto &child : childList) {
 		if (child) {
-			child->headParent = child;
+			child->parent = NULL;	
 			delete child;
-			child = NULL;
+			child = NULL;	
 		}
-	}
+	}*/
 		
-	for (int i = 0; i < HashSize; i++) {
+	/*for (int i = 0; i < HashSize; i++) {
 		if (table[i]) { 
 			delete table[i];
 			table[i] = NULL;
 		}
-	}
+	}*/
 }
 
 #endif

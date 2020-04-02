@@ -7,14 +7,14 @@
 #include "SymbolTable/Symbol.hpp"
 #include "AST/ASTTraversal.hpp"
 
+// initializes a symbol table
 SymbolTable *SymbolTableBuilder::build(Program *prg) {
 	//copy program pointer for deallocation
 	program  = prg;	
 	
 	ss << "{" << std::endl;
 	numTabs++;
-	symbolTable = new SymbolTable();
-	symbolTable->headParent = symbolTable; // for memory deallocation
+	symbolTable = new SymbolTable();	
 	Symbol *symb = NULL;
 	
 	// pre-declared mappings
@@ -42,15 +42,93 @@ SymbolTable *SymbolTableBuilder::build(Program *prg) {
 	return symbolTable;
 }
 
-void SymbolTableBuilder::resolveType(SymbolTable *symbolTable, const std::string &type, int lineno) {
+
+//=====================HELPER FUNCTIONS===========================
+//=================================================================
+
+
+// termination after errors
+void SymbolTableBuilder::terminate() {
+	//TODO: fix symbolTable destructor
+	delete symbolTable;
+	symbolTable = NULL;
+	delete program;
+	program = NULL;	
+	exit(1);
+}
+
+// helper function for inserting function parameters into scope
+void SymbolTableBuilder::insertFuncParams(Node *node) {	
+	if (typeid(FunctionDeclaration) == typeid(*node)) {	
+		FunctionDeclaration *funcDecl = (FunctionDeclaration*)node;
+		std::stringstream paramType;
+
+		if (funcDecl->params) {
+			for (auto const& param : *(funcDecl->params)) {
+				//clear string stream
+				paramType.str(std::string());
+				
+				// array indexes
+                       		if (param->second->second) {
+					for(auto const& index : *(param->second->second)) {
+						paramType << "[" << std::to_string(index) << "]";
+					}
+				}
+                          	// type
+				paramType << param->second->first;
+				
+				Symbol *symbol = symbolTable->putSymbol(
+					param->first,
+					CATEGORY_VAR,
+					paramType.str(),
+					funcDecl // TODO: change to identifier node
+				);
+	
+				// terminate if id already declared
+				if (symbol == NULL) terminate();
+				
+				// pass to stream for printing
+				ss << getTabs() << param->first << " [" << CATEGORY_VAR << "]"
+				   << " = " << paramType.str() << std::endl;
+			}
+		}
+	}
+}
+
+// check init and main functions
+void SymbolTableBuilder::checkSpecialFunctions(Node *node) {
+	//TODO: change default type of init func to <unmapped>
+	if (typeid(FunctionDeclaration) == typeid(*node)) {
+		FunctionDeclaration *funcDecl = (FunctionDeclaration*)node;
+		
+		// return if not "main" nor "init"
+		if(funcDecl->id.compare(SPECIALFUNC_MAIN) != 0) return;
+		if(funcDecl->id.compare(SPECIALFUNC_INIT) != 0) return;
+		
+		if(funcDecl->type || funcDecl->params) {
+			std::cerr << "Error: (line " << node->lineno << ") "
+				  << "main must have no parameters and no return value" << std::endl;
+			terminate();
+		}	
+	}
+}
+
+// check if type is declared
+void SymbolTableBuilder::resolveType(const std::string &type, int lineno) {
 	if (symbolTable->getSymbol(symbolTable, type)) return;
 	
 	std::cerr << ss.str();
 	std::cerr << "Error: (line " << lineno << ") type \"" << type << "\" is not declared" << std::endl;
-	delete symbolTable;
-	delete program;
-	exit(1);		
+	//TODO: fix symbolTable destructor
+	terminate();
 }
+
+//=====================END OF HELPER FUNCTIONS=====================
+//=================================================================
+
+
+//=====================VISITOR PATTERN=============================
+//=================================================================
 
 void SymbolTableBuilder::visit(Program *prg) {
 	if (prg == NULL) return;
@@ -69,6 +147,9 @@ void SymbolTableBuilder::visit(Program *prg) {
 void SymbolTableBuilder::visit(VariableDeclaration *varDecl) {
 	if (varDecl == NULL) return;
 	
+	//copy string stream for printing errors
+	symbolTable->ss.str(ss.str());
+
 	// reverse iteration
 	for (auto var = varDecl->idList->rbegin(); var != varDecl->idList->rend(); var++) {
 		std::stringstream type;
@@ -76,7 +157,7 @@ void SymbolTableBuilder::visit(VariableDeclaration *varDecl) {
 		
 		if (varDecl->type) {
 			//check if type exists
-			resolveType(symbolTable, varDecl->type->first, varDecl->lineno);
+			resolveType(varDecl->type->first, varDecl->lineno);
 			
 			if (varDecl->type->second) {
 				for(auto const& index : *(varDecl->type->second)) {
@@ -97,16 +178,30 @@ void SymbolTableBuilder::visit(VariableDeclaration *varDecl) {
 			type.str(),
 			varDecl
 		);
+		
+		// terminate if id already declared
+		if (symbol == NULL) terminate();
+
 		(*var)->symbol = symbol;
 	}
 }
 
 void SymbolTableBuilder::visit(TypeDeclaration *typeDecl) {
 	if (typeDecl == NULL) return;
+
+	//copy string stream for printing errors
+	symbolTable->ss.str(ss.str());
 	
 	//check if type exists
 	if (typeDecl->type)
-		resolveType(symbolTable, typeDecl->type->first, typeDecl->lineno);
+		resolveType(typeDecl->type->first, typeDecl->lineno);
+	
+	//check for recursive type declarations
+	if(typeDecl->id.compare(typeDecl->symbolTypeToStr()) == 0) {
+		std::cerr << "Error: (line " << typeDecl->lineno
+			  << ") invalid recursive type " << typeDecl->symbolTypeToStr() << std::endl;
+		terminate();
+	}
 	
 	Symbol *symbol = symbolTable->putSymbol(
 		typeDecl->id,
@@ -114,40 +209,68 @@ void SymbolTableBuilder::visit(TypeDeclaration *typeDecl) {
 		typeDecl->symbolTypeToStr(),
 		typeDecl
 	);
+	
+	// terminate if id already declared
+	if (symbol == NULL) terminate();
+
 	typeDecl->symbol = symbol;
 	ss << getTabs() << typeDecl->symbolToStr() << std::endl;
 }
 
 void SymbolTableBuilder::visit(FunctionDeclaration *funcDecl) {
 	if (funcDecl == NULL) return;
+
+	// copy string stream for printing errors
+	symbolTable->ss.str(ss.str());
+
+	// check special functions: init and main
+	checkSpecialFunctions(funcDecl);
 	
-	//check if return type exists
+	// check if return type exists
 	if (funcDecl->type)
-		resolveType(symbolTable, funcDecl->type->first, funcDecl->lineno);
-	//check if parameter types exist
+		resolveType(funcDecl->type->first, funcDecl->lineno);
+
+	// check if parameter types exist
 	if (funcDecl->params) {
 		for (auto const& param : *(funcDecl->params)) {
-			resolveType(symbolTable, param->second->first, funcDecl->lineno);
+			resolveType(param->second->first, funcDecl->lineno);
 		}
 	}
+	
+	// save pointer to the parent node (func declaration) in the block statement,
+	// so func parameters can be added to the child scope
+	funcDecl->blockStmt->parentNode = funcDecl;
 	
 	Symbol *symbol = symbolTable->putSymbol(
 		funcDecl->id,
 		CATEGORY_FUNC,
 		funcDecl->symbolTypeToStr(),
-		funcDecl);
+		funcDecl
+	);
+	
+	// terminate if id already declared
+	if (symbol == NULL) terminate();
+
 	funcDecl->symbol = symbol;
 	ss << getTabs() << funcDecl->symbolToStr() << std::endl;
 }
 
 void SymbolTableBuilder::visit(BlockStatement *blockStmt) {
 	if (blockStmt == NULL) return;
-	
+		
 	if (isScopeOpened) {
+		// open new scope
 		symbolTable = symbolTable->scopeSymbolTable();
+		
 		ss << getTabs() << "{" << std::endl;
 		numTabs++;
+		
+		// if parent node is FuncDecl, put func parameters to the symbol table
+		if (typeid(FunctionDeclaration) == typeid(*(blockStmt->parentNode)))
+			insertFuncParams(blockStmt->parentNode);
+		
 	} else {
+		// close scope
 		symbolTable = symbolTable->unscopeSymbolTable();
 		numTabs--;
 		ss << getTabs() << "}" << std::endl;

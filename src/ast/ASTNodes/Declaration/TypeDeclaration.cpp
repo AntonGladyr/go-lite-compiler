@@ -28,13 +28,13 @@ std::string TypeDeclaration::toString() {
 std::string TypeDeclaration::symbolToStr() {
 	std::stringstream ss;
 	ss << id << " [" << CATEGORY_TYPE << "]" << " = ";
+	ss << id << " -> ";
 	ss << symbolTypeToStr();
 	return ss.str();
 }
 
 std::string TypeDeclaration::symbolTypeToStr() {
-	std::stringstream ss;
-	ss << id << " -> ";
+	std::stringstream ss;	
 	if (type->second) {
 		for(auto const& index: *(type->second)) {
 			ss << "[" << std::to_string(index) << "]";

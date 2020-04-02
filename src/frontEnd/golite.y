@@ -55,6 +55,7 @@ int yylex();
 void yyerror(const char *s) {
 	std::cerr << "Error: (line " << yylineno << ") " << s << std::endl;
 	delete program;
+	program = NULL;
 	exit(1);
 }
 %}

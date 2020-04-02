@@ -5,12 +5,13 @@
 #include <string>
 #include "SymbolTable/Symbol.hpp"
 
-std::string Symbol::toString() {
-	return "";
-}
+std::string Symbol::toString() { }
 
 Symbol::~Symbol() {
-
+	delete node;
+	node = NULL;
+	delete next;
+	next = NULL;
 }
 
 #endif

@@ -19,6 +19,8 @@ const std::string CATEGORY_TYPE = "type";
 const std::string CATEGORY_CONST = "constant";
 const std::string CATEGORY_VAR = "variable";
 const std::string CATEGORY_FUNC = "function";
+const std::string SPECIALFUNC_MAIN = "main";
+const std::string SPECIALFUNC_INIT = "init";
 
 class Symbol {
 	public:

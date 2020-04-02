@@ -9,6 +9,7 @@
 class BlockStatement : public Statement {
 	public:
 		std::vector<Statement*> *stmtList = NULL;
+		Node *parentNode = NULL;
 		
 		virtual void accept(Visitor& v) override;
 		virtual std::string toString();

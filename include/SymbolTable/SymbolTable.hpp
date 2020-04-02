@@ -11,8 +11,7 @@
 class SymbolTable {	
 	public:
 		Symbol *table[HashSize] = {};
-		SymbolTable *parent = NULL;
-		SymbolTable *headParent = NULL; // keep the top parent for memory deallocation
+		SymbolTable *parent = NULL;	
 		// keep pointers to the child scopes for memory deallocation
 		std::vector<SymbolTable*> childList;
 		std::stringstream ss; // for printing symbol table
@@ -30,7 +29,7 @@ class SymbolTable {
 		
 		std::string toString();
 		
-		SymbolTable() { }
+		SymbolTable() { } // for memory deallocation
 		~SymbolTable();
 };
 

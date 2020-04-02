@@ -35,7 +35,8 @@ int main(int argc, char *argv[]){
         	yyparse();
         	std::cout << "OK" << std::endl;
 		
-		delete program;	
+		delete program;
+		program = NULL;
         	return 0;
     	}
     	else if(!strcmp(argv[1], "pretty")) {		
@@ -44,6 +45,7 @@ int main(int argc, char *argv[]){
 		ASTTraversal::traverse(program, printer);	
 		
 		delete program;
+		program = NULL;
         	return 0;
     	}
 	else if(!strcmp(argv[1], "symbol")) {
@@ -53,7 +55,9 @@ int main(int argc, char *argv[]){
 		std::cout << symbolTable->toString();	
 		
 		delete symbolTable;
+		symbolTable = NULL;
 		delete program;
+		program = NULL;
 		return 0;
 	}
 	else if(!strcmp(argv[1], "typecheck")) {
@@ -65,7 +69,9 @@ int main(int argc, char *argv[]){
 			
 		std::cout << "OK" << std::endl;
 		delete program;
+		program = NULL;
 		delete symbolTable;
+		symbolTable = NULL;
 		return 0;
 	}
 	else {	

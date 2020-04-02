@@ -1,13 +1,22 @@
-package main
+package test
 
-type t1 float64
-//type t1 float64
+//var test int = t + t
 
-var variable int = 5
+//type main init
 
-func test(test int, t int) int {
-	var test int = 0
-	var variable int = 5
-	type t1 float64
-	return 5
+func test() {
+	5 + 5
+}
+
+func init() {
+}
+
+func init() {
+}
+
+func init() {
+}
+
+func main() {
+	var main int = 5 + 5
 }

@@ -94,7 +94,7 @@ std::string FunctionDeclaration::symbolSignatureToStr() {
 			
 			ss << param->second->first;
 			if (&param != &params->back())
-				ss << " ";	
+				ss << ", ";
 		}
 
 	}

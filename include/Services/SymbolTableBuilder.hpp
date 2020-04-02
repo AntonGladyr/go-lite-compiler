@@ -32,9 +32,13 @@ class SymbolTableBuilder : public Visitor {
 		SymbolTable *symbolTable = NULL;
 		int numTabs = 0;
 		std::stringstream ss; // for printing symbol table
+	
+		void terminate();
+		void resolveType(const std::string &type, int lineno);
+		void insertFuncParams(Node *node);
+		void checkSpecialFunctions(Node *node);
 	public:	
 		SymbolTable *build(Program *prg);
-		void resolveType(SymbolTable *symbolTable, const std::string &type, int lineno);
 		virtual void visit(Program *prg) override;
 		virtual void visit(VariableDeclaration *varDecl) override;
 		virtual void visit(TypeDeclaration *typeDecl) override;
@@ -59,7 +63,7 @@ class SymbolTableBuilder : public Visitor {
 		virtual void closeScope() override { isScopeOpened = false; }
 		std::string getTabs();
 		
-		SymbolTableBuilder() { }
+		SymbolTableBuilder() { } 
 		~SymbolTableBuilder() { }
 };
 
