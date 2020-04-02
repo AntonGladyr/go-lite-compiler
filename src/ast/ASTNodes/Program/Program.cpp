@@ -13,11 +13,13 @@ void Program::accept(Visitor& v) {
 std::string Program::toString() {
 	//TODO: fix declarations output
 	std::stringstream ss;
-	ss << "package " << package; 
+	ss << "package " << package->id;
 	return ss.str();
 }
 
 Program::~Program() {
+	delete package;
+	
 	if (declList) {
 		for(auto const& decl : *declList) {
 			delete decl;

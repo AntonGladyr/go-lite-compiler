@@ -5,15 +5,17 @@
 #include <vector>
 #include "Services/Visitor.hpp"
 #include "AST/Declaration/Declaration.hpp"
+#include "AST/Expression/IdentifierExp.hpp"
 #include "AST/Node.hpp"
 
 class Declaration;
 class Visitor;
+class IdentifierExp;
 class Node;
 
 class Program : public Node {
 	public:
-		std::string package;
+		IdentifierExp *package = NULL;
 		//std::vector<std::shared_ptr<Declaration>> *declList;
 		std::vector<Declaration*> *declList = NULL;
 		
@@ -21,7 +23,7 @@ class Program : public Node {
 		virtual std::string toString();
 	
 		Program(
-			const std::string &_package,
+			IdentifierExp *_package,
 			std::vector<Declaration*> *_declList,
 			int _lineno
 		) : package(_package), declList(_declList), Node(_lineno) { }

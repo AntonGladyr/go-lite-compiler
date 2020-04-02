@@ -9,14 +9,18 @@
 
 class ArrayExp : public Expression {
 	public:	
-		std::string id;
+		IdentifierExp *idExp = NULL;
 		std::vector<Expression*> *expList = NULL;
 
 		virtual void accept(Visitor& v) override;
 		virtual std::string toString();
 			
-		ArrayExp(const std::string &_id, std::vector<Expression*> *_expList, int _lineno) :
-			id(_id), expList(_expList), Expression(_lineno) { }
+		ArrayExp(
+			IdentifierExp *_idExp,
+			std::vector<Expression*> *_expList,
+			int _lineno
+		) :idExp(_idExp), expList(_expList), Expression(_lineno) { }
+		
 		ArrayExp() { }
 		~ArrayExp();	
 };

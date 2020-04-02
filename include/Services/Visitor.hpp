@@ -21,6 +21,7 @@
 #include "AST/Statement/ReturnStatement.hpp"
 #include "AST/Statement/EmptyStatement.hpp"
 #include "AST/Expression/Expression.hpp"
+#include "AST/Expression/IdentifierExp.hpp"
 
 class Program;
 class VariableDeclaration;
@@ -41,6 +42,7 @@ class BreakStatement;
 class ContinueStatement;
 class ReturnStatement;
 class EmptyStatement;
+class IdentifierExp;
 
 class Visitor {	
 	protected:
@@ -65,6 +67,7 @@ class Visitor {
 		virtual void visit(IncDecStatement *incDecStmt) = 0;
 		virtual void visit(ReturnStatement *returnStmt) = 0;
 		virtual void visit(EmptyStatement *emptyStmt) = 0;
+		//virtual void visit(IdentifierExp *idExp) = 0;
 
 		virtual void openScope() = 0;
 		virtual void closeScope() = 0;

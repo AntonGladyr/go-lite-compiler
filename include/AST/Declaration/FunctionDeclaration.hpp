@@ -8,14 +8,16 @@
 #include "AST/Declaration/Declaration.hpp"
 #include "AST/Statement/Statement.hpp"
 #include "AST/Statement/BlockStatement.hpp"
+#include "AST/Expression/IdentifierExp.hpp"
 
 class BlockStatement;
+class IdentifierExp;
 //pair<id, pair<type, indexes>>
-typedef std::pair<std::string, std::pair<std::string, std::vector<int>*>*> param_type;
+typedef std::pair<IdentifierExp*, std::pair<std::string, std::vector<int>*>*> param_type;
 
 class FunctionDeclaration : public Declaration {
 	public:
-		std::string id;
+		IdentifierExp *idExp = NULL;
 		std::vector<param_type*> *params = NULL;
 		std::pair<std::string, std::vector<int>*> *type = NULL;
 		BlockStatement *blockStmt = NULL;
@@ -28,19 +30,26 @@ class FunctionDeclaration : public Declaration {
 		virtual std::string toString();
 		
 		FunctionDeclaration(
-			const std::string &_id,
+			IdentifierExp *_idExp,
 			std::vector<param_type*> *_params,
 			BlockStatement *_blockStmt,
 			int _lineno
-		) : id(_id), params{_params}, blockStmt{_blockStmt}, Declaration(_lineno) { }
+		) : idExp(_idExp), 
+		    params{_params},
+		    blockStmt{_blockStmt},
+		    Declaration(_lineno) { };
 		
 		FunctionDeclaration(
-			const std::string &_id,
+			IdentifierExp *_idExp,
 			std::vector<param_type*> *_params,
 			std::pair<std::string, std::vector<int>*> *_type,
 			BlockStatement *_blockStmt,
 			int _lineno
-		) : id(_id), params{_params}, type(_type), blockStmt{_blockStmt}, Declaration(_lineno) { }
+		) : idExp(_idExp), 
+		    params{_params},
+		    type(_type),
+		    blockStmt{_blockStmt},
+		    Declaration(_lineno) { };
 		
 		FunctionDeclaration() { }
 		~FunctionDeclaration();

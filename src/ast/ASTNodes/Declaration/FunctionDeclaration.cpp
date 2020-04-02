@@ -15,13 +15,13 @@ std::string FunctionDeclaration::toString() {
 	std::stringstream ss;
 
 	//TODO: fix block output
-	ss << "func " << id;
+	ss << "func " << idExp->id;
 	ss << "(";
 	
 	//parameters	
 	if (params) {
 		for(auto const& param : *params) {
-			ss << param->first << " ";
+			ss << param->first->id << " ";
 				
 			if (param->second->second) {
 				for(auto const& index : *(param->second->second)) {
@@ -46,7 +46,7 @@ std::string FunctionDeclaration::toString() {
 			}	
 		}	
 		//type id
-		ss << type->first << " ";	
+		ss << type->first << " ";
 	}
 
 	return ss.str();
@@ -54,7 +54,7 @@ std::string FunctionDeclaration::toString() {
 
 std::string FunctionDeclaration::symbolToStr() {
 	std::stringstream ss;
-	ss << id << " [" << CATEGORY_FUNC << "]" << " = ";
+	ss << idExp->id << " [" << CATEGORY_FUNC << "]" << " = ";
 	ss << symbolSignatureToStr();
 	return ss.str();
 }
@@ -108,6 +108,8 @@ std::string FunctionDeclaration::symbolSignatureToStr() {
 }
 
 FunctionDeclaration::~FunctionDeclaration() {
+	delete idExp;
+
 	if (params) {
 		for(auto const& param : *params) {
 			delete param->second->second;

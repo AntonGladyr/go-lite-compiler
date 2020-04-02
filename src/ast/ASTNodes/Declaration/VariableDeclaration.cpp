@@ -36,6 +36,27 @@ std::string VariableDeclaration::symbolToStr() { }
 
 std::string VariableDeclaration::symbolTypeToStr() { }
 
+VariableDeclaration::VariableDeclaration(
+	std::vector<IdentifierExp*> *_idList,
+	std::vector<Expression*> *_expList,
+	int _lineno
+) : idList(_idList), expList(_expList), Declaration(_lineno) {
+	for(auto const& id : *idList) {
+		id->parentNode = this;
+	}		
+}
+		
+VariableDeclaration::VariableDeclaration(
+	std::vector<IdentifierExp*> *_idList,
+	std::pair<std::string, std::vector<int>*> *_type,
+	std::vector<Expression*> *_expList,
+	int _lineno
+) : idList(_idList), type(_type), expList(_expList), Declaration(_lineno) {
+	for(auto const& id : *idList) {
+		id->parentNode = this;
+	}
+}
+
 VariableDeclaration::~VariableDeclaration() {
 	for(auto const& id : *idList) {
 		delete id;

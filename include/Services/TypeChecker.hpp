@@ -24,6 +24,7 @@
 #include "AST/Statement/ReturnStatement.hpp"
 #include "AST/Statement/EmptyStatement.hpp"
 #include "SymbolTable/SymbolTable.hpp"
+#include "AST/Expression/IdentifierExp.hpp"
 
 class TypeChecker : public Visitor {
 	private:
@@ -49,6 +50,7 @@ class TypeChecker : public Visitor {
 		virtual void visit(IncDecStatement *incDecStmt) override;
 		virtual void visit(ReturnStatement *returnStmt) override;
 		virtual void visit(EmptyStatement *emptyStmt) override;
+		//virtual void visit(IdentifierExp *idExp) override;
 
 		virtual void openScope() override { isScopeOpened = true; }
 		virtual void closeScope() override { isScopeOpened = false; }	

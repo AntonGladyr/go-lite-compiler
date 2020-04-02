@@ -5,10 +5,13 @@
 #include <string>
 #include "Services/Visitor.hpp"
 #include "AST/Declaration/Declaration.hpp"
+#include "AST/Expression/IdentifierExp.hpp"
+
+class IdentifierExp;
 
 class TypeDeclaration : public Declaration {
 	public:
-		std::string id;
+		IdentifierExp *idExp = NULL;
 		std::pair<std::string, std::vector<int>*> *type = NULL;
 		
 		virtual void accept(Visitor& v) override;
@@ -17,10 +20,12 @@ class TypeDeclaration : public Declaration {
 		virtual std::string toString();
 
 		TypeDeclaration(
-			std::string _id,
+			IdentifierExp *_idExp,
 			std::pair<std::string, std::vector<int>*> *_type,
 			int _lineno
-		) : id(_id), type(_type), Declaration(_lineno) { }
+		) : idExp(_idExp), 
+		    type(_type),
+		    Declaration(_lineno) { }
 		
 		TypeDeclaration() { }
 		~TypeDeclaration();

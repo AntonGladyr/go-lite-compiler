@@ -29,18 +29,10 @@ Symbol *SymbolTable::putSymbol(
 	const std::string &type,
 	Node *node
 ) {
-	FunctionDeclaration *funcDecl = NULL;
-	if (node != NULL) {
-		if (typeid(FunctionDeclaration) == typeid(*node))
-			funcDecl = (FunctionDeclaration*)node;
-	}
-
 	int i = Hash(name);	
 	for (Symbol *s = this->table[i]; s; s = s->next) {
 		// check if init function, so we allow to declare init function multiple times at the top-level scope
-		if(funcDecl) {	
-			if(funcDecl->id.compare(SPECIALFUNC_INIT) == 0) break;
-		}
+		if (isInitFunc(node)) break;
 		
 		if (s->name.compare(name) == 0) {
 			std::cerr << ss.str();
@@ -69,6 +61,18 @@ Symbol *SymbolTable::getSymbol(SymbolTable *t, const std::string &name) {
 	
 	// Check the parent scopes
 	return getSymbol(t->parent, name);
+}
+
+bool SymbolTable::isInitFunc(Node *node) {
+	if (node == NULL) return false;
+	
+	if (typeid(IdentifierExp) != typeid(*node)) return false;
+	IdentifierExp *idExp = (IdentifierExp*)node;
+
+	if (typeid(FunctionDeclaration) == typeid(*(idExp->parentNode))) {
+		FunctionDeclaration *funcDecl = (FunctionDeclaration*)idExp->parentNode;	
+		return (funcDecl->idExp->id.compare(SPECIALFUNC_INIT) == 0);
+	}
 }
 
 

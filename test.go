@@ -2,10 +2,10 @@ package test
 
 //var test int = t + t
 
-//type main init
+var init int
 
 func test() {
-	5 + 5
+	//5 + 5
 }
 
 func init() {
@@ -15,6 +15,9 @@ func init() {
 }
 
 func init() {
+}
+
+func main() {
 }
 
 func main() {

@@ -4,16 +4,22 @@
 #include <string>
 #include "Services/Visitor.hpp"
 #include <AST/Expression/Expression.hpp>
+#include "AST/Node.hpp"
 
 class IdentifierExp : public Expression {
 	public:
+		std::string id;
 		Symbol *symbol = NULL;
-		std::string value;
+		Node *parentNode = NULL;
 
 		virtual void accept(Visitor& v) override;
 		virtual std::string toString();
 	
-		IdentifierExp(const std::string &_idValue, int _lineno) : value(_idValue), Expression(_lineno) { }
+		IdentifierExp(
+			const std::string &_id,
+			int _lineno
+		) : id(_id), Expression(_lineno) { }
+		
 		IdentifierExp() { }
 		~IdentifierExp();
 };

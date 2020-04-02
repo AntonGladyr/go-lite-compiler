@@ -8,7 +8,9 @@
 #include "SymbolTable/HashFunction.h"
 #include "AST/Node.hpp"
 
-class SymbolTable {	
+class SymbolTable {
+	private:
+		bool isInitFunc(Node *node);
 	public:
 		Symbol *table[HashSize] = {};
 		SymbolTable *parent = NULL;	

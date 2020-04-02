@@ -31,14 +31,14 @@ class VariableDeclaration : public Declaration {
 			std::vector<IdentifierExp*> *_idList,
 			std::vector<Expression*> *_expList,
 			int _lineno
-		) : idList(_idList), expList(_expList), Declaration(_lineno) { }
+		);
 		
 		VariableDeclaration(
 			std::vector<IdentifierExp*> *_idList,
 			std::pair<std::string, std::vector<int>*> *_type,
 			std::vector<Expression*> *_expList,
 			int _lineno
-		) : idList(_idList), type(_type), expList(_expList), Declaration(_lineno) { }
+		); 
 		
 		VariableDeclaration() { }
 		~VariableDeclaration();	
