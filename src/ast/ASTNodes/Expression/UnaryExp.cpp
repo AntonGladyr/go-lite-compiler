@@ -5,7 +5,7 @@
 #include "AST/Expression/UnaryExp.hpp"
 
 void UnaryExp::accept(Visitor& v) {
-	//v.visit(this);
+	v.visit(this);
 }
 
 std::string UnaryExp::toString() {

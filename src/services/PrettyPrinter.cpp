@@ -154,6 +154,50 @@ void PrettyPrinter::visit(EmptyStatement *emptyStmt) {
 	//std::cout << getTabs() << emptyStmt->toString() << std::endl;
 }
 
+void PrettyPrinter::visit(ArrayExp *arrExp) {
+	if (arrExp == NULL) return;
+}
+
+void PrettyPrinter::visit(BinaryOperatorExp *binOpExp) {
+	if (binOpExp == NULL) return;
+}
+
+void PrettyPrinter::visit(BoolExp *boolExp) {
+	if (boolExp == NULL) return;
+}
+
+void PrettyPrinter::visit(BuiltinsExp *builtinsExp) {
+	if (builtinsExp == NULL) return;
+}
+
+void PrettyPrinter::visit(FloatExp *floatExp) {
+	if (floatExp == NULL) return;
+}
+
+void PrettyPrinter::visit(FunctionCallExp *funcCallExp) {
+	if (funcCallExp == NULL) return;
+}
+
+void PrettyPrinter::visit(IdentifierExp *idExp) {
+	if (idExp == NULL) return;
+}
+
+void PrettyPrinter::visit(IntegerExp *intExp) {
+	if (intExp == NULL) return;
+}
+
+void PrettyPrinter::visit(RuneExp *runeExp) {
+	if (runeExp == NULL) return;
+}
+
+void PrettyPrinter::visit(StringExp *strExp) {
+	if (strExp == NULL) return;
+}
+
+void PrettyPrinter::visit(UnaryExp *unaryExp) {
+	if (unaryExp == NULL) return;
+}
+
 std::string PrettyPrinter::getTabs() {
 	std::stringstream ss;
 	for(int i = 0; i < numTabs; i++) {

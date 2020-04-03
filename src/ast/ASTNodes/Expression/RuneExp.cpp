@@ -9,9 +9,8 @@ RuneExp::RuneExp(const std::string &_runeValue, int _lineno) : value(_runeValue)
 	value.erase(remove(value.begin(), value.end(), '\''), value.end());
 }
 
-
 void RuneExp::accept(Visitor& v) {
-	//v.visit(this);
+	v.visit(this);
 }
 
 std::string RuneExp::toString() {

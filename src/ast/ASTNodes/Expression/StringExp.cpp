@@ -6,7 +6,7 @@
 #include "AST/Expression/StringExp.hpp"
 
 void StringExp::accept(Visitor& v) {
-	//v.visit(this);
+	v.visit(this);
 }
 
 std::string StringExp::toString() {

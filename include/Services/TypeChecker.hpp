@@ -50,7 +50,17 @@ class TypeChecker : public Visitor {
 		virtual void visit(IncDecStatement *incDecStmt) override;
 		virtual void visit(ReturnStatement *returnStmt) override;
 		virtual void visit(EmptyStatement *emptyStmt) override;
-		//virtual void visit(IdentifierExp *idExp) override;
+		virtual void visit(ArrayExp *arrExp) override;
+		virtual void visit(BinaryOperatorExp *binOpExp) override;
+		virtual void visit(BoolExp *boolExp) override;
+		virtual void visit(BuiltinsExp *builtinsExp) override;
+		virtual void visit(FloatExp *floatExp) override;
+		virtual void visit(FunctionCallExp *funcCallExp) override;	
+		virtual void visit(IdentifierExp *idExp) override;
+		virtual void visit(IntegerExp *intExp) override;
+		virtual void visit(RuneExp *runeExp) override;
+		virtual void visit(StringExp *strExp) override;
+		virtual void visit(UnaryExp *unaryExp) override;
 
 		virtual void openScope() override { isScopeOpened = true; }
 		virtual void closeScope() override { isScopeOpened = false; }	

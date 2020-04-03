@@ -5,7 +5,7 @@
 #include "AST/Expression/BinaryOperatorExp.hpp"
 
 void BinaryOperatorExp::accept(Visitor& v) {
-	//v.visit(this);
+	v.visit(this);
 }
 
 std::string BinaryOperatorExp::toString() {

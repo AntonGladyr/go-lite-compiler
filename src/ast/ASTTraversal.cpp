@@ -22,6 +22,19 @@
 #include "AST/Statement/IncDecStatement.hpp"
 #include "AST/Statement/ReturnStatement.hpp"
 #include "AST/Statement/EmptyStatement.hpp"
+#include "AST/Expression/ArrayExp.hpp"
+#include "AST/Expression/BinaryOperatorExp.hpp"
+#include "AST/Expression/BoolExp.hpp"
+#include "AST/Expression/BuiltinsExp.hpp"
+#include "AST/Expression/Expression.hpp"
+#include "AST/Expression/FloatExp.hpp"
+#include "AST/Expression/FunctionCallExp.hpp"
+#include "AST/Expression/IdentifierExp.hpp"
+#include "AST/Expression/IntegerExp.hpp"
+#include "AST/Expression/RuneExp.hpp"
+#include "AST/Expression/StringExp.hpp"
+#include "AST/Expression/UnaryExp.hpp"
+
 
 void ASTTraversal::traverse(Node *node, Visitor& visitor) {
 	if (node == NULL) return;
@@ -140,6 +153,61 @@ void ASTTraversal::traverse(Node *node, Visitor& visitor) {
 	if (typeid(EmptyStatement) == typeid(*node)) {
 		EmptyStatement *emptyStmt = (EmptyStatement*)node;
 		emptyStmt->accept(visitor);
+	}
+
+	if (typeid(ArrayExp) == typeid(*node)) {
+		ArrayExp *arrayExp = (ArrayExp*)node;
+		arrayExp->accept(visitor);
+	}
+
+	if (typeid(BinaryOperatorExp) == typeid(*node)) {
+		BinaryOperatorExp *binOpExp = (BinaryOperatorExp*)node;
+		binOpExp->accept(visitor);
+	}
+
+	if (typeid(BoolExp) == typeid(*node)) {
+		BoolExp *boolExp = (BoolExp*)node;
+		boolExp->accept(visitor);
+	}
+
+	if (typeid(BuiltinsExp) == typeid(*node)) {
+		BuiltinsExp *builtinsExp = (BuiltinsExp*)node;
+		builtinsExp->accept(visitor);
+	}
+
+	if (typeid(FloatExp) == typeid(*node)) {
+		FloatExp *floatExp = (FloatExp*)node;
+		floatExp->accept(visitor);
+	}
+	
+	if (typeid(FunctionCallExp) == typeid(*node)) {
+		FunctionCallExp *funcCall = (FunctionCallExp*)node;
+		funcCall->accept(visitor);
+	}
+
+	if (typeid(IdentifierExp) == typeid(*node)) {
+		IdentifierExp *idExp = (IdentifierExp*)node;
+		idExp->accept(visitor);
+	}
+
+	if (typeid(IntegerExp) == typeid(*node)) {
+		IntegerExp *intExp = (IntegerExp*)node;
+		intExp->accept(visitor);
+	}
+
+	if (typeid(RuneExp) == typeid(*node)) {
+		RuneExp *runeExp = (RuneExp*)node;
+		runeExp->accept(visitor);
+	}
+
+	if (typeid(StringExp) == typeid(*node)) {
+		StringExp *strExp = (StringExp*)node;
+		strExp->accept(visitor);
+	}
+
+	if (typeid(UnaryExp) == typeid(*node)) {
+		UnaryExp *unaryExp = (UnaryExp*)node;
+		unaryExp->accept(visitor);
 	}
 }
 

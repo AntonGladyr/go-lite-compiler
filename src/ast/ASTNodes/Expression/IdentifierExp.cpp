@@ -4,7 +4,7 @@
 #include "AST/Expression/IdentifierExp.hpp"
 
 void IdentifierExp::accept(Visitor& v) {
-	//v.visit(this);
+	v.visit(this);
 }
 
 std::string IdentifierExp::toString() {

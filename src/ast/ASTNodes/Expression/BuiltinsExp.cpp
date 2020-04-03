@@ -5,7 +5,7 @@
 #include "AST/Expression/BuiltinsExp.hpp"
 
 void BuiltinsExp::accept(Visitor& v) {
-	//v.visit(this);
+	v.visit(this);
 }
 
 std::string BuiltinsExp::toString() {

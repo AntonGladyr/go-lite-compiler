@@ -48,8 +48,8 @@ SymbolTable *SymbolTableBuilder::build(Program *prg) {
 
 
 // termination after errors
-void SymbolTableBuilder::terminate() {	
-	symbolTable->deallocate();	
+void SymbolTableBuilder::terminate() {
+	symbolTable->deallocate();
 	delete symbolTable;
 	symbolTable = NULL;
 	delete program;
@@ -163,6 +163,17 @@ void SymbolTableBuilder::visit(Program *prg) {
 void SymbolTableBuilder::visit(VariableDeclaration *varDecl) {
 	if (varDecl == NULL) return;
 	
+	//check if number of ids equals to the number of the expressions
+	if (varDecl->expList) {
+		if (varDecl->expList->size() != 0) {
+			if (varDecl->idList->size() != varDecl->expList->size()) {
+				std::cerr << "Error: (line " << varDecl->lineno << ") "
+				 	  << "variable declaration lhs(" << varDecl->idList->size() << ")"
+				  	  << " != rhs(" << varDecl->expList->size() << ")" << std::endl;
+				terminate();
+			}
+		}
+	}	
 	//copy string stream for printing errors
 	symbolTable->ss.str(ss.str());
 
@@ -172,9 +183,7 @@ void SymbolTableBuilder::visit(VariableDeclaration *varDecl) {
 		
 		// check if var name is not 'main' nor 'init'
 		// parent->parent => basetypes
-		if (symbolTable->parent->parent == NULL) checkIdName(*var);
-		
-		ss << getTabs() << (*var)->id << " [" << CATEGORY_VAR << "]" << " = ";	
+		if (symbolTable->parent->parent == NULL) checkIdName(*var);	
 		
 		if (varDecl->type) {
 			//check if type exists
@@ -191,6 +200,7 @@ void SymbolTableBuilder::visit(VariableDeclaration *varDecl) {
 			type << BASETYPE_UNDEFINED;
 		}
 		
+		ss << getTabs() << (*var)->id << " [" << CATEGORY_VAR << "]" << " = ";
 		ss << type.str() << std::endl;
 		
 		//save pointer to the parent node in idExp
@@ -318,9 +328,28 @@ void SymbolTableBuilder::visit(TypeDeclarationStatement *typeDeclStmt) {
 	ASTTraversal::traverse(typeDeclStmt->typeDecl, *this);
 }
 
-void SymbolTableBuilder::visit(AssignStatement *assignStmt) { }
+void SymbolTableBuilder::visit(AssignStatement *assignStmt) {
+	if (assignStmt == NULL) return;
+	
+	if(assignStmt->lhs->size() != assignStmt->rhs->size()) {
+		std::cerr << "Error: (line " << assignStmt->lineno << ") "
+			  << "assignment lhs(" << assignStmt->lhs->size() << ")"
+		          << " != rhs(" << assignStmt->rhs->size() << ")" << std::endl;
+		terminate();
+	}
+}
 
-void SymbolTableBuilder::visit(ExpressionStatement *expStmt) { }
+void SymbolTableBuilder::visit(ExpressionStatement *expStmt) {
+	if (expStmt == NULL) return;
+	
+	if(typeid(FunctionCallExp) != typeid(expStmt->exp)) {
+		// copy string stream for printing errors
+		symbolTable->ss.str(ss.str());
+		std::cerr << "Error: (line " << expStmt->exp->lineno << ") "
+			  << "expression statements must be function calls" << std::endl;
+		terminate();
+	}	
+}
 
 void SymbolTableBuilder::visit(ForStatement *forStmt) { }
 
@@ -373,6 +402,52 @@ void SymbolTableBuilder::visit(IncDecStatement *incDecStmt) { }
 void SymbolTableBuilder::visit(ReturnStatement *returnStmt) { }
 
 void SymbolTableBuilder::visit(EmptyStatement *emptyStmt) { }
+
+void SymbolTableBuilder::visit(ArrayExp *arrExp) {
+	if (arrExp == NULL) return;
+}
+
+void SymbolTableBuilder::visit(BinaryOperatorExp *binOpExp) {
+	if (binOpExp == NULL) return;
+}
+
+void SymbolTableBuilder::visit(BoolExp *boolExp) {
+	if (boolExp == NULL) return;
+}
+
+void SymbolTableBuilder::visit(BuiltinsExp *builtinsExp) {
+	if (builtinsExp == NULL) return;
+}
+
+void SymbolTableBuilder::visit(FloatExp *floatExp) {
+	if (floatExp == NULL) return;
+}
+
+void SymbolTableBuilder::visit(FunctionCallExp *funcCallExp) {
+	if (funcCallExp == NULL) return;
+}
+
+void SymbolTableBuilder::visit(IdentifierExp *idExp) {
+	if (idExp == NULL) return;
+}
+
+void SymbolTableBuilder::visit(IntegerExp *intExp) {
+	if (intExp == NULL) return;
+}
+
+void SymbolTableBuilder::visit(RuneExp *runeExp) {
+	if (runeExp == NULL) return;
+}
+
+void SymbolTableBuilder::visit(StringExp *strExp) {
+	if (strExp == NULL) return;
+}
+
+void SymbolTableBuilder::visit(UnaryExp *unaryExp) {
+	if (unaryExp == NULL) return;
+}
+
+
 
 std::string SymbolTableBuilder::getTabs() {
 	std::stringstream ss;

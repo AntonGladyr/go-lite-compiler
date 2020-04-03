@@ -5,7 +5,7 @@
 #include "AST/Expression/BoolExp.hpp"
 
 void BoolExp::accept(Visitor& v) {
-	//v.visit(this);
+	v.visit(this);
 }
 
 std::string BoolExp::toString() {	

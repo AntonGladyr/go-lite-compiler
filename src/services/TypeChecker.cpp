@@ -120,4 +120,48 @@ void TypeChecker::visit(EmptyStatement *emptyStmt) {
 	if (emptyStmt == NULL) return;	
 }
 
+void TypeChecker::visit(ArrayExp *arrExp) {
+	if (arrExp == NULL) return;
+}
+
+void TypeChecker::visit(BinaryOperatorExp *binOpExp) {
+	if (binOpExp == NULL) return;
+}
+
+void TypeChecker::visit(BoolExp *boolExp) {
+	if (boolExp == NULL) return;
+}
+
+void TypeChecker::visit(BuiltinsExp *builtinsExp) {
+	if (builtinsExp == NULL) return;
+}
+
+void TypeChecker::visit(FloatExp *floatExp) {
+	if (floatExp == NULL) return;
+}
+
+void TypeChecker::visit(FunctionCallExp *funcCallExp) {
+	if (funcCallExp == NULL) return;
+}
+
+void TypeChecker::visit(IdentifierExp *idExp) {
+	if (idExp == NULL) return;
+}
+
+void TypeChecker::visit(IntegerExp *intExp) {
+	if (intExp == NULL) return;
+}
+
+void TypeChecker::visit(RuneExp *runeExp) {
+	if (runeExp == NULL) return;
+}
+
+void TypeChecker::visit(StringExp *strExp) {
+	if (strExp == NULL) return;
+}
+
+void TypeChecker::visit(UnaryExp *unaryExp) {
+	if (unaryExp == NULL) return;
+}
+
 #endif

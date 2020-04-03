@@ -106,8 +106,10 @@ void SymbolTable::deallocate() {
 	
 	// find the head of the tree (symboltable)
 	while(current->parent != NULL) {
-		current = parent;
-	}		
+		if (current == parent) break;
+		current = parent;	
+	}
+		
 	// delete all childs
 	for (auto &child : current->childList) {	
 		if (child) {

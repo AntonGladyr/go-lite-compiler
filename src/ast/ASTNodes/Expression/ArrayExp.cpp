@@ -5,7 +5,7 @@
 #include "AST/Expression/ArrayExp.hpp"
 
 void ArrayExp::accept(Visitor& v) {
-	//v.visit(this);
+	v.visit(this);
 }
 
 std::string ArrayExp::toString() {

@@ -5,7 +5,7 @@
 #include "AST/Expression/FloatExp.hpp"
 
 void FloatExp::accept(Visitor& v) {
-	//v.visit(this);
+	v.visit(this);
 }
 
 std::string FloatExp::toString(){	

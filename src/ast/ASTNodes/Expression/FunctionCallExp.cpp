@@ -6,7 +6,7 @@
 #include "../../../helpers/vectorExtension.cpp"
 
 void FunctionCallExp::accept(Visitor& v) {
-	//v.visit(this);
+	v.visit(this);
 }
 
 std::string FunctionCallExp::toString() {

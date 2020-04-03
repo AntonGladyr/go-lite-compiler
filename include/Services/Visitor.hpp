@@ -21,7 +21,19 @@
 #include "AST/Statement/ReturnStatement.hpp"
 #include "AST/Statement/EmptyStatement.hpp"
 #include "AST/Expression/Expression.hpp"
+#include "AST/Expression/ArrayExp.hpp"
+#include "AST/Expression/BinaryOperatorExp.hpp"
+#include "AST/Expression/BoolExp.hpp"
+#include "AST/Expression/BuiltinsExp.hpp"
+#include "AST/Expression/Expression.hpp"
+#include "AST/Expression/FloatExp.hpp"
+#include "AST/Expression/FunctionCallExp.hpp"
 #include "AST/Expression/IdentifierExp.hpp"
+#include "AST/Expression/IntegerExp.hpp"
+#include "AST/Expression/RuneExp.hpp"
+#include "AST/Expression/StringExp.hpp"
+#include "AST/Expression/UnaryExp.hpp"
+
 
 class Program;
 class VariableDeclaration;
@@ -42,7 +54,17 @@ class BreakStatement;
 class ContinueStatement;
 class ReturnStatement;
 class EmptyStatement;
+class ArrayExp;
+class BinaryOperatorExp;
+class BoolExp;
+class BuiltinsExp;
+class FloatExp;
+class FunctionCallExp;
 class IdentifierExp;
+class IntegerExp;
+class RuneExp;
+class StringExp;
+class UnaryExp;
 
 class Visitor {	
 	protected:
@@ -67,7 +89,17 @@ class Visitor {
 		virtual void visit(IncDecStatement *incDecStmt) = 0;
 		virtual void visit(ReturnStatement *returnStmt) = 0;
 		virtual void visit(EmptyStatement *emptyStmt) = 0;
-		//virtual void visit(IdentifierExp *idExp) = 0;
+		virtual void visit(ArrayExp *arrExp) = 0;
+		virtual void visit(BinaryOperatorExp *binOpExp) = 0;
+		virtual void visit(BoolExp *boolExp) = 0;
+		virtual void visit(BuiltinsExp *builtinsExp) = 0;
+		virtual void visit(FloatExp *floatExp) = 0;
+		virtual void visit(FunctionCallExp *funcCallExp) = 0;	
+		virtual void visit(IdentifierExp *idExp) = 0;
+		virtual void visit(IntegerExp *intExp) = 0;
+		virtual void visit(RuneExp *runeExp) = 0;
+		virtual void visit(StringExp *strExp) = 0;
+		virtual void visit(UnaryExp *unaryExp) = 0;
 
 		virtual void openScope() = 0;
 		virtual void closeScope() = 0;
