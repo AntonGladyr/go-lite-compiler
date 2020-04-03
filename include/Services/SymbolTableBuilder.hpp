@@ -24,8 +24,10 @@
 #include "AST/Statement/IncDecStatement.hpp"
 #include "AST/Statement/ReturnStatement.hpp"
 #include "AST/Statement/EmptyStatement.hpp"
-#include "SymbolTable/SymbolTable.hpp"
 #include "AST/Expression/IdentifierExp.hpp"
+#include "SymbolTable/SymbolTable.hpp"
+
+class SymbolTable;
 
 class SymbolTableBuilder : public Visitor {
 	private:

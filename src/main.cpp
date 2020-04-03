@@ -49,11 +49,12 @@ int main(int argc, char *argv[]){
         	return 0;
     	}
 	else if(!strcmp(argv[1], "symbol")) {
-		yyparse();
-		SymbolTableBuilder builder;
-		symbolTable = builder.build(program);
-		std::cout << symbolTable->toString();	
+		yyparse();	
+		SymbolTable *symbolTable = new SymbolTable(program);	
+		std::cout << symbolTable->toString();
 		
+		//TODO: invoke deallocate() behind the scenes
+		symbolTable->deallocate();
 		delete symbolTable;
 		symbolTable = NULL;
 		delete program;
@@ -61,16 +62,18 @@ int main(int argc, char *argv[]){
 		return 0;
 	}
 	else if(!strcmp(argv[1], "typecheck")) {
-		yyparse();
-		SymbolTableBuilder builder;
-		symbolTable = builder.build(program);
+		yyparse();	
+		SymbolTable *symbolTable = new SymbolTable(program);
 		TypeChecker checker;
 		checker.typecheck(program, symbolTable);		
 			
 		std::cout << "OK" << std::endl;
+			
+		//TODO: invoke deallocate() behind the scenes
+		symbolTable->deallocate();
+		delete symbolTable;	
 		delete program;
 		program = NULL;
-		delete symbolTable;
 		symbolTable = NULL;
 		return 0;
 	}

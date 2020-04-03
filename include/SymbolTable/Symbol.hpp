@@ -28,7 +28,7 @@ class Symbol {
 		std::string category;
 		std::string type;
 		Symbol *next = NULL;
-		Node *node = NULL;		
+		Node *node = NULL;
 		
 		std::string toString();
 		

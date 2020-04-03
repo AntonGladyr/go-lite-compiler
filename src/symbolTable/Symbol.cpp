@@ -8,9 +8,7 @@
 std::string Symbol::toString() { }
 
 Symbol::~Symbol() {
-	delete node;
-	node = NULL;
-	delete next;
+	if (next) delete next;
 	next = NULL;
 }
 

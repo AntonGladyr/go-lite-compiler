@@ -4,9 +4,29 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <algorithm>
+#include <iterator>
 #include "SymbolTable/SymbolTable.hpp"
 #include "SymbolTable/HashFunction.h"
 #include "AST/Declaration/FunctionDeclaration.hpp"
+
+SymbolTable::SymbolTable(Program *prg) {
+	SymbolTableBuilder builder;
+	SymbolTable *sbPtr = builder.build(prg);
+	std::copy(std::begin(sbPtr->table), std::end(sbPtr->table), std::begin(table));
+	childList = sbPtr->childList;
+	parent = sbPtr->parent;
+	ss << sbPtr->ss.str();
+}
+
+void SymbolTable::build(Program *prg) {
+	SymbolTableBuilder builder;
+	SymbolTable *sbPtr = builder.build(prg);
+	std::copy(std::begin(sbPtr->table), std::end(sbPtr->table), std::begin(table));	
+	childList = sbPtr->childList;
+	parent = sbPtr->parent;
+	ss << sbPtr->ss.str();
+}
 
 SymbolTable *SymbolTable::scopeSymbolTable() {
 	SymbolTable *t = new SymbolTable();
@@ -80,23 +100,33 @@ std::string SymbolTable::toString() {
 	return ss.str(); 
 }
 
-SymbolTable::~SymbolTable() {
-	//TODO: fix for parent nodes
+void SymbolTable::deallocate() {
+	// delete child and parent nodes		
+	SymbolTable *current = this;
 	
-	/*for (auto &child : childList) {
+	// find the head of the tree (symboltable)
+	while(current->parent != NULL) {
+		current = parent;
+	}		
+	// delete all childs
+	for (auto &child : current->childList) {	
 		if (child) {
-			child->parent = NULL;	
+			child->parent = NULL;
+			child->deallocate();
+		} else {
 			delete child;
-			child = NULL;	
 		}
-	}*/
-		
-	/*for (int i = 0; i < HashSize; i++) {
-		if (table[i]) { 
+	}	
+}
+
+SymbolTable::~SymbolTable() {
+	// delete table	(scope)
+	for (int i = 0; i < HashSize; i++) {	
+		if (table[i]) {		
 			delete table[i];
 			table[i] = NULL;
 		}
-	}*/
+	}	
 }
 
 #endif

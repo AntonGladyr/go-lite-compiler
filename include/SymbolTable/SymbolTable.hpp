@@ -7,6 +7,8 @@
 #include "SymbolTable/Symbol.hpp"
 #include "SymbolTable/HashFunction.h"
 #include "AST/Node.hpp"
+#include "AST/Program/Program.hpp"
+#include "Services/SymbolTableBuilder.hpp"
 
 class SymbolTable {
 	private:
@@ -25,13 +27,15 @@ class SymbolTable {
 			const std::string &category,
 			const std::string &type,
 			Node *node
-		);
-		
+		);	
 		Symbol *getSymbol(SymbolTable *t, const std::string &name);
+		void build(Program *prg); // build symbol table
+		void deallocate(); //for memory deallocation
 		
 		std::string toString();
 		
-		SymbolTable() { } // for memory deallocation
+		SymbolTable(Program *prg);	
+		SymbolTable() { }; 
 		~SymbolTable();
 };
 

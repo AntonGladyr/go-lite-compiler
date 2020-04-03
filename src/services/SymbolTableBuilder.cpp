@@ -10,7 +10,7 @@
 // initializes a symbol table
 SymbolTable *SymbolTableBuilder::build(Program *prg) {
 	//copy program pointer for deallocation
-	program  = prg;	
+	program = prg;
 	
 	ss << "{" << std::endl;
 	numTabs++;
@@ -48,8 +48,8 @@ SymbolTable *SymbolTableBuilder::build(Program *prg) {
 
 
 // termination after errors
-void SymbolTableBuilder::terminate() {
-	//TODO: fix symbolTable destructor
+void SymbolTableBuilder::terminate() {	
+	symbolTable->deallocate();	
 	delete symbolTable;
 	symbolTable = NULL;
 	delete program;
@@ -120,8 +120,7 @@ void SymbolTableBuilder::resolveType(const std::string &type, int lineno) {
 	if (symbolTable->getSymbol(symbolTable, type)) return;
 	
 	std::cerr << ss.str();
-	std::cerr << "Error: (line " << lineno << ") type \"" << type << "\" is not declared" << std::endl;
-	//TODO: fix symbolTable destructor
+	std::cerr << "Error: (line " << lineno << ") type \"" << type << "\" is not declared" << std::endl;	
 	terminate();
 }
 
