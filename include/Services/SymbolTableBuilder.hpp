@@ -36,7 +36,7 @@ class SymbolTableBuilder : public Visitor {
 		std::stringstream ss; // for printing symbol table	
 		void terminate();
 		// TODO: chanhge resolveType params to (Node *node)
-		void resolveType(const std::string &type, int lineno);
+		void checkTypeName(const std::string &type, int lineno);
 		void insertFuncParams(Node *node);
 		void checkSpecialFunctions(Node *node);
 		void checkIdName(Node *node); // check identifier name ('main' and 'init' must be a function)	

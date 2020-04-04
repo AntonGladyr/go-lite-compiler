@@ -1,20 +1,25 @@
 package test
 
-func test(f int) {
+/*func test(f int) {
 	var f1 float64
 	return
 	return f1[int]
-}
+}*/
+
+var str int = "string"
 
 type qq int
 var qwe int
+
+var s qq = qq(3)
+
 func true() qq {
 	qq = qq
 	for ; qq < 0; qq++{
 
 	}
 
-	if true() {
+	if {
 	}
 	/*{
 	} else {

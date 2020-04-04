@@ -150,7 +150,7 @@ void yyerror(const char *s) {
 %type <program> program
 %type <declList> decl_list
 %type <decl> decl var_decl func_decl type_decl
-%type <stmt> stmt ifstmt loopstmt assignstmt stmt_decl incdecstmt printstmt returnstmt switchstmt simplestmt initstmt emptystmt
+%type <stmt> stmt ifstmt loopstmt assignstmt stmt_decl incdecstmt printstmt returnstmt switchstmt simplestmt emptystmt
 %type <blockStmt> blockstmt
 %type <exp> exp primary_exp func_call expstmt
 %type <param> param
@@ -368,13 +368,9 @@ returnstmt : tRETURN { $$ = new ReturnStatement(yylineno); }
     | tRETURN exp { $$ = new ReturnStatement($2, yylineno); } 
     ;
 
-initstmt : id_listne tSHORTDECLARE exp_list 
-	{ $$ = new DeclarationStatement(new VariableDeclaration($1, $3, yylineno), yylineno); }
-    | simplestmt
-    ;
-
-loopstmt : tFOR initstmt tSEMICOLON expstmt tSEMICOLON simplestmt blockstmt
-	{ $$ = new ForStatement($2, $4, $6, $7, yylineno); }
+loopstmt : tFOR simplestmt tSEMICOLON expstmt tSEMICOLON simplestmt blockstmt
+	{ //TODO: implement short decalration 
+	  $$ = new ForStatement($2, $4, $6, $7, yylineno); }
     | tFOR expstmt blockstmt { $$ = new ForStatement($2, $3, yylineno); } 
     ;
 
@@ -443,8 +439,8 @@ index : tLBRACKET exp tRBRACKET { $$ = new std::vector<Expression*>(); $$->push_
 				      $$->insert($$->end(), $4->begin(), $4->end()); }
     ;
 
-primary_exp : id_exp { } 
-    | func_call { $$ = $1; }
+primary_exp : id_exp { $$ = $1; } 
+    |  func_call { $$ = $1; }
     | id_exp index { $$ = new ArrayExp($1, $2, yylineno); }
     | tLPAREN exp tRPAREN { $$ = $2; }
     ;
@@ -452,7 +448,7 @@ primary_exp : id_exp { }
 id_exp : tIDENTIFIER { $$ = new IdentifierExp(*$1, yylineno); delete $1; }
     ;
 
-exp : primary_exp
+exp : primary_exp { $$ = $1; }
     | tLEN tLPAREN exp tRPAREN { $$ = new BuiltinsExp(BUILTIN_LEN, $3, yylineno); }
     | tCAP tLPAREN exp tRPAREN { $$ = new BuiltinsExp(BUILTIN_CAP, $3, yylineno); }
     | exp tPLUS exp { $$ = new BinaryOperatorExp(BINARY_PLUS, $1, $3, yylineno); }

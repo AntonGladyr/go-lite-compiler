@@ -117,7 +117,7 @@ void SymbolTableBuilder::checkSpecialFunctions(Node *node) {
 }
 
 // check if type is declared
-void SymbolTableBuilder::resolveType(const std::string &type, int lineno) {
+void SymbolTableBuilder::checkTypeName(const std::string &type, int lineno) {
 	Symbol *s = symbolTable->getSymbol(symbolTable, type);
 	
 	// check if identifier exists in the symbol table
@@ -214,12 +214,12 @@ void SymbolTableBuilder::visit(VariableDeclaration *varDecl) {
 		std::stringstream type;
 		
 		// check if a variable name is not 'main' nor 'init'
-		// parent->parent => basetypes
+		// parent->parent scope => basetypes
 		if (symbolTable->parent->parent == NULL) checkIdName(*var);	
 		
 		if (varDecl->type) {
 			//check if type exists
-			resolveType(varDecl->type->first, (*var)->lineno);
+			checkTypeName(varDecl->type->first, (*var)->lineno);
 			
 			if (varDecl->type->second) {
 				for(auto const& index : *(varDecl->type->second)) {
@@ -264,7 +264,7 @@ void SymbolTableBuilder::visit(TypeDeclaration *typeDecl) {
 
 	//check if type exists
 	if (typeDecl->type)
-		resolveType(typeDecl->type->first, typeDecl->idExp->lineno);
+		checkTypeName(typeDecl->type->first, typeDecl->idExp->lineno);
 	
 	//check for recursive type declarations
 	if(typeDecl->idExp->id.compare(typeDecl->symbolTypeToStr()) == 0) {
@@ -285,7 +285,8 @@ void SymbolTableBuilder::visit(TypeDeclaration *typeDecl) {
 	
 	// terminate if id already declared
 	if (symbol == NULL) terminate();
-
+	
+	// save to the node
 	typeDecl->symbol = symbol;
 	ss << getTabs() << typeDecl->symbolToStr() << std::endl;
 }
@@ -301,12 +302,12 @@ void SymbolTableBuilder::visit(FunctionDeclaration *funcDecl) {
 	
 	// check if return type exists
 	if (funcDecl->type)
-		resolveType(funcDecl->type->first, funcDecl->idExp->lineno);
+		checkTypeName(funcDecl->type->first, funcDecl->idExp->lineno);
 
 	// check if parameter types exist
 	if (funcDecl->params) {
 		for (auto const& param : *(funcDecl->params)) {
-			resolveType(param->second->first, funcDecl->idExp->lineno);
+			checkTypeName(param->second->first, funcDecl->idExp->lineno);
 		}
 	}
 	
@@ -324,6 +325,7 @@ void SymbolTableBuilder::visit(FunctionDeclaration *funcDecl) {
 	// terminate if id already declared
 	if (symbol == NULL) terminate();
 
+	// save to the node
 	funcDecl->symbol = symbol;
 	ss << getTabs() << funcDecl->symbolToStr() << std::endl;
 }
@@ -526,7 +528,7 @@ void SymbolTableBuilder::visit(FunctionCallExp *funcCallExp) {
 void SymbolTableBuilder::visit(IdentifierExp *idExp) {
 	if (idExp == NULL) return;
 		
-	// check if function identifier exists
+	// check if identifier exists
 	if(symbolTable->getSymbol(symbolTable, idExp->id) == NULL) {
 		std::cerr << ss.str();
 		std::cerr << "Error: (line " << idExp->lineno << ") \""
