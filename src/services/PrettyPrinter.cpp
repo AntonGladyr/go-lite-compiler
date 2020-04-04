@@ -84,11 +84,6 @@ void PrettyPrinter::visit(IfElseStatement *ifElseStmt) {
 	}
 }
 
-void PrettyPrinter::visit(IfStatement *ifStmt) {
-	if (ifStmt == NULL) return;
-	std::cout << getTabs() << ifStmt->toString();
-}
-
 void PrettyPrinter::visit(SwitchStatement *switchStmt) {
 	if (switchStmt == NULL) return;
 	

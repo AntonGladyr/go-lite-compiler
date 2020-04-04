@@ -7,9 +7,23 @@ func test(f int) {
 }
 
 type qq int
-
+var qwe int
 func true() qq {
-	return
+	qq = qq
+	for ; qq < 0; qq++{
+
+	}
+
+	if true() {
+	}
+	/*{
+	} else {
+		var variable = 100
+	}*/
+	/*for i := 0; i < 0; i++ {
+		var t int = 0
+		return
+	}*/
 }
 
 func qwerty(s string) string {

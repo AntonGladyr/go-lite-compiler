@@ -71,10 +71,6 @@ void TypeChecker::visit(IfElseStatement *ifElseStmt) {
 	}
 }
 
-void TypeChecker::visit(IfStatement *ifStmt) {
-	if (ifStmt == NULL) return;	
-}
-
 void TypeChecker::visit(SwitchStatement *switchStmt) {
 	if (switchStmt == NULL) return;
 		

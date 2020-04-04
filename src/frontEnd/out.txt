@@ -25,10 +25,12 @@ Terminals unused in grammar
    tLSHIFTASSIGN
    tBWANDNOTASSIGN
    tARROW
-   tSHORTDECLARE
    tELLIPSIS
    tPERIOD
    tNEWLINE
+
+
+State 160 conflicts: 1 reduce/reduce
 
 
 Grammar
@@ -100,86 +102,89 @@ Grammar
    45 returnstmt: tRETURN
    46           | tRETURN exp
 
-   47 loopstmt: tFOR simplestmt tSEMICOLON expstmt tSEMICOLON simplestmt blockstmt
-   48         | tFOR expstmt blockstmt
+   47 initstmt: id_listne tSHORTDECLARE exp_list
+   48         | simplestmt
 
-   49 simplestmt: emptystmt
-   50           | exp
-   51           | incdecstmt
-   52           | assignstmt
+   49 loopstmt: tFOR initstmt tSEMICOLON expstmt tSEMICOLON simplestmt blockstmt
+   50         | tFOR expstmt blockstmt
 
-   53 assignstmt: exp_list tASSIGN exp_list
+   51 simplestmt: emptystmt
+   52           | exp
+   53           | incdecstmt
+   54           | assignstmt
 
-   54 ifstmt: tIF exp blockstmt
-   55       | tIF exp blockstmt tELSE blockstmt
-   56       | tIF exp blockstmt tELSE ifstmt
+   55 assignstmt: exp_list tASSIGN exp_list
 
-   57 switchstmt: tSWITCH tLBRACE case_block tRBRACE
-   58           | tSWITCH exp tLBRACE case_block tRBRACE
+   56 ifstmt: tIF exp blockstmt
+   57       | tIF exp blockstmt tELSE blockstmt
+   58       | tIF exp blockstmt tELSE ifstmt
 
-   59 case_block: default_clause
-   60           | case_clause case_block
-   61           | %empty
+   59 switchstmt: tSWITCH tLBRACE case_block tRBRACE
+   60           | tSWITCH exp tLBRACE case_block tRBRACE
 
-   62 switch_stmts: stmt_list
-   63             | %empty
+   61 case_block: default_clause
+   62           | case_clause case_block
+   63           | %empty
 
-   64 case_clause: tCASE exp_list tCOLON switch_stmts
+   64 switch_stmts: stmt_list
+   65             | %empty
 
-   65 default_clause: tDEFAULT tCOLON switch_stmts
+   66 case_clause: tCASE exp_list tCOLON switch_stmts
 
-   66 incdecstmt: exp tINC
-   67           | exp tDEC
+   67 default_clause: tDEFAULT tCOLON switch_stmts
 
-   68 printstmt: tPRINT tLPAREN exp_listpe tRPAREN
-   69          | tPRINTLN tLPAREN exp_listpe tRPAREN
+   68 incdecstmt: exp tINC
+   69           | exp tDEC
 
-   70 blockstmt: tLBRACE stmt_list tRBRACE
-   71          | tLBRACE tRBRACE
+   70 printstmt: tPRINT tLPAREN exp_listpe tRPAREN
+   71          | tPRINTLN tLPAREN exp_listpe tRPAREN
 
-   72 func_call: id_exp tLPAREN exp_listpe tRPAREN
+   72 blockstmt: tLBRACE stmt_list tRBRACE
+   73          | tLBRACE tRBRACE
 
-   73 index: tLBRACKET exp tRBRACKET
-   74      | tLBRACKET exp tRBRACKET index
+   74 func_call: id_exp tLPAREN exp_listpe tRPAREN
 
-   75 primary_exp: id_exp
-   76            | func_call
-   77            | id_exp index
-   78            | tLPAREN exp tRPAREN
+   75 index: tLBRACKET exp tRBRACKET
+   76      | tLBRACKET exp tRBRACKET index
 
-   79 id_exp: tIDENTIFIER
+   77 primary_exp: id_exp
+   78            | func_call
+   79            | id_exp index
+   80            | tLPAREN exp tRPAREN
 
-   80 exp: primary_exp
-   81    | tLEN tLPAREN exp tRPAREN
-   82    | tCAP tLPAREN exp tRPAREN
-   83    | exp tPLUS exp
-   84    | exp tMINUS exp
-   85    | exp tTIMES exp
-   86    | exp tDIV exp
-   87    | exp tREM exp
-   88    | exp tBWAND exp
-   89    | exp tBWOR exp
-   90    | exp tBWXOR exp
-   91    | exp tLEFTSHIFT exp
-   92    | exp tRIGHTSHIFT exp
-   93    | exp tBWANDNOT exp
-   94    | exp tAND exp
-   95    | exp tOR exp
-   96    | exp tEQUAL exp
-   97    | exp tNOTEQ exp
-   98    | exp tGREATER exp
-   99    | exp tLESS exp
-  100    | exp tGREATEREQ exp
-  101    | exp tLESSEQ exp
-  102    | tINTVAL
-  103    | tFLOATVAL
-  104    | tRUNEVAL
-  105    | tSTRINGVAL
-  106    | tBOOLVAL
-  107    | tBANG exp
-  108    | tMINUS exp
-  109    | tPLUS exp
-  110    | tBWXOR exp
+   81 id_exp: tIDENTIFIER
+
+   82 exp: primary_exp
+   83    | tLEN tLPAREN exp tRPAREN
+   84    | tCAP tLPAREN exp tRPAREN
+   85    | exp tPLUS exp
+   86    | exp tMINUS exp
+   87    | exp tTIMES exp
+   88    | exp tDIV exp
+   89    | exp tREM exp
+   90    | exp tBWAND exp
+   91    | exp tBWOR exp
+   92    | exp tBWXOR exp
+   93    | exp tLEFTSHIFT exp
+   94    | exp tRIGHTSHIFT exp
+   95    | exp tBWANDNOT exp
+   96    | exp tAND exp
+   97    | exp tOR exp
+   98    | exp tEQUAL exp
+   99    | exp tNOTEQ exp
+  100    | exp tGREATER exp
+  101    | exp tLESS exp
+  102    | exp tGREATEREQ exp
+  103    | exp tLESSEQ exp
+  104    | tINTVAL
+  105    | tFLOATVAL
+  106    | tRUNEVAL
+  107    | tSTRINGVAL
+  108    | tBOOLVAL
+  109    | tBANG exp
+  110    | tMINUS exp
+  111    | tPLUS exp
+  112    | tBWXOR exp
 
 
 Terminals, with rules where they appear
@@ -187,19 +192,19 @@ Terminals, with rules where they appear
 $end (0) 0
 error (256)
 tBREAK (258) 37
-tCASE (259) 64
+tCASE (259) 66
 tCONST (260)
 tCHAN (261)
 tCONTINUE (262) 38
-tDEFAULT (263) 65
+tDEFAULT (263) 67
 tDEFER (264)
-tELSE (265) 55 56
+tELSE (265) 57 58
 tFALLTHROUGH (266)
-tFOR (267) 47 48
+tFOR (267) 49 50
 tFUNC (268) 12 13
 tGO (269)
 tGOTO (270)
-tIF (271) 54 55 56
+tIF (271) 56 57 58
 tIMPORT (272)
 tINTERFACE (273)
 tMAP (274)
@@ -208,25 +213,25 @@ tRANGE (276)
 tRETURN (277) 45 46
 tSELECT (278)
 tSTRUCT (279)
-tSWITCH (280) 57 58
+tSWITCH (280) 59 60
 tTYPE (281) 11
 tVAR (282) 8 9 10
-tPRINT (283) 68
-tPRINTLN (284) 69
+tPRINT (283) 70
+tPRINTLN (284) 71
 tAPPEND (285)
-tLEN (286) 81
-tCAP (287) 82
-tPLUS (288) 83 109
-tMINUS (289) 84 108
-tDIV (290) 86
-tTIMES (291) 85
-tREM (292) 87
-tBWAND (293) 88
-tBWOR (294) 89
-tBWXOR (295) 90 110
-tRIGHTSHIFT (296) 92
-tLEFTSHIFT (297) 91
-tBWANDNOT (298) 93
+tLEN (286) 83
+tCAP (287) 84
+tPLUS (288) 85 111
+tMINUS (289) 86 110
+tDIV (290) 88
+tTIMES (291) 87
+tREM (292) 89
+tBWAND (293) 90
+tBWOR (294) 91
+tBWXOR (295) 92 112
+tRIGHTSHIFT (296) 94
+tLEFTSHIFT (297) 93
+tBWANDNOT (298) 95
 tPLUSASSIGN (299)
 tMINUSASSIGN (300)
 tMULTASSIGN (301)
@@ -238,37 +243,37 @@ tBWXORASSIGN (306)
 tRSHIFTASSIGN (307)
 tLSHIFTASSIGN (308)
 tBWANDNOTASSIGN (309)
-tAND (310) 94
-tOR (311) 95
+tAND (310) 96
+tOR (311) 97
 tARROW (312)
-tINC (313) 66
-tDEC (314) 67
-tEQUAL (315) 96
-tLESS (316) 99
-tGREATER (317) 98
-tASSIGN (318) 9 10 53
-tBANG (319) 107
-tNOTEQ (320) 97
-tLESSEQ (321) 101
-tGREATEREQ (322) 100
-tSHORTDECLARE (323)
+tINC (313) 68
+tDEC (314) 69
+tEQUAL (315) 98
+tLESS (316) 101
+tGREATER (317) 100
+tASSIGN (318) 9 10 55
+tBANG (319) 109
+tNOTEQ (320) 99
+tLESSEQ (321) 103
+tGREATEREQ (322) 102
+tSHORTDECLARE (323) 47
 tELLIPSIS (324)
-tLBRACE (325) 57 58 70 71
-tLPAREN (326) 12 13 18 68 69 72 78 81 82
-tLBRACKET (327) 17 73 74
+tLBRACE (325) 59 60 72 73
+tLPAREN (326) 12 13 18 70 71 74 80 83 84
+tLBRACKET (327) 17 75 76
 tCOMMA (328) 20 22 27
 tPERIOD (329)
-tRBRACE (330) 57 58 70 71
-tRPAREN (331) 12 13 18 68 69 72 78 81 82
-tRBRACKET (332) 17 73 74
-tSEMICOLON (333) 1 2 5 6 7 30 31 32 33 34 35 36 37 38 39 47
-tCOLON (334) 64 65
-tIDENTIFIER (335) 16 79
-tINTVAL (336) 17 102
-tFLOATVAL (337) 103
-tBOOLVAL (338) 106
-tRUNEVAL (339) 104
-tSTRINGVAL (340) 105
+tRBRACE (330) 59 60 72 73
+tRPAREN (331) 12 13 18 70 71 74 80 83 84
+tRBRACKET (332) 17 75 76
+tSEMICOLON (333) 1 2 5 6 7 30 31 32 33 34 35 36 37 38 39 49
+tCOLON (334) 66 67
+tIDENTIFIER (335) 16 81
+tINTVAL (336) 17 104
+tFLOATVAL (337) 105
+tBOOLVAL (338) 108
+tRUNEVAL (339) 106
+tSTRINGVAL (340) 107
 tNEWLINE (341)
 pMINUS (342)
 pBANG (343)
@@ -293,15 +298,15 @@ type_decl (96)
 func_decl (97)
     on left: 12 13, on right: 7
 stmt_list (98)
-    on left: 14 15, on right: 15 62 70
+    on left: 14 15, on right: 15 64 72
 type (99)
     on left: 16 17 18, on right: 8 10 11 13 17 18 25
 id_listne (100)
-    on left: 19 20, on right: 8 9 10 20
+    on left: 19 20, on right: 8 9 10 20 47
 exp_list (101)
-    on left: 21 22, on right: 9 10 22 23 53 64
+    on left: 21 22, on right: 9 10 22 23 47 55 66
 exp_listpe (102)
-    on left: 23 24, on right: 68 69 72
+    on left: 23 24, on right: 70 71 74
 param (103)
     on left: 25, on right: 26 27
 paramsne (104)
@@ -311,50 +316,52 @@ paramspe (105)
 stmt (106)
     on left: 30 31 32 33 34 35 36 37 38 39, on right: 14 15
 emptystmt (107)
-    on left: 40, on right: 49
+    on left: 40, on right: 51
 expstmt (108)
-    on left: 41 42, on right: 47 48
+    on left: 41 42, on right: 49 50
 stmt_decl (109)
     on left: 43 44, on right: 31
 returnstmt (110)
     on left: 45 46, on right: 36
-loopstmt (111)
-    on left: 47 48, on right: 32
-simplestmt (112)
-    on left: 49 50 51 52, on right: 39 47
-assignstmt (113)
-    on left: 53, on right: 52
-ifstmt (114)
-    on left: 54 55 56, on right: 33 56
-switchstmt (115)
-    on left: 57 58, on right: 34
-case_block (116)
-    on left: 59 60 61, on right: 57 58 60
-switch_stmts (117)
-    on left: 62 63, on right: 64 65
-case_clause (118)
-    on left: 64, on right: 60
-default_clause (119)
-    on left: 65, on right: 59
-incdecstmt (120)
-    on left: 66 67, on right: 51
-printstmt (121)
-    on left: 68 69, on right: 35
-blockstmt (122)
-    on left: 70 71, on right: 12 13 30 47 48 54 55 56
-func_call (123)
-    on left: 72, on right: 76
-index (124)
-    on left: 73 74, on right: 74 77
-primary_exp (125)
-    on left: 75 76 77 78, on right: 80
-id_exp (126)
-    on left: 79, on right: 1 2 11 12 13 19 20 25 72 75 77
-exp (127)
-    on left: 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97
-    98 99 100 101 102 103 104 105 106 107 108 109 110, on right: 21
-    22 41 46 50 54 55 56 58 66 67 73 74 78 81 82 83 84 85 86 87 88
-    89 90 91 92 93 94 95 96 97 98 99 100 101 107 108 109 110
+initstmt (111)
+    on left: 47 48, on right: 49
+loopstmt (112)
+    on left: 49 50, on right: 32
+simplestmt (113)
+    on left: 51 52 53 54, on right: 39 48 49
+assignstmt (114)
+    on left: 55, on right: 54
+ifstmt (115)
+    on left: 56 57 58, on right: 33 58
+switchstmt (116)
+    on left: 59 60, on right: 34
+case_block (117)
+    on left: 61 62 63, on right: 59 60 62
+switch_stmts (118)
+    on left: 64 65, on right: 66 67
+case_clause (119)
+    on left: 66, on right: 62
+default_clause (120)
+    on left: 67, on right: 61
+incdecstmt (121)
+    on left: 68 69, on right: 53
+printstmt (122)
+    on left: 70 71, on right: 35
+blockstmt (123)
+    on left: 72 73, on right: 12 13 30 49 50 56 57 58
+func_call (124)
+    on left: 74, on right: 78
+index (125)
+    on left: 75 76, on right: 76 79
+primary_exp (126)
+    on left: 77 78 79 80, on right: 82
+id_exp (127)
+    on left: 81, on right: 1 2 11 12 13 19 20 25 74 77 79
+exp (128)
+    on left: 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99
+    100 101 102 103 104 105 106 107 108 109 110 111 112, on right:
+    21 22 41 46 52 56 57 58 60 68 69 75 76 80 83 84 85 86 87 88 89
+    90 91 92 93 94 95 96 97 98 99 100 101 102 103 109 110 111 112
 
 
 State 0
@@ -385,9 +392,9 @@ State 2
 
 State 3
 
-   79 id_exp: tIDENTIFIER .
+   81 id_exp: tIDENTIFIER .
 
-    $default  reduce using rule 79 (id_exp)
+    $default  reduce using rule 81 (id_exp)
 
 
 State 4
@@ -712,21 +719,21 @@ State 36
 
 State 37
 
-   81 exp: tLEN . tLPAREN exp tRPAREN
+   83 exp: tLEN . tLPAREN exp tRPAREN
 
     tLPAREN  shift, and go to state 61
 
 
 State 38
 
-   82 exp: tCAP . tLPAREN exp tRPAREN
+   84 exp: tCAP . tLPAREN exp tRPAREN
 
     tLPAREN  shift, and go to state 62
 
 
 State 39
 
-  109 exp: tPLUS . exp
+  111 exp: tPLUS . exp
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -750,7 +757,7 @@ State 39
 
 State 40
 
-  108 exp: tMINUS . exp
+  110 exp: tMINUS . exp
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -774,7 +781,7 @@ State 40
 
 State 41
 
-  110 exp: tBWXOR . exp
+  112 exp: tBWXOR . exp
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -798,7 +805,7 @@ State 41
 
 State 42
 
-  107 exp: tBANG . exp
+  109 exp: tBANG . exp
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -822,7 +829,7 @@ State 42
 
 State 43
 
-   78 primary_exp: tLPAREN . exp tRPAREN
+   80 primary_exp: tLPAREN . exp tRPAREN
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -846,37 +853,37 @@ State 43
 
 State 44
 
-  102 exp: tINTVAL .
-
-    $default  reduce using rule 102 (exp)
-
-
-State 45
-
-  103 exp: tFLOATVAL .
-
-    $default  reduce using rule 103 (exp)
-
-
-State 46
-
-  106 exp: tBOOLVAL .
-
-    $default  reduce using rule 106 (exp)
-
-
-State 47
-
-  104 exp: tRUNEVAL .
+  104 exp: tINTVAL .
 
     $default  reduce using rule 104 (exp)
 
 
-State 48
+State 45
 
-  105 exp: tSTRINGVAL .
+  105 exp: tFLOATVAL .
 
     $default  reduce using rule 105 (exp)
+
+
+State 46
+
+  108 exp: tBOOLVAL .
+
+    $default  reduce using rule 108 (exp)
+
+
+State 47
+
+  106 exp: tRUNEVAL .
+
+    $default  reduce using rule 106 (exp)
+
+
+State 48
+
+  107 exp: tSTRINGVAL .
+
+    $default  reduce using rule 107 (exp)
 
 
 State 49
@@ -891,28 +898,28 @@ State 49
 
 State 50
 
-   76 primary_exp: func_call .
+   78 primary_exp: func_call .
 
-    $default  reduce using rule 76 (primary_exp)
+    $default  reduce using rule 78 (primary_exp)
 
 
 State 51
 
-   80 exp: primary_exp .
+   82 exp: primary_exp .
 
-    $default  reduce using rule 80 (exp)
+    $default  reduce using rule 82 (exp)
 
 
 State 52
 
-   72 func_call: id_exp . tLPAREN exp_listpe tRPAREN
-   75 primary_exp: id_exp .
-   77            | id_exp . index
+   74 func_call: id_exp . tLPAREN exp_listpe tRPAREN
+   77 primary_exp: id_exp .
+   79            | id_exp . index
 
     tLPAREN    shift, and go to state 69
     tLBRACKET  shift, and go to state 70
 
-    $default  reduce using rule 75 (primary_exp)
+    $default  reduce using rule 77 (primary_exp)
 
     index  go to state 71
 
@@ -920,25 +927,25 @@ State 52
 State 53
 
    21 exp_list: exp .
-   83 exp: exp . tPLUS exp
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
+   85 exp: exp . tPLUS exp
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
 
     tPLUS        shift, and go to state 72
     tMINUS       shift, and go to state 73
@@ -1046,7 +1053,7 @@ State 60
 
 State 61
 
-   81 exp: tLEN tLPAREN . exp tRPAREN
+   83 exp: tLEN tLPAREN . exp tRPAREN
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -1070,7 +1077,7 @@ State 61
 
 State 62
 
-   82 exp: tCAP tLPAREN . exp tRPAREN
+   84 exp: tCAP tLPAREN . exp tRPAREN
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -1094,130 +1101,130 @@ State 62
 
 State 63
 
-   83 exp: exp . tPLUS exp
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
-  109    | tPLUS exp .
+   85 exp: exp . tPLUS exp
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
+  111    | tPLUS exp .
 
-    $default  reduce using rule 109 (exp)
+    $default  reduce using rule 111 (exp)
 
 
 State 64
 
-   83 exp: exp . tPLUS exp
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
-  108    | tMINUS exp .
-
-    $default  reduce using rule 108 (exp)
-
-
-State 65
-
-   83 exp: exp . tPLUS exp
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
-  110    | tBWXOR exp .
+   85 exp: exp . tPLUS exp
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
+  110    | tMINUS exp .
 
     $default  reduce using rule 110 (exp)
 
 
+State 65
+
+   85 exp: exp . tPLUS exp
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
+  112    | tBWXOR exp .
+
+    $default  reduce using rule 112 (exp)
+
+
 State 66
 
-   83 exp: exp . tPLUS exp
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
-  107    | tBANG exp .
+   85 exp: exp . tPLUS exp
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
+  109    | tBANG exp .
 
-    $default  reduce using rule 107 (exp)
+    $default  reduce using rule 109 (exp)
 
 
 State 67
 
-   78 primary_exp: tLPAREN exp . tRPAREN
-   83 exp: exp . tPLUS exp
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
+   80 primary_exp: tLPAREN exp . tRPAREN
+   85 exp: exp . tPLUS exp
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
 
     tPLUS        shift, and go to state 72
     tMINUS       shift, and go to state 73
@@ -1267,7 +1274,7 @@ State 68
 
 State 69
 
-   72 func_call: id_exp tLPAREN . exp_listpe tRPAREN
+   74 func_call: id_exp tLPAREN . exp_listpe tRPAREN
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -1295,8 +1302,8 @@ State 69
 
 State 70
 
-   73 index: tLBRACKET . exp tRBRACKET
-   74      | tLBRACKET . exp tRBRACKET index
+   75 index: tLBRACKET . exp tRBRACKET
+   76      | tLBRACKET . exp tRBRACKET index
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -1320,14 +1327,14 @@ State 70
 
 State 71
 
-   77 primary_exp: id_exp index .
+   79 primary_exp: id_exp index .
 
-    $default  reduce using rule 77 (primary_exp)
+    $default  reduce using rule 79 (primary_exp)
 
 
 State 72
 
-   83 exp: exp tPLUS . exp
+   85 exp: exp tPLUS . exp
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -1351,7 +1358,7 @@ State 72
 
 State 73
 
-   84 exp: exp tMINUS . exp
+   86 exp: exp tMINUS . exp
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -1375,7 +1382,7 @@ State 73
 
 State 74
 
-   86 exp: exp tDIV . exp
+   88 exp: exp tDIV . exp
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -1399,7 +1406,7 @@ State 74
 
 State 75
 
-   85 exp: exp tTIMES . exp
+   87 exp: exp tTIMES . exp
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -1423,7 +1430,7 @@ State 75
 
 State 76
 
-   87 exp: exp tREM . exp
+   89 exp: exp tREM . exp
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -1447,7 +1454,7 @@ State 76
 
 State 77
 
-   88 exp: exp tBWAND . exp
+   90 exp: exp tBWAND . exp
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -1471,7 +1478,7 @@ State 77
 
 State 78
 
-   89 exp: exp tBWOR . exp
+   91 exp: exp tBWOR . exp
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -1495,7 +1502,7 @@ State 78
 
 State 79
 
-   90 exp: exp tBWXOR . exp
+   92 exp: exp tBWXOR . exp
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -1519,7 +1526,7 @@ State 79
 
 State 80
 
-   92 exp: exp tRIGHTSHIFT . exp
+   94 exp: exp tRIGHTSHIFT . exp
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -1543,7 +1550,7 @@ State 80
 
 State 81
 
-   91 exp: exp tLEFTSHIFT . exp
+   93 exp: exp tLEFTSHIFT . exp
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -1567,7 +1574,7 @@ State 81
 
 State 82
 
-   93 exp: exp tBWANDNOT . exp
+   95 exp: exp tBWANDNOT . exp
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -1591,7 +1598,7 @@ State 82
 
 State 83
 
-   94 exp: exp tAND . exp
+   96 exp: exp tAND . exp
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -1615,7 +1622,7 @@ State 83
 
 State 84
 
-   95 exp: exp tOR . exp
+   97 exp: exp tOR . exp
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -1639,7 +1646,7 @@ State 84
 
 State 85
 
-   96 exp: exp tEQUAL . exp
+   98 exp: exp tEQUAL . exp
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -1663,7 +1670,7 @@ State 85
 
 State 86
 
-   99 exp: exp tLESS . exp
+  101 exp: exp tLESS . exp
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -1687,7 +1694,7 @@ State 86
 
 State 87
 
-   98 exp: exp tGREATER . exp
+  100 exp: exp tGREATER . exp
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -1711,7 +1718,7 @@ State 87
 
 State 88
 
-   97 exp: exp tNOTEQ . exp
+   99 exp: exp tNOTEQ . exp
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -1735,7 +1742,7 @@ State 88
 
 State 89
 
-  101 exp: exp tLESSEQ . exp
+  103 exp: exp tLESSEQ . exp
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -1759,7 +1766,7 @@ State 89
 
 State 90
 
-  100 exp: exp tGREATEREQ . exp
+  102 exp: exp tGREATEREQ . exp
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -1800,8 +1807,8 @@ State 92
 
 State 93
 
-   70 blockstmt: tLBRACE . stmt_list tRBRACE
-   71          | tLBRACE . tRBRACE
+   72 blockstmt: tLBRACE . stmt_list tRBRACE
+   73          | tLBRACE . tRBRACE
 
     tBREAK       shift, and go to state 123
     tCONTINUE    shift, and go to state 124
@@ -1878,26 +1885,26 @@ State 96
 
 State 97
 
-   81 exp: tLEN tLPAREN exp . tRPAREN
-   83    | exp . tPLUS exp
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
+   83 exp: tLEN tLPAREN exp . tRPAREN
+   85    | exp . tPLUS exp
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
 
     tPLUS        shift, and go to state 72
     tMINUS       shift, and go to state 73
@@ -1923,26 +1930,26 @@ State 97
 
 State 98
 
-   82 exp: tCAP tLPAREN exp . tRPAREN
-   83    | exp . tPLUS exp
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
+   84 exp: tCAP tLPAREN exp . tRPAREN
+   85    | exp . tPLUS exp
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
 
     tPLUS        shift, and go to state 72
     tMINUS       shift, and go to state 73
@@ -1968,33 +1975,33 @@ State 98
 
 State 99
 
-   78 primary_exp: tLPAREN exp tRPAREN .
+   80 primary_exp: tLPAREN exp tRPAREN .
 
-    $default  reduce using rule 78 (primary_exp)
+    $default  reduce using rule 80 (primary_exp)
 
 
 State 100
 
    22 exp_list: exp_list tCOMMA exp .
-   83 exp: exp . tPLUS exp
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
+   85 exp: exp . tPLUS exp
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
 
     tPLUS        shift, and go to state 72
     tMINUS       shift, and go to state 73
@@ -2031,34 +2038,34 @@ State 101
 
 State 102
 
-   72 func_call: id_exp tLPAREN exp_listpe . tRPAREN
+   74 func_call: id_exp tLPAREN exp_listpe . tRPAREN
 
     tRPAREN  shift, and go to state 152
 
 
 State 103
 
-   73 index: tLBRACKET exp . tRBRACKET
-   74      | tLBRACKET exp . tRBRACKET index
-   83 exp: exp . tPLUS exp
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
+   75 index: tLBRACKET exp . tRBRACKET
+   76      | tLBRACKET exp . tRBRACKET index
+   85 exp: exp . tPLUS exp
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
 
     tPLUS        shift, and go to state 72
     tMINUS       shift, and go to state 73
@@ -2084,26 +2091,26 @@ State 103
 
 State 104
 
-   83 exp: exp . tPLUS exp
-   83    | exp tPLUS exp .
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
+   85 exp: exp . tPLUS exp
+   85    | exp tPLUS exp .
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
 
     tDIV         shift, and go to state 74
     tTIMES       shift, and go to state 75
@@ -2120,179 +2127,74 @@ State 104
     tNOTEQ       shift, and go to state 88
     tLESSEQ      shift, and go to state 89
     tGREATEREQ   shift, and go to state 90
-
-    $default  reduce using rule 83 (exp)
-
-
-State 105
-
-   83 exp: exp . tPLUS exp
-   84    | exp . tMINUS exp
-   84    | exp tMINUS exp .
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
-
-    tDIV         shift, and go to state 74
-    tTIMES       shift, and go to state 75
-    tREM         shift, and go to state 76
-    tBWAND       shift, and go to state 77
-    tRIGHTSHIFT  shift, and go to state 80
-    tLEFTSHIFT   shift, and go to state 81
-    tBWANDNOT    shift, and go to state 82
-    tAND         shift, and go to state 83
-    tOR          shift, and go to state 84
-    tEQUAL       shift, and go to state 85
-    tLESS        shift, and go to state 86
-    tGREATER     shift, and go to state 87
-    tNOTEQ       shift, and go to state 88
-    tLESSEQ      shift, and go to state 89
-    tGREATEREQ   shift, and go to state 90
-
-    $default  reduce using rule 84 (exp)
-
-
-State 106
-
-   83 exp: exp . tPLUS exp
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   86    | exp tDIV exp .
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
-
-    tAND        shift, and go to state 83
-    tOR         shift, and go to state 84
-    tEQUAL      shift, and go to state 85
-    tLESS       shift, and go to state 86
-    tGREATER    shift, and go to state 87
-    tNOTEQ      shift, and go to state 88
-    tLESSEQ     shift, and go to state 89
-    tGREATEREQ  shift, and go to state 90
-
-    $default  reduce using rule 86 (exp)
-
-
-State 107
-
-   83 exp: exp . tPLUS exp
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   85    | exp tTIMES exp .
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
-
-    tAND        shift, and go to state 83
-    tOR         shift, and go to state 84
-    tEQUAL      shift, and go to state 85
-    tLESS       shift, and go to state 86
-    tGREATER    shift, and go to state 87
-    tNOTEQ      shift, and go to state 88
-    tLESSEQ     shift, and go to state 89
-    tGREATEREQ  shift, and go to state 90
 
     $default  reduce using rule 85 (exp)
 
 
-State 108
+State 105
 
-   83 exp: exp . tPLUS exp
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   87    | exp tREM exp .
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
+   85 exp: exp . tPLUS exp
+   86    | exp . tMINUS exp
+   86    | exp tMINUS exp .
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
 
-    tAND        shift, and go to state 83
-    tOR         shift, and go to state 84
-    tEQUAL      shift, and go to state 85
-    tLESS       shift, and go to state 86
-    tGREATER    shift, and go to state 87
-    tNOTEQ      shift, and go to state 88
-    tLESSEQ     shift, and go to state 89
-    tGREATEREQ  shift, and go to state 90
+    tDIV         shift, and go to state 74
+    tTIMES       shift, and go to state 75
+    tREM         shift, and go to state 76
+    tBWAND       shift, and go to state 77
+    tRIGHTSHIFT  shift, and go to state 80
+    tLEFTSHIFT   shift, and go to state 81
+    tBWANDNOT    shift, and go to state 82
+    tAND         shift, and go to state 83
+    tOR          shift, and go to state 84
+    tEQUAL       shift, and go to state 85
+    tLESS        shift, and go to state 86
+    tGREATER     shift, and go to state 87
+    tNOTEQ       shift, and go to state 88
+    tLESSEQ      shift, and go to state 89
+    tGREATEREQ   shift, and go to state 90
 
-    $default  reduce using rule 87 (exp)
+    $default  reduce using rule 86 (exp)
 
 
-State 109
+State 106
 
-   83 exp: exp . tPLUS exp
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   88    | exp tBWAND exp .
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
+   85 exp: exp . tPLUS exp
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   88    | exp tDIV exp .
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
 
     tAND        shift, and go to state 83
     tOR         shift, and go to state 84
@@ -2306,70 +2208,133 @@ State 109
     $default  reduce using rule 88 (exp)
 
 
-State 110
+State 107
 
-   83 exp: exp . tPLUS exp
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   89    | exp tBWOR exp .
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
+   85 exp: exp . tPLUS exp
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   87    | exp tTIMES exp .
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
 
-    tDIV         shift, and go to state 74
-    tTIMES       shift, and go to state 75
-    tREM         shift, and go to state 76
-    tBWAND       shift, and go to state 77
-    tRIGHTSHIFT  shift, and go to state 80
-    tLEFTSHIFT   shift, and go to state 81
-    tBWANDNOT    shift, and go to state 82
-    tAND         shift, and go to state 83
-    tOR          shift, and go to state 84
-    tEQUAL       shift, and go to state 85
-    tLESS        shift, and go to state 86
-    tGREATER     shift, and go to state 87
-    tNOTEQ       shift, and go to state 88
-    tLESSEQ      shift, and go to state 89
-    tGREATEREQ   shift, and go to state 90
+    tAND        shift, and go to state 83
+    tOR         shift, and go to state 84
+    tEQUAL      shift, and go to state 85
+    tLESS       shift, and go to state 86
+    tGREATER    shift, and go to state 87
+    tNOTEQ      shift, and go to state 88
+    tLESSEQ     shift, and go to state 89
+    tGREATEREQ  shift, and go to state 90
+
+    $default  reduce using rule 87 (exp)
+
+
+State 108
+
+   85 exp: exp . tPLUS exp
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   89    | exp tREM exp .
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
+
+    tAND        shift, and go to state 83
+    tOR         shift, and go to state 84
+    tEQUAL      shift, and go to state 85
+    tLESS       shift, and go to state 86
+    tGREATER    shift, and go to state 87
+    tNOTEQ      shift, and go to state 88
+    tLESSEQ     shift, and go to state 89
+    tGREATEREQ  shift, and go to state 90
 
     $default  reduce using rule 89 (exp)
 
 
-State 111
+State 109
 
-   83 exp: exp . tPLUS exp
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   90    | exp tBWXOR exp .
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
+   85 exp: exp . tPLUS exp
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   90    | exp tBWAND exp .
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
+
+    tAND        shift, and go to state 83
+    tOR         shift, and go to state 84
+    tEQUAL      shift, and go to state 85
+    tLESS       shift, and go to state 86
+    tGREATER    shift, and go to state 87
+    tNOTEQ      shift, and go to state 88
+    tLESSEQ     shift, and go to state 89
+    tGREATEREQ  shift, and go to state 90
+
+    $default  reduce using rule 90 (exp)
+
+
+State 110
+
+   85 exp: exp . tPLUS exp
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   91    | exp tBWOR exp .
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
 
     tDIV         shift, and go to state 74
     tTIMES       shift, and go to state 75
@@ -2387,66 +2352,73 @@ State 111
     tLESSEQ      shift, and go to state 89
     tGREATEREQ   shift, and go to state 90
 
-    $default  reduce using rule 90 (exp)
+    $default  reduce using rule 91 (exp)
 
 
-State 112
+State 111
 
-   83 exp: exp . tPLUS exp
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   92    | exp tRIGHTSHIFT exp .
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
+   85 exp: exp . tPLUS exp
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   92    | exp tBWXOR exp .
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
 
-    tAND        shift, and go to state 83
-    tOR         shift, and go to state 84
-    tEQUAL      shift, and go to state 85
-    tLESS       shift, and go to state 86
-    tGREATER    shift, and go to state 87
-    tNOTEQ      shift, and go to state 88
-    tLESSEQ     shift, and go to state 89
-    tGREATEREQ  shift, and go to state 90
+    tDIV         shift, and go to state 74
+    tTIMES       shift, and go to state 75
+    tREM         shift, and go to state 76
+    tBWAND       shift, and go to state 77
+    tRIGHTSHIFT  shift, and go to state 80
+    tLEFTSHIFT   shift, and go to state 81
+    tBWANDNOT    shift, and go to state 82
+    tAND         shift, and go to state 83
+    tOR          shift, and go to state 84
+    tEQUAL       shift, and go to state 85
+    tLESS        shift, and go to state 86
+    tGREATER     shift, and go to state 87
+    tNOTEQ       shift, and go to state 88
+    tLESSEQ      shift, and go to state 89
+    tGREATEREQ   shift, and go to state 90
 
     $default  reduce using rule 92 (exp)
 
 
-State 113
+State 112
 
-   83 exp: exp . tPLUS exp
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   91    | exp tLEFTSHIFT exp .
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
+   85 exp: exp . tPLUS exp
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   94    | exp tRIGHTSHIFT exp .
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
 
     tAND        shift, and go to state 83
     tOR         shift, and go to state 84
@@ -2457,31 +2429,31 @@ State 113
     tLESSEQ     shift, and go to state 89
     tGREATEREQ  shift, and go to state 90
 
-    $default  reduce using rule 91 (exp)
+    $default  reduce using rule 94 (exp)
 
 
-State 114
+State 113
 
-   83 exp: exp . tPLUS exp
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   93    | exp tBWANDNOT exp .
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
+   85 exp: exp . tPLUS exp
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   93    | exp tLEFTSHIFT exp .
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
 
     tAND        shift, and go to state 83
     tOR         shift, and go to state 84
@@ -2495,140 +2467,117 @@ State 114
     $default  reduce using rule 93 (exp)
 
 
-State 115
+State 114
 
-   83 exp: exp . tPLUS exp
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   94    | exp tAND exp .
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
+   85 exp: exp . tPLUS exp
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   95    | exp tBWANDNOT exp .
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
 
-    tOR  shift, and go to state 84
-
-    $default  reduce using rule 94 (exp)
-
-
-State 116
-
-   83 exp: exp . tPLUS exp
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   95    | exp tOR exp .
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
+    tAND        shift, and go to state 83
+    tOR         shift, and go to state 84
+    tEQUAL      shift, and go to state 85
+    tLESS       shift, and go to state 86
+    tGREATER    shift, and go to state 87
+    tNOTEQ      shift, and go to state 88
+    tLESSEQ     shift, and go to state 89
+    tGREATEREQ  shift, and go to state 90
 
     $default  reduce using rule 95 (exp)
 
 
-State 117
+State 115
 
-   83 exp: exp . tPLUS exp
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   96    | exp tEQUAL exp .
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
+   85 exp: exp . tPLUS exp
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   96    | exp tAND exp .
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
 
-    tAND  shift, and go to state 83
-    tOR   shift, and go to state 84
+    tOR  shift, and go to state 84
 
     $default  reduce using rule 96 (exp)
 
 
-State 118
+State 116
 
-   83 exp: exp . tPLUS exp
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-   99    | exp tLESS exp .
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
+   85 exp: exp . tPLUS exp
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   97    | exp tOR exp .
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
 
-    tAND  shift, and go to state 83
-    tOR   shift, and go to state 84
-
-    $default  reduce using rule 99 (exp)
+    $default  reduce using rule 97 (exp)
 
 
-State 119
+State 117
 
-   83 exp: exp . tPLUS exp
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   98    | exp tGREATER exp .
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
+   85 exp: exp . tPLUS exp
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   98    | exp tEQUAL exp .
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
 
     tAND  shift, and go to state 83
     tOR   shift, and go to state 84
@@ -2636,57 +2585,28 @@ State 119
     $default  reduce using rule 98 (exp)
 
 
-State 120
+State 118
 
-   83 exp: exp . tPLUS exp
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   97    | exp tNOTEQ exp .
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
-
-    tAND  shift, and go to state 83
-    tOR   shift, and go to state 84
-
-    $default  reduce using rule 97 (exp)
-
-
-State 121
-
-   83 exp: exp . tPLUS exp
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
-  101    | exp tLESSEQ exp .
+   85 exp: exp . tPLUS exp
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  101    | exp tLESS exp .
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
 
     tAND  shift, and go to state 83
     tOR   shift, and go to state 84
@@ -2694,33 +2614,120 @@ State 121
     $default  reduce using rule 101 (exp)
 
 
-State 122
+State 119
 
-   83 exp: exp . tPLUS exp
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  100    | exp tGREATEREQ exp .
-  101    | exp . tLESSEQ exp
+   85 exp: exp . tPLUS exp
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  100    | exp tGREATER exp .
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
 
     tAND  shift, and go to state 83
     tOR   shift, and go to state 84
 
     $default  reduce using rule 100 (exp)
+
+
+State 120
+
+   85 exp: exp . tPLUS exp
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+   99    | exp tNOTEQ exp .
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
+
+    tAND  shift, and go to state 83
+    tOR   shift, and go to state 84
+
+    $default  reduce using rule 99 (exp)
+
+
+State 121
+
+   85 exp: exp . tPLUS exp
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
+  103    | exp tLESSEQ exp .
+
+    tAND  shift, and go to state 83
+    tOR   shift, and go to state 84
+
+    $default  reduce using rule 103 (exp)
+
+
+State 122
+
+   85 exp: exp . tPLUS exp
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  102    | exp tGREATEREQ exp .
+  103    | exp . tLESSEQ exp
+
+    tAND  shift, and go to state 83
+    tOR   shift, and go to state 84
+
+    $default  reduce using rule 102 (exp)
 
 
 State 123
@@ -2739,8 +2746,8 @@ State 124
 
 State 125
 
-   47 loopstmt: tFOR . simplestmt tSEMICOLON expstmt tSEMICOLON simplestmt blockstmt
-   48         | tFOR . expstmt blockstmt
+   49 loopstmt: tFOR . initstmt tSEMICOLON expstmt tSEMICOLON simplestmt blockstmt
+   50         | tFOR . expstmt blockstmt
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -2759,23 +2766,25 @@ State 125
     tLBRACE   reduce using rule 42 (expstmt)
     $default  reduce using rule 40 (emptystmt)
 
+    id_listne    go to state 156
     exp_list     go to state 135
     emptystmt    go to state 137
-    expstmt      go to state 156
-    simplestmt   go to state 157
+    expstmt      go to state 157
+    initstmt     go to state 158
+    simplestmt   go to state 159
     assignstmt   go to state 142
     incdecstmt   go to state 145
     func_call    go to state 50
     primary_exp  go to state 51
-    id_exp       go to state 52
-    exp          go to state 158
+    id_exp       go to state 160
+    exp          go to state 161
 
 
 State 126
 
-   54 ifstmt: tIF . exp blockstmt
-   55       | tIF . exp blockstmt tELSE blockstmt
-   56       | tIF . exp blockstmt tELSE ifstmt
+   56 ifstmt: tIF . exp blockstmt
+   57       | tIF . exp blockstmt tELSE blockstmt
+   58       | tIF . exp blockstmt tELSE ifstmt
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -2794,7 +2803,7 @@ State 126
     func_call    go to state 50
     primary_exp  go to state 51
     id_exp       go to state 52
-    exp          go to state 159
+    exp          go to state 162
 
 
 State 127
@@ -2821,13 +2830,13 @@ State 127
     func_call    go to state 50
     primary_exp  go to state 51
     id_exp       go to state 52
-    exp          go to state 160
+    exp          go to state 163
 
 
 State 128
 
-   57 switchstmt: tSWITCH . tLBRACE case_block tRBRACE
-   58           | tSWITCH . exp tLBRACE case_block tRBRACE
+   59 switchstmt: tSWITCH . tLBRACE case_block tRBRACE
+   60           | tSWITCH . exp tLBRACE case_block tRBRACE
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -2835,7 +2844,7 @@ State 128
     tMINUS       shift, and go to state 40
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
-    tLBRACE      shift, and go to state 161
+    tLBRACE      shift, and go to state 164
     tLPAREN      shift, and go to state 43
     tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
@@ -2847,28 +2856,28 @@ State 128
     func_call    go to state 50
     primary_exp  go to state 51
     id_exp       go to state 52
-    exp          go to state 162
+    exp          go to state 165
 
 
 State 129
 
-   68 printstmt: tPRINT . tLPAREN exp_listpe tRPAREN
+   70 printstmt: tPRINT . tLPAREN exp_listpe tRPAREN
 
-    tLPAREN  shift, and go to state 163
+    tLPAREN  shift, and go to state 166
 
 
 State 130
 
-   69 printstmt: tPRINTLN . tLPAREN exp_listpe tRPAREN
+   71 printstmt: tPRINTLN . tLPAREN exp_listpe tRPAREN
 
-    tLPAREN  shift, and go to state 164
+    tLPAREN  shift, and go to state 167
 
 
 State 131
 
-   71 blockstmt: tLBRACE tRBRACE .
+   73 blockstmt: tLBRACE tRBRACE .
 
-    $default  reduce using rule 71 (blockstmt)
+    $default  reduce using rule 73 (blockstmt)
 
 
 State 132
@@ -2888,7 +2897,7 @@ State 133
 State 134
 
    15 stmt_list: stmt_list . stmt
-   70 blockstmt: tLBRACE stmt_list . tRBRACE
+   72 blockstmt: tLBRACE stmt_list . tRBRACE
 
     tBREAK       shift, and go to state 123
     tCONTINUE    shift, and go to state 124
@@ -2908,7 +2917,7 @@ State 134
     tBANG        shift, and go to state 42
     tLBRACE      shift, and go to state 93
     tLPAREN      shift, and go to state 43
-    tRBRACE      shift, and go to state 165
+    tRBRACE      shift, and go to state 168
     tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
@@ -2921,7 +2930,7 @@ State 134
     var_decl     go to state 132
     type_decl    go to state 133
     exp_list     go to state 135
-    stmt         go to state 166
+    stmt         go to state 169
     emptystmt    go to state 137
     stmt_decl    go to state 138
     returnstmt   go to state 139
@@ -2942,9 +2951,9 @@ State 134
 State 135
 
    22 exp_list: exp_list . tCOMMA exp
-   53 assignstmt: exp_list . tASSIGN exp_list
+   55 assignstmt: exp_list . tASSIGN exp_list
 
-    tASSIGN  shift, and go to state 167
+    tASSIGN  shift, and go to state 170
     tCOMMA   shift, and go to state 68
 
 
@@ -2957,106 +2966,106 @@ State 136
 
 State 137
 
-   49 simplestmt: emptystmt .
+   51 simplestmt: emptystmt .
 
-    $default  reduce using rule 49 (simplestmt)
+    $default  reduce using rule 51 (simplestmt)
 
 
 State 138
 
    31 stmt: stmt_decl . tSEMICOLON
 
-    tSEMICOLON  shift, and go to state 168
+    tSEMICOLON  shift, and go to state 171
 
 
 State 139
 
    36 stmt: returnstmt . tSEMICOLON
 
-    tSEMICOLON  shift, and go to state 169
+    tSEMICOLON  shift, and go to state 172
 
 
 State 140
 
    32 stmt: loopstmt . tSEMICOLON
 
-    tSEMICOLON  shift, and go to state 170
+    tSEMICOLON  shift, and go to state 173
 
 
 State 141
 
    39 stmt: simplestmt . tSEMICOLON
 
-    tSEMICOLON  shift, and go to state 171
+    tSEMICOLON  shift, and go to state 174
 
 
 State 142
 
-   52 simplestmt: assignstmt .
+   54 simplestmt: assignstmt .
 
-    $default  reduce using rule 52 (simplestmt)
+    $default  reduce using rule 54 (simplestmt)
 
 
 State 143
 
    33 stmt: ifstmt . tSEMICOLON
 
-    tSEMICOLON  shift, and go to state 172
+    tSEMICOLON  shift, and go to state 175
 
 
 State 144
 
    34 stmt: switchstmt . tSEMICOLON
 
-    tSEMICOLON  shift, and go to state 173
+    tSEMICOLON  shift, and go to state 176
 
 
 State 145
 
-   51 simplestmt: incdecstmt .
+   53 simplestmt: incdecstmt .
 
-    $default  reduce using rule 51 (simplestmt)
+    $default  reduce using rule 53 (simplestmt)
 
 
 State 146
 
    35 stmt: printstmt . tSEMICOLON
 
-    tSEMICOLON  shift, and go to state 174
+    tSEMICOLON  shift, and go to state 177
 
 
 State 147
 
    30 stmt: blockstmt . tSEMICOLON
 
-    tSEMICOLON  shift, and go to state 175
+    tSEMICOLON  shift, and go to state 178
 
 
 State 148
 
    21 exp_list: exp .
-   50 simplestmt: exp .
-   66 incdecstmt: exp . tINC
-   67           | exp . tDEC
-   83 exp: exp . tPLUS exp
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
+   52 simplestmt: exp .
+   68 incdecstmt: exp . tINC
+   69           | exp . tDEC
+   85 exp: exp . tPLUS exp
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
 
     tPLUS        shift, and go to state 72
     tMINUS       shift, and go to state 73
@@ -3071,8 +3080,8 @@ State 148
     tBWANDNOT    shift, and go to state 82
     tAND         shift, and go to state 83
     tOR          shift, and go to state 84
-    tINC         shift, and go to state 176
-    tDEC         shift, and go to state 177
+    tINC         shift, and go to state 179
+    tDEC         shift, and go to state 180
     tEQUAL       shift, and go to state 85
     tLESS        shift, and go to state 86
     tGREATER     shift, and go to state 87
@@ -3080,8 +3089,8 @@ State 148
     tLESSEQ      shift, and go to state 89
     tGREATEREQ   shift, and go to state 90
 
-    tLBRACE     reduce using rule 50 (simplestmt)
-    tSEMICOLON  reduce using rule 50 (simplestmt)
+    tLBRACE     reduce using rule 52 (simplestmt)
+    tSEMICOLON  reduce using rule 52 (simplestmt)
     $default    reduce using rule 21 (exp_list)
 
 
@@ -3094,35 +3103,35 @@ State 149
 
 State 150
 
-   81 exp: tLEN tLPAREN exp tRPAREN .
+   83 exp: tLEN tLPAREN exp tRPAREN .
 
-    $default  reduce using rule 81 (exp)
+    $default  reduce using rule 83 (exp)
 
 
 State 151
 
-   82 exp: tCAP tLPAREN exp tRPAREN .
+   84 exp: tCAP tLPAREN exp tRPAREN .
 
-    $default  reduce using rule 82 (exp)
+    $default  reduce using rule 84 (exp)
 
 
 State 152
 
-   72 func_call: id_exp tLPAREN exp_listpe tRPAREN .
+   74 func_call: id_exp tLPAREN exp_listpe tRPAREN .
 
-    $default  reduce using rule 72 (func_call)
+    $default  reduce using rule 74 (func_call)
 
 
 State 153
 
-   73 index: tLBRACKET exp tRBRACKET .
-   74      | tLBRACKET exp tRBRACKET . index
+   75 index: tLBRACKET exp tRBRACKET .
+   76      | tLBRACKET exp tRBRACKET . index
 
     tLBRACKET  shift, and go to state 70
 
-    $default  reduce using rule 73 (index)
+    $default  reduce using rule 75 (index)
 
-    index  go to state 178
+    index  go to state 181
 
 
 State 154
@@ -3141,46 +3150,80 @@ State 155
 
 State 156
 
-   48 loopstmt: tFOR expstmt . blockstmt
+   20 id_listne: id_listne . tCOMMA id_exp
+   47 initstmt: id_listne . tSHORTDECLARE exp_list
 
-    tLBRACE  shift, and go to state 93
-
-    blockstmt  go to state 179
+    tSHORTDECLARE  shift, and go to state 182
+    tCOMMA         shift, and go to state 29
 
 
 State 157
 
-   47 loopstmt: tFOR simplestmt . tSEMICOLON expstmt tSEMICOLON simplestmt blockstmt
+   50 loopstmt: tFOR expstmt . blockstmt
 
-    tSEMICOLON  shift, and go to state 180
+    tLBRACE  shift, and go to state 93
+
+    blockstmt  go to state 183
 
 
 State 158
 
+   49 loopstmt: tFOR initstmt . tSEMICOLON expstmt tSEMICOLON simplestmt blockstmt
+
+    tSEMICOLON  shift, and go to state 184
+
+
+State 159
+
+   48 initstmt: simplestmt .
+
+    $default  reduce using rule 48 (initstmt)
+
+
+State 160
+
+   19 id_listne: id_exp .
+   74 func_call: id_exp . tLPAREN exp_listpe tRPAREN
+   77 primary_exp: id_exp .
+   79            | id_exp . index
+
+    tLPAREN    shift, and go to state 69
+    tLBRACKET  shift, and go to state 70
+
+    tSHORTDECLARE  reduce using rule 19 (id_listne)
+    tCOMMA         reduce using rule 19 (id_listne)
+    tCOMMA         [reduce using rule 77 (primary_exp)]
+    $default       reduce using rule 77 (primary_exp)
+
+    index  go to state 71
+
+
+State 161
+
    21 exp_list: exp .
    41 expstmt: exp .
-   50 simplestmt: exp .
-   66 incdecstmt: exp . tINC
-   67           | exp . tDEC
-   83 exp: exp . tPLUS exp
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
+   52 simplestmt: exp .
+   68 incdecstmt: exp . tINC
+   69           | exp . tDEC
+   85 exp: exp . tPLUS exp
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
 
     tPLUS        shift, and go to state 72
     tMINUS       shift, and go to state 73
@@ -3195,8 +3238,8 @@ State 158
     tBWANDNOT    shift, and go to state 82
     tAND         shift, and go to state 83
     tOR          shift, and go to state 84
-    tINC         shift, and go to state 176
-    tDEC         shift, and go to state 177
+    tINC         shift, and go to state 179
+    tDEC         shift, and go to state 180
     tEQUAL       shift, and go to state 85
     tLESS        shift, and go to state 86
     tGREATER     shift, and go to state 87
@@ -3205,34 +3248,34 @@ State 158
     tGREATEREQ   shift, and go to state 90
 
     tLBRACE     reduce using rule 41 (expstmt)
-    tSEMICOLON  reduce using rule 50 (simplestmt)
+    tSEMICOLON  reduce using rule 52 (simplestmt)
     $default    reduce using rule 21 (exp_list)
 
 
-State 159
+State 162
 
-   54 ifstmt: tIF exp . blockstmt
-   55       | tIF exp . blockstmt tELSE blockstmt
-   56       | tIF exp . blockstmt tELSE ifstmt
-   83 exp: exp . tPLUS exp
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
+   56 ifstmt: tIF exp . blockstmt
+   57       | tIF exp . blockstmt tELSE blockstmt
+   58       | tIF exp . blockstmt tELSE ifstmt
+   85 exp: exp . tPLUS exp
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
 
     tPLUS        shift, and go to state 72
     tMINUS       shift, and go to state 73
@@ -3255,31 +3298,31 @@ State 159
     tGREATEREQ   shift, and go to state 90
     tLBRACE      shift, and go to state 93
 
-    blockstmt  go to state 181
+    blockstmt  go to state 185
 
 
-State 160
+State 163
 
    46 returnstmt: tRETURN exp .
-   83 exp: exp . tPLUS exp
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
+   85 exp: exp . tPLUS exp
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
 
     tPLUS        shift, and go to state 72
     tMINUS       shift, and go to state 73
@@ -3304,42 +3347,42 @@ State 160
     $default  reduce using rule 46 (returnstmt)
 
 
-State 161
+State 164
 
-   57 switchstmt: tSWITCH tLBRACE . case_block tRBRACE
+   59 switchstmt: tSWITCH tLBRACE . case_block tRBRACE
 
-    tCASE     shift, and go to state 182
-    tDEFAULT  shift, and go to state 183
+    tCASE     shift, and go to state 186
+    tDEFAULT  shift, and go to state 187
 
-    $default  reduce using rule 61 (case_block)
+    $default  reduce using rule 63 (case_block)
 
-    case_block      go to state 184
-    case_clause     go to state 185
-    default_clause  go to state 186
+    case_block      go to state 188
+    case_clause     go to state 189
+    default_clause  go to state 190
 
 
-State 162
+State 165
 
-   58 switchstmt: tSWITCH exp . tLBRACE case_block tRBRACE
-   83 exp: exp . tPLUS exp
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
+   60 switchstmt: tSWITCH exp . tLBRACE case_block tRBRACE
+   85 exp: exp . tPLUS exp
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
 
     tPLUS        shift, and go to state 72
     tMINUS       shift, and go to state 73
@@ -3360,82 +3403,12 @@ State 162
     tNOTEQ       shift, and go to state 88
     tLESSEQ      shift, and go to state 89
     tGREATEREQ   shift, and go to state 90
-    tLBRACE      shift, and go to state 187
-
-
-State 163
-
-   68 printstmt: tPRINT tLPAREN . exp_listpe tRPAREN
-
-    tLEN         shift, and go to state 37
-    tCAP         shift, and go to state 38
-    tPLUS        shift, and go to state 39
-    tMINUS       shift, and go to state 40
-    tBWXOR       shift, and go to state 41
-    tBANG        shift, and go to state 42
-    tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
-    tINTVAL      shift, and go to state 44
-    tFLOATVAL    shift, and go to state 45
-    tBOOLVAL     shift, and go to state 46
-    tRUNEVAL     shift, and go to state 47
-    tSTRINGVAL   shift, and go to state 48
-
-    $default  reduce using rule 24 (exp_listpe)
-
-    exp_list     go to state 101
-    exp_listpe   go to state 188
-    func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
-    exp          go to state 53
-
-
-State 164
-
-   69 printstmt: tPRINTLN tLPAREN . exp_listpe tRPAREN
-
-    tLEN         shift, and go to state 37
-    tCAP         shift, and go to state 38
-    tPLUS        shift, and go to state 39
-    tMINUS       shift, and go to state 40
-    tBWXOR       shift, and go to state 41
-    tBANG        shift, and go to state 42
-    tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
-    tINTVAL      shift, and go to state 44
-    tFLOATVAL    shift, and go to state 45
-    tBOOLVAL     shift, and go to state 46
-    tRUNEVAL     shift, and go to state 47
-    tSTRINGVAL   shift, and go to state 48
-
-    $default  reduce using rule 24 (exp_listpe)
-
-    exp_list     go to state 101
-    exp_listpe   go to state 189
-    func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
-    exp          go to state 53
-
-
-State 165
-
-   70 blockstmt: tLBRACE stmt_list tRBRACE .
-
-    $default  reduce using rule 70 (blockstmt)
+    tLBRACE      shift, and go to state 191
 
 
 State 166
 
-   15 stmt_list: stmt_list stmt .
-
-    $default  reduce using rule 15 (stmt_list)
-
-
-State 167
-
-   53 assignstmt: exp_list tASSIGN . exp_list
+   70 printstmt: tPRINT tLPAREN . exp_listpe tRPAREN
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -3451,7 +3424,38 @@ State 167
     tRUNEVAL     shift, and go to state 47
     tSTRINGVAL   shift, and go to state 48
 
-    exp_list     go to state 190
+    $default  reduce using rule 24 (exp_listpe)
+
+    exp_list     go to state 101
+    exp_listpe   go to state 192
+    func_call    go to state 50
+    primary_exp  go to state 51
+    id_exp       go to state 52
+    exp          go to state 53
+
+
+State 167
+
+   71 printstmt: tPRINTLN tLPAREN . exp_listpe tRPAREN
+
+    tLEN         shift, and go to state 37
+    tCAP         shift, and go to state 38
+    tPLUS        shift, and go to state 39
+    tMINUS       shift, and go to state 40
+    tBWXOR       shift, and go to state 41
+    tBANG        shift, and go to state 42
+    tLPAREN      shift, and go to state 43
+    tIDENTIFIER  shift, and go to state 3
+    tINTVAL      shift, and go to state 44
+    tFLOATVAL    shift, and go to state 45
+    tBOOLVAL     shift, and go to state 46
+    tRUNEVAL     shift, and go to state 47
+    tSTRINGVAL   shift, and go to state 48
+
+    $default  reduce using rule 24 (exp_listpe)
+
+    exp_list     go to state 101
+    exp_listpe   go to state 193
     func_call    go to state 50
     primary_exp  go to state 51
     id_exp       go to state 52
@@ -3460,129 +3464,21 @@ State 167
 
 State 168
 
-   31 stmt: stmt_decl tSEMICOLON .
+   72 blockstmt: tLBRACE stmt_list tRBRACE .
 
-    $default  reduce using rule 31 (stmt)
+    $default  reduce using rule 72 (blockstmt)
 
 
 State 169
 
-   36 stmt: returnstmt tSEMICOLON .
+   15 stmt_list: stmt_list stmt .
 
-    $default  reduce using rule 36 (stmt)
+    $default  reduce using rule 15 (stmt_list)
 
 
 State 170
 
-   32 stmt: loopstmt tSEMICOLON .
-
-    $default  reduce using rule 32 (stmt)
-
-
-State 171
-
-   39 stmt: simplestmt tSEMICOLON .
-
-    $default  reduce using rule 39 (stmt)
-
-
-State 172
-
-   33 stmt: ifstmt tSEMICOLON .
-
-    $default  reduce using rule 33 (stmt)
-
-
-State 173
-
-   34 stmt: switchstmt tSEMICOLON .
-
-    $default  reduce using rule 34 (stmt)
-
-
-State 174
-
-   35 stmt: printstmt tSEMICOLON .
-
-    $default  reduce using rule 35 (stmt)
-
-
-State 175
-
-   30 stmt: blockstmt tSEMICOLON .
-
-    $default  reduce using rule 30 (stmt)
-
-
-State 176
-
-   66 incdecstmt: exp tINC .
-
-    $default  reduce using rule 66 (incdecstmt)
-
-
-State 177
-
-   67 incdecstmt: exp tDEC .
-
-    $default  reduce using rule 67 (incdecstmt)
-
-
-State 178
-
-   74 index: tLBRACKET exp tRBRACKET index .
-
-    $default  reduce using rule 74 (index)
-
-
-State 179
-
-   48 loopstmt: tFOR expstmt blockstmt .
-
-    $default  reduce using rule 48 (loopstmt)
-
-
-State 180
-
-   47 loopstmt: tFOR simplestmt tSEMICOLON . expstmt tSEMICOLON simplestmt blockstmt
-
-    tLEN         shift, and go to state 37
-    tCAP         shift, and go to state 38
-    tPLUS        shift, and go to state 39
-    tMINUS       shift, and go to state 40
-    tBWXOR       shift, and go to state 41
-    tBANG        shift, and go to state 42
-    tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
-    tINTVAL      shift, and go to state 44
-    tFLOATVAL    shift, and go to state 45
-    tBOOLVAL     shift, and go to state 46
-    tRUNEVAL     shift, and go to state 47
-    tSTRINGVAL   shift, and go to state 48
-
-    $default  reduce using rule 42 (expstmt)
-
-    expstmt      go to state 191
-    func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
-    exp          go to state 192
-
-
-State 181
-
-   54 ifstmt: tIF exp blockstmt .
-   55       | tIF exp blockstmt . tELSE blockstmt
-   56       | tIF exp blockstmt . tELSE ifstmt
-
-    tELSE  shift, and go to state 193
-
-    $default  reduce using rule 54 (ifstmt)
-
-
-State 182
-
-   64 case_clause: tCASE . exp_list tCOLON switch_stmts
+   55 assignstmt: exp_list tASSIGN . exp_list
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -3605,108 +3501,290 @@ State 182
     exp          go to state 53
 
 
+State 171
+
+   31 stmt: stmt_decl tSEMICOLON .
+
+    $default  reduce using rule 31 (stmt)
+
+
+State 172
+
+   36 stmt: returnstmt tSEMICOLON .
+
+    $default  reduce using rule 36 (stmt)
+
+
+State 173
+
+   32 stmt: loopstmt tSEMICOLON .
+
+    $default  reduce using rule 32 (stmt)
+
+
+State 174
+
+   39 stmt: simplestmt tSEMICOLON .
+
+    $default  reduce using rule 39 (stmt)
+
+
+State 175
+
+   33 stmt: ifstmt tSEMICOLON .
+
+    $default  reduce using rule 33 (stmt)
+
+
+State 176
+
+   34 stmt: switchstmt tSEMICOLON .
+
+    $default  reduce using rule 34 (stmt)
+
+
+State 177
+
+   35 stmt: printstmt tSEMICOLON .
+
+    $default  reduce using rule 35 (stmt)
+
+
+State 178
+
+   30 stmt: blockstmt tSEMICOLON .
+
+    $default  reduce using rule 30 (stmt)
+
+
+State 179
+
+   68 incdecstmt: exp tINC .
+
+    $default  reduce using rule 68 (incdecstmt)
+
+
+State 180
+
+   69 incdecstmt: exp tDEC .
+
+    $default  reduce using rule 69 (incdecstmt)
+
+
+State 181
+
+   76 index: tLBRACKET exp tRBRACKET index .
+
+    $default  reduce using rule 76 (index)
+
+
+State 182
+
+   47 initstmt: id_listne tSHORTDECLARE . exp_list
+
+    tLEN         shift, and go to state 37
+    tCAP         shift, and go to state 38
+    tPLUS        shift, and go to state 39
+    tMINUS       shift, and go to state 40
+    tBWXOR       shift, and go to state 41
+    tBANG        shift, and go to state 42
+    tLPAREN      shift, and go to state 43
+    tIDENTIFIER  shift, and go to state 3
+    tINTVAL      shift, and go to state 44
+    tFLOATVAL    shift, and go to state 45
+    tBOOLVAL     shift, and go to state 46
+    tRUNEVAL     shift, and go to state 47
+    tSTRINGVAL   shift, and go to state 48
+
+    exp_list     go to state 195
+    func_call    go to state 50
+    primary_exp  go to state 51
+    id_exp       go to state 52
+    exp          go to state 53
+
+
 State 183
 
-   65 default_clause: tDEFAULT . tCOLON switch_stmts
+   50 loopstmt: tFOR expstmt blockstmt .
 
-    tCOLON  shift, and go to state 195
+    $default  reduce using rule 50 (loopstmt)
 
 
 State 184
 
-   57 switchstmt: tSWITCH tLBRACE case_block . tRBRACE
+   49 loopstmt: tFOR initstmt tSEMICOLON . expstmt tSEMICOLON simplestmt blockstmt
 
-    tRBRACE  shift, and go to state 196
+    tLEN         shift, and go to state 37
+    tCAP         shift, and go to state 38
+    tPLUS        shift, and go to state 39
+    tMINUS       shift, and go to state 40
+    tBWXOR       shift, and go to state 41
+    tBANG        shift, and go to state 42
+    tLPAREN      shift, and go to state 43
+    tIDENTIFIER  shift, and go to state 3
+    tINTVAL      shift, and go to state 44
+    tFLOATVAL    shift, and go to state 45
+    tBOOLVAL     shift, and go to state 46
+    tRUNEVAL     shift, and go to state 47
+    tSTRINGVAL   shift, and go to state 48
+
+    $default  reduce using rule 42 (expstmt)
+
+    expstmt      go to state 196
+    func_call    go to state 50
+    primary_exp  go to state 51
+    id_exp       go to state 52
+    exp          go to state 197
 
 
 State 185
 
-   60 case_block: case_clause . case_block
+   56 ifstmt: tIF exp blockstmt .
+   57       | tIF exp blockstmt . tELSE blockstmt
+   58       | tIF exp blockstmt . tELSE ifstmt
 
-    tCASE     shift, and go to state 182
-    tDEFAULT  shift, and go to state 183
+    tELSE  shift, and go to state 198
 
-    $default  reduce using rule 61 (case_block)
-
-    case_block      go to state 197
-    case_clause     go to state 185
-    default_clause  go to state 186
+    $default  reduce using rule 56 (ifstmt)
 
 
 State 186
 
-   59 case_block: default_clause .
+   66 case_clause: tCASE . exp_list tCOLON switch_stmts
 
-    $default  reduce using rule 59 (case_block)
+    tLEN         shift, and go to state 37
+    tCAP         shift, and go to state 38
+    tPLUS        shift, and go to state 39
+    tMINUS       shift, and go to state 40
+    tBWXOR       shift, and go to state 41
+    tBANG        shift, and go to state 42
+    tLPAREN      shift, and go to state 43
+    tIDENTIFIER  shift, and go to state 3
+    tINTVAL      shift, and go to state 44
+    tFLOATVAL    shift, and go to state 45
+    tBOOLVAL     shift, and go to state 46
+    tRUNEVAL     shift, and go to state 47
+    tSTRINGVAL   shift, and go to state 48
+
+    exp_list     go to state 199
+    func_call    go to state 50
+    primary_exp  go to state 51
+    id_exp       go to state 52
+    exp          go to state 53
 
 
 State 187
 
-   58 switchstmt: tSWITCH exp tLBRACE . case_block tRBRACE
+   67 default_clause: tDEFAULT . tCOLON switch_stmts
 
-    tCASE     shift, and go to state 182
-    tDEFAULT  shift, and go to state 183
-
-    $default  reduce using rule 61 (case_block)
-
-    case_block      go to state 198
-    case_clause     go to state 185
-    default_clause  go to state 186
+    tCOLON  shift, and go to state 200
 
 
 State 188
 
-   68 printstmt: tPRINT tLPAREN exp_listpe . tRPAREN
+   59 switchstmt: tSWITCH tLBRACE case_block . tRBRACE
 
-    tRPAREN  shift, and go to state 199
+    tRBRACE  shift, and go to state 201
 
 
 State 189
 
-   69 printstmt: tPRINTLN tLPAREN exp_listpe . tRPAREN
+   62 case_block: case_clause . case_block
 
-    tRPAREN  shift, and go to state 200
+    tCASE     shift, and go to state 186
+    tDEFAULT  shift, and go to state 187
+
+    $default  reduce using rule 63 (case_block)
+
+    case_block      go to state 202
+    case_clause     go to state 189
+    default_clause  go to state 190
 
 
 State 190
 
-   22 exp_list: exp_list . tCOMMA exp
-   53 assignstmt: exp_list tASSIGN exp_list .
+   61 case_block: default_clause .
 
-    tCOMMA  shift, and go to state 68
-
-    $default  reduce using rule 53 (assignstmt)
+    $default  reduce using rule 61 (case_block)
 
 
 State 191
 
-   47 loopstmt: tFOR simplestmt tSEMICOLON expstmt . tSEMICOLON simplestmt blockstmt
+   60 switchstmt: tSWITCH exp tLBRACE . case_block tRBRACE
 
-    tSEMICOLON  shift, and go to state 201
+    tCASE     shift, and go to state 186
+    tDEFAULT  shift, and go to state 187
+
+    $default  reduce using rule 63 (case_block)
+
+    case_block      go to state 203
+    case_clause     go to state 189
+    default_clause  go to state 190
 
 
 State 192
 
+   70 printstmt: tPRINT tLPAREN exp_listpe . tRPAREN
+
+    tRPAREN  shift, and go to state 204
+
+
+State 193
+
+   71 printstmt: tPRINTLN tLPAREN exp_listpe . tRPAREN
+
+    tRPAREN  shift, and go to state 205
+
+
+State 194
+
+   22 exp_list: exp_list . tCOMMA exp
+   55 assignstmt: exp_list tASSIGN exp_list .
+
+    tCOMMA  shift, and go to state 68
+
+    $default  reduce using rule 55 (assignstmt)
+
+
+State 195
+
+   22 exp_list: exp_list . tCOMMA exp
+   47 initstmt: id_listne tSHORTDECLARE exp_list .
+
+    tCOMMA  shift, and go to state 68
+
+    $default  reduce using rule 47 (initstmt)
+
+
+State 196
+
+   49 loopstmt: tFOR initstmt tSEMICOLON expstmt . tSEMICOLON simplestmt blockstmt
+
+    tSEMICOLON  shift, and go to state 206
+
+
+State 197
+
    41 expstmt: exp .
-   83 exp: exp . tPLUS exp
-   84    | exp . tMINUS exp
-   85    | exp . tTIMES exp
-   86    | exp . tDIV exp
-   87    | exp . tREM exp
-   88    | exp . tBWAND exp
-   89    | exp . tBWOR exp
-   90    | exp . tBWXOR exp
-   91    | exp . tLEFTSHIFT exp
-   92    | exp . tRIGHTSHIFT exp
-   93    | exp . tBWANDNOT exp
-   94    | exp . tAND exp
-   95    | exp . tOR exp
-   96    | exp . tEQUAL exp
-   97    | exp . tNOTEQ exp
-   98    | exp . tGREATER exp
-   99    | exp . tLESS exp
-  100    | exp . tGREATEREQ exp
-  101    | exp . tLESSEQ exp
+   85 exp: exp . tPLUS exp
+   86    | exp . tMINUS exp
+   87    | exp . tTIMES exp
+   88    | exp . tDIV exp
+   89    | exp . tREM exp
+   90    | exp . tBWAND exp
+   91    | exp . tBWOR exp
+   92    | exp . tBWXOR exp
+   93    | exp . tLEFTSHIFT exp
+   94    | exp . tRIGHTSHIFT exp
+   95    | exp . tBWANDNOT exp
+   96    | exp . tAND exp
+   97    | exp . tOR exp
+   98    | exp . tEQUAL exp
+   99    | exp . tNOTEQ exp
+  100    | exp . tGREATER exp
+  101    | exp . tLESS exp
+  102    | exp . tGREATEREQ exp
+  103    | exp . tLESSEQ exp
 
     tPLUS        shift, and go to state 72
     tMINUS       shift, and go to state 73
@@ -3731,30 +3809,30 @@ State 192
     $default  reduce using rule 41 (expstmt)
 
 
-State 193
+State 198
 
-   55 ifstmt: tIF exp blockstmt tELSE . blockstmt
-   56       | tIF exp blockstmt tELSE . ifstmt
+   57 ifstmt: tIF exp blockstmt tELSE . blockstmt
+   58       | tIF exp blockstmt tELSE . ifstmt
 
     tIF      shift, and go to state 126
     tLBRACE  shift, and go to state 93
 
-    ifstmt     go to state 202
-    blockstmt  go to state 203
+    ifstmt     go to state 207
+    blockstmt  go to state 208
 
 
-State 194
+State 199
 
    22 exp_list: exp_list . tCOMMA exp
-   64 case_clause: tCASE exp_list . tCOLON switch_stmts
+   66 case_clause: tCASE exp_list . tCOLON switch_stmts
 
     tCOMMA  shift, and go to state 68
-    tCOLON  shift, and go to state 204
+    tCOLON  shift, and go to state 209
 
 
-State 195
+State 200
 
-   65 default_clause: tDEFAULT tCOLON . switch_stmts
+   67 default_clause: tDEFAULT tCOLON . switch_stmts
 
     tBREAK       shift, and go to state 123
     tCONTINUE    shift, and go to state 124
@@ -3781,12 +3859,12 @@ State 195
     tRUNEVAL     shift, and go to state 47
     tSTRINGVAL   shift, and go to state 48
 
-    tRBRACE   reduce using rule 63 (switch_stmts)
+    tRBRACE   reduce using rule 65 (switch_stmts)
     $default  reduce using rule 40 (emptystmt)
 
     var_decl      go to state 132
     type_decl     go to state 133
-    stmt_list     go to state 205
+    stmt_list     go to state 210
     exp_list      go to state 135
     stmt          go to state 136
     emptystmt     go to state 137
@@ -3797,7 +3875,7 @@ State 195
     assignstmt    go to state 142
     ifstmt        go to state 143
     switchstmt    go to state 144
-    switch_stmts  go to state 206
+    switch_stmts  go to state 211
     incdecstmt    go to state 145
     printstmt     go to state 146
     blockstmt     go to state 147
@@ -3807,44 +3885,44 @@ State 195
     exp           go to state 148
 
 
-State 196
-
-   57 switchstmt: tSWITCH tLBRACE case_block tRBRACE .
-
-    $default  reduce using rule 57 (switchstmt)
-
-
-State 197
-
-   60 case_block: case_clause case_block .
-
-    $default  reduce using rule 60 (case_block)
-
-
-State 198
-
-   58 switchstmt: tSWITCH exp tLBRACE case_block . tRBRACE
-
-    tRBRACE  shift, and go to state 207
-
-
-State 199
-
-   68 printstmt: tPRINT tLPAREN exp_listpe tRPAREN .
-
-    $default  reduce using rule 68 (printstmt)
-
-
-State 200
-
-   69 printstmt: tPRINTLN tLPAREN exp_listpe tRPAREN .
-
-    $default  reduce using rule 69 (printstmt)
-
-
 State 201
 
-   47 loopstmt: tFOR simplestmt tSEMICOLON expstmt tSEMICOLON . simplestmt blockstmt
+   59 switchstmt: tSWITCH tLBRACE case_block tRBRACE .
+
+    $default  reduce using rule 59 (switchstmt)
+
+
+State 202
+
+   62 case_block: case_clause case_block .
+
+    $default  reduce using rule 62 (case_block)
+
+
+State 203
+
+   60 switchstmt: tSWITCH exp tLBRACE case_block . tRBRACE
+
+    tRBRACE  shift, and go to state 212
+
+
+State 204
+
+   70 printstmt: tPRINT tLPAREN exp_listpe tRPAREN .
+
+    $default  reduce using rule 70 (printstmt)
+
+
+State 205
+
+   71 printstmt: tPRINTLN tLPAREN exp_listpe tRPAREN .
+
+    $default  reduce using rule 71 (printstmt)
+
+
+State 206
+
+   49 loopstmt: tFOR initstmt tSEMICOLON expstmt tSEMICOLON . simplestmt blockstmt
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -3864,7 +3942,7 @@ State 201
 
     exp_list     go to state 135
     emptystmt    go to state 137
-    simplestmt   go to state 208
+    simplestmt   go to state 213
     assignstmt   go to state 142
     incdecstmt   go to state 145
     func_call    go to state 50
@@ -3873,23 +3951,23 @@ State 201
     exp          go to state 148
 
 
-State 202
+State 207
 
-   56 ifstmt: tIF exp blockstmt tELSE ifstmt .
+   58 ifstmt: tIF exp blockstmt tELSE ifstmt .
 
-    $default  reduce using rule 56 (ifstmt)
-
-
-State 203
-
-   55 ifstmt: tIF exp blockstmt tELSE blockstmt .
-
-    $default  reduce using rule 55 (ifstmt)
+    $default  reduce using rule 58 (ifstmt)
 
 
-State 204
+State 208
 
-   64 case_clause: tCASE exp_list tCOLON . switch_stmts
+   57 ifstmt: tIF exp blockstmt tELSE blockstmt .
+
+    $default  reduce using rule 57 (ifstmt)
+
+
+State 209
+
+   66 case_clause: tCASE exp_list tCOLON . switch_stmts
 
     tBREAK       shift, and go to state 123
     tCONTINUE    shift, and go to state 124
@@ -3917,11 +3995,11 @@ State 204
     tSTRINGVAL   shift, and go to state 48
 
     tSEMICOLON  reduce using rule 40 (emptystmt)
-    $default    reduce using rule 63 (switch_stmts)
+    $default    reduce using rule 65 (switch_stmts)
 
     var_decl      go to state 132
     type_decl     go to state 133
-    stmt_list     go to state 205
+    stmt_list     go to state 210
     exp_list      go to state 135
     stmt          go to state 136
     emptystmt     go to state 137
@@ -3932,7 +4010,7 @@ State 204
     assignstmt    go to state 142
     ifstmt        go to state 143
     switchstmt    go to state 144
-    switch_stmts  go to state 209
+    switch_stmts  go to state 214
     incdecstmt    go to state 145
     printstmt     go to state 146
     blockstmt     go to state 147
@@ -3942,10 +4020,10 @@ State 204
     exp           go to state 148
 
 
-State 205
+State 210
 
    15 stmt_list: stmt_list . stmt
-   62 switch_stmts: stmt_list .
+   64 switch_stmts: stmt_list .
 
     tBREAK       shift, and go to state 123
     tCONTINUE    shift, and go to state 124
@@ -3973,12 +4051,12 @@ State 205
     tSTRINGVAL   shift, and go to state 48
 
     tSEMICOLON  reduce using rule 40 (emptystmt)
-    $default    reduce using rule 62 (switch_stmts)
+    $default    reduce using rule 64 (switch_stmts)
 
     var_decl     go to state 132
     type_decl    go to state 133
     exp_list     go to state 135
-    stmt         go to state 166
+    stmt         go to state 169
     emptystmt    go to state 137
     stmt_decl    go to state 138
     returnstmt   go to state 139
@@ -3996,38 +4074,38 @@ State 205
     exp          go to state 148
 
 
-State 206
+State 211
 
-   65 default_clause: tDEFAULT tCOLON switch_stmts .
+   67 default_clause: tDEFAULT tCOLON switch_stmts .
 
-    $default  reduce using rule 65 (default_clause)
-
-
-State 207
-
-   58 switchstmt: tSWITCH exp tLBRACE case_block tRBRACE .
-
-    $default  reduce using rule 58 (switchstmt)
+    $default  reduce using rule 67 (default_clause)
 
 
-State 208
+State 212
 
-   47 loopstmt: tFOR simplestmt tSEMICOLON expstmt tSEMICOLON simplestmt . blockstmt
+   60 switchstmt: tSWITCH exp tLBRACE case_block tRBRACE .
+
+    $default  reduce using rule 60 (switchstmt)
+
+
+State 213
+
+   49 loopstmt: tFOR initstmt tSEMICOLON expstmt tSEMICOLON simplestmt . blockstmt
 
     tLBRACE  shift, and go to state 93
 
-    blockstmt  go to state 210
+    blockstmt  go to state 215
 
 
-State 209
+State 214
 
-   64 case_clause: tCASE exp_list tCOLON switch_stmts .
+   66 case_clause: tCASE exp_list tCOLON switch_stmts .
 
-    $default  reduce using rule 64 (case_clause)
+    $default  reduce using rule 66 (case_clause)
 
 
-State 210
+State 215
 
-   47 loopstmt: tFOR simplestmt tSEMICOLON expstmt tSEMICOLON simplestmt blockstmt .
+   49 loopstmt: tFOR initstmt tSEMICOLON expstmt tSEMICOLON simplestmt blockstmt .
 
-    $default  reduce using rule 47 (loopstmt)
+    $default  reduce using rule 49 (loopstmt)

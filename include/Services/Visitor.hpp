@@ -12,7 +12,6 @@
 #include "AST/Statement/ExpressionStatement.hpp"
 #include "AST/Statement/ForStatement.hpp"
 #include "AST/Statement/IfElseStatement.hpp"
-#include "AST/Statement/IfStatement.hpp"
 #include "AST/Statement/SwitchStatement.hpp"
 #include "AST/Statement/PrintStatement.hpp"
 #include "AST/Statement/BreakStatement.hpp"
@@ -46,7 +45,6 @@ class AssignStatement;
 class ExpressionStatement;
 class ForStatement;
 class IfElseStatement;
-class IfStatement;
 class SwitchStatement;
 class PrintStatement;
 class IncDecStatement;
@@ -80,8 +78,7 @@ class Visitor {
 		virtual void visit(AssignStatement *assignStmt) = 0;
 		virtual void visit(ExpressionStatement *expStmt) = 0;
 		virtual void visit(ForStatement *forStmt) = 0;
-		virtual void visit(IfElseStatement *ifElseStmt) = 0;
-		virtual void visit(IfStatement *ifStmt) = 0;
+		virtual void visit(IfElseStatement *ifElseStmt) = 0;	
 		virtual void visit(SwitchStatement *switchStmt) = 0;	
 		virtual void visit(PrintStatement *printStmt) = 0;
 		virtual void visit(BreakStatement *breakStmt) = 0;
@@ -99,7 +96,7 @@ class Visitor {
 		virtual void visit(IntegerExp *intExp) = 0;
 		virtual void visit(RuneExp *runeExp) = 0;
 		virtual void visit(StringExp *strExp) = 0;
-		virtual void visit(UnaryExp *unaryExp) = 0;
+		virtual void visit(UnaryExp *unaryExp) = 0;	
 
 		virtual void openScope() = 0;
 		virtual void closeScope() = 0;

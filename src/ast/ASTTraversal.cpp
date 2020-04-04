@@ -14,7 +14,6 @@
 #include "AST/Statement/ExpressionStatement.hpp"
 #include "AST/Statement/ForStatement.hpp"
 #include "AST/Statement/IfElseStatement.hpp"
-#include "AST/Statement/IfStatement.hpp"
 #include "AST/Statement/SwitchStatement.hpp"
 #include "AST/Statement/PrintStatement.hpp"
 #include "AST/Statement/BreakStatement.hpp"
@@ -105,19 +104,16 @@ void ASTTraversal::traverse(Node *node, Visitor& visitor) {
 
 	if (typeid(ForStatement) == typeid(*node)) {
 		ForStatement *forStmt = (ForStatement*)node;
+		visitor.openScope();
 		forStmt->accept(visitor);
 		traverse(forStmt->blockStmt, visitor);
+		visitor.closeScope();
+		forStmt->accept(visitor);
 	}
 
 	if (typeid(IfElseStatement) == typeid(*node)) {
 		IfElseStatement *ifElseStmt = (IfElseStatement*)node;
 		ifElseStmt->accept(visitor);
-	}
-
-	if (typeid(IfStatement) == typeid(*node)) {
-		IfStatement *ifStmt = (IfStatement*)node;
-		ifStmt->accept(visitor);
-		traverse(ifStmt->blockStmt, visitor);
 	}
 
 	if(typeid(SwitchStatement) == typeid(*node)) {	

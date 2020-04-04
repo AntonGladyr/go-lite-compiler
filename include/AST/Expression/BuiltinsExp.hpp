@@ -5,6 +5,9 @@
 #include "Services/Visitor.hpp"
 #include <AST/Expression/Expression.hpp>
 
+const std::string BUILTIN_LEN =  "len";
+const std::string BUILTIN_CAP =  "cap";
+
 class BuiltinsExp : public Expression {
 	public:
 		std::string name;

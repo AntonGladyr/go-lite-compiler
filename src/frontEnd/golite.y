@@ -24,7 +24,6 @@
 #include "AST/Statement/DeclarationStatement.hpp"
 #include "AST/Statement/AssignStatement.hpp"
 #include "AST/Statement/ExpressionStatement.hpp"
-#include "AST/Statement/IfStatement.hpp"
 #include "AST/Statement/IfElseStatement.hpp"
 #include "AST/Statement/IncDecStatement.hpp"
 #include "AST/Statement/PrintStatement.hpp"
@@ -80,7 +79,6 @@ void yyerror(const char *s) {
 	#include "AST/Statement/ForStatement.hpp"
 	#include "AST/Statement/AssignStatement.hpp"
 	#include "AST/Statement/ExpressionStatement.hpp"
-	#include "AST/Statement/IfStatement.hpp"
 	#include "AST/Statement/IfElseStatement.hpp"
 	#include "AST/Statement/IncDecStatement.hpp"
 	#include "AST/Statement/PrintStatement.hpp"
@@ -127,9 +125,7 @@ void yyerror(const char *s) {
 	BlockStatement *blockStmt;	
 	std::vector<Statement*> *stmtList;
 	ForStatement *forStmt;
-	AssignStatement *assignStmt;
-	ExpressionStatement *expStmt;
-	IfStatement *ifStmt;
+	AssignStatement *assignStmt;	
 	IfElseStatement *ifElseStmt;
 	IncDecStatement *incDecStmt;
 	PrintStatement *printStmt;
@@ -154,10 +150,9 @@ void yyerror(const char *s) {
 %type <program> program
 %type <declList> decl_list
 %type <decl> decl var_decl func_decl type_decl
-%type <stmt> stmt ifstmt loopstmt assignstmt stmt_decl incdecstmt printstmt returnstmt switchstmt simplestmt emptystmt
+%type <stmt> stmt ifstmt loopstmt assignstmt stmt_decl incdecstmt printstmt returnstmt switchstmt simplestmt initstmt emptystmt
 %type <blockStmt> blockstmt
-%type <expStmt> expstmt
-%type <exp> exp primary_exp func_call
+%type <exp> exp primary_exp func_call expstmt
 %type <param> param
 %type <caseBlock> case_block
 %type <caseClause> case_clause default_clause
@@ -361,7 +356,7 @@ stmt : blockstmt tSEMICOLON { $$ = $1; }
 emptystmt : %empty { }
     ;
 
-expstmt : exp { $$ = new ExpressionStatement($1, yylineno); }
+expstmt : exp { $$ = $1; }
     | %empty { $$ = NULL; } 
     ;
 
@@ -373,7 +368,12 @@ returnstmt : tRETURN { $$ = new ReturnStatement(yylineno); }
     | tRETURN exp { $$ = new ReturnStatement($2, yylineno); } 
     ;
 
-loopstmt : tFOR simplestmt tSEMICOLON expstmt tSEMICOLON simplestmt blockstmt
+initstmt : id_listne tSHORTDECLARE exp_list 
+	{ $$ = new DeclarationStatement(new VariableDeclaration($1, $3, yylineno), yylineno); }
+    | simplestmt
+    ;
+
+loopstmt : tFOR initstmt tSEMICOLON expstmt tSEMICOLON simplestmt blockstmt
 	{ $$ = new ForStatement($2, $4, $6, $7, yylineno); }
     | tFOR expstmt blockstmt { $$ = new ForStatement($2, $3, yylineno); } 
     ;
@@ -387,7 +387,7 @@ simplestmt : emptystmt { $$ = new EmptyStatement(yylineno); }
 assignstmt : exp_list tASSIGN exp_list { $$ = new AssignStatement($1, $3, yylineno); } 
     ;
 
-ifstmt : tIF exp blockstmt { $$ = new IfStatement($2, $3, yylineno); }
+ifstmt : tIF exp blockstmt { $$ = new IfElseStatement($2, $3, yylineno); }
     | tIF exp blockstmt tELSE blockstmt { $$ = new IfElseStatement($2, $3, $5, yylineno); }
     | tIF exp blockstmt tELSE ifstmt { $$ = new IfElseStatement($2, $3, $5, yylineno); }
     ;
@@ -428,7 +428,7 @@ incdecstmt : exp tINC { $$ = new IncDecStatement($1, IncDecOp::INC, yylineno); }
     ;
 
 printstmt : tPRINT tLPAREN exp_listpe tRPAREN { $$ = new PrintStatement($3, yylineno); }
-    | tPRINTLN tLPAREN exp_listpe tRPAREN { $$ = new PrintStatement($3, yylineno); }
+    | tPRINTLN tLPAREN exp_listpe tRPAREN { $$ = new PrintStatement($3, true, yylineno); }
     ;
 
 blockstmt: tLBRACE stmt_list tRBRACE { $$ = new BlockStatement($2, yylineno); }
@@ -453,35 +453,35 @@ id_exp : tIDENTIFIER { $$ = new IdentifierExp(*$1, yylineno); delete $1; }
     ;
 
 exp : primary_exp
-    | tLEN tLPAREN exp tRPAREN { $$ = new BuiltinsExp("len", $3, yylineno); }
-    | tCAP tLPAREN exp tRPAREN { $$ = new BuiltinsExp("cap", $3, yylineno); }
-    | exp tPLUS exp { $$ = new BinaryOperatorExp("+", $1, $3, yylineno); }
-    | exp tMINUS exp { $$ = new BinaryOperatorExp("-", $1, $3, yylineno); }
-    | exp tTIMES exp { $$ = new BinaryOperatorExp("*", $1, $3, yylineno); }
-    | exp tDIV exp { $$ = new BinaryOperatorExp("/", $1, $3, yylineno); }
-    | exp tREM exp { $$ = new BinaryOperatorExp("%", $1, $3, yylineno); }
-    | exp tBWAND exp { $$ = new BinaryOperatorExp("&", $1, $3, yylineno); }
-    | exp tBWOR exp { $$ = new BinaryOperatorExp("|", $1, $3, yylineno); }
-    | exp tBWXOR exp { $$ = new BinaryOperatorExp("^", $1, $3, yylineno); }
-    | exp tLEFTSHIFT exp { $$ = new BinaryOperatorExp("<<", $1, $3, yylineno); }
-    | exp tRIGHTSHIFT exp { $$ = new BinaryOperatorExp(">>", $1, $3, yylineno); }
-    | exp tBWANDNOT exp { $$ = new BinaryOperatorExp("&^", $1, $3, yylineno); }
-    | exp tAND exp { $$ = new BinaryOperatorExp("&&", $1, $3, yylineno); }
-    | exp tOR exp { $$ = new BinaryOperatorExp("||", $1, $3, yylineno); }
-    | exp tEQUAL exp { $$ = new BinaryOperatorExp("==", $1, $3, yylineno); }
-    | exp tNOTEQ exp { $$ = new BinaryOperatorExp("!=", $1, $3, yylineno); }
-    | exp tGREATER exp { $$ = new BinaryOperatorExp(">", $1, $3, yylineno); }
-    | exp tLESS exp { $$ = new BinaryOperatorExp("<", $1, $3, yylineno); }
-    | exp tGREATEREQ exp { $$ = new BinaryOperatorExp(">=", $1, $3, yylineno); }
-    | exp tLESSEQ exp { $$ = new BinaryOperatorExp("<=", $1, $3, yylineno); }
+    | tLEN tLPAREN exp tRPAREN { $$ = new BuiltinsExp(BUILTIN_LEN, $3, yylineno); }
+    | tCAP tLPAREN exp tRPAREN { $$ = new BuiltinsExp(BUILTIN_CAP, $3, yylineno); }
+    | exp tPLUS exp { $$ = new BinaryOperatorExp(BINARY_PLUS, $1, $3, yylineno); }
+    | exp tMINUS exp { $$ = new BinaryOperatorExp(BINARY_MINUS, $1, $3, yylineno); }
+    | exp tTIMES exp { $$ = new BinaryOperatorExp(BINARY_TIMES, $1, $3, yylineno); }
+    | exp tDIV exp { $$ = new BinaryOperatorExp(BINARY_DIV, $1, $3, yylineno); }
+    | exp tREM exp { $$ = new BinaryOperatorExp(BINARY_REMAIN, $1, $3, yylineno); }
+    | exp tBWAND exp { $$ = new BinaryOperatorExp(BINARY_BWAND, $1, $3, yylineno); }
+    | exp tBWOR exp { $$ = new BinaryOperatorExp(BINARY_BWOR, $1, $3, yylineno); }
+    | exp tBWXOR exp { $$ = new BinaryOperatorExp(BINARY_BWXOR, $1, $3, yylineno); }
+    | exp tLEFTSHIFT exp { $$ = new BinaryOperatorExp(BINARY_LEFTSHIFT, $1, $3, yylineno); }
+    | exp tRIGHTSHIFT exp { $$ = new BinaryOperatorExp(BINARY_RIGHTSHIFT, $1, $3, yylineno); }
+    | exp tBWANDNOT exp { $$ = new BinaryOperatorExp(BINARY_BWANDNOT, $1, $3, yylineno); }
+    | exp tAND exp { $$ = new BinaryOperatorExp(BINARY_AND, $1, $3, yylineno); }
+    | exp tOR exp { $$ = new BinaryOperatorExp(BINARY_OR, $1, $3, yylineno); }
+    | exp tEQUAL exp { $$ = new BinaryOperatorExp(BINARY_EQUAL, $1, $3, yylineno); }
+    | exp tNOTEQ exp { $$ = new BinaryOperatorExp(BINARY_NOTEQ, $1, $3, yylineno); }
+    | exp tGREATER exp { $$ = new BinaryOperatorExp(BINARY_GREATER, $1, $3, yylineno); }
+    | exp tLESS exp { $$ = new BinaryOperatorExp(BINARY_LESS, $1, $3, yylineno); }
+    | exp tGREATEREQ exp { $$ = new BinaryOperatorExp(BINARY_GREATEREQ, $1, $3, yylineno); }
+    | exp tLESSEQ exp { $$ = new BinaryOperatorExp(BINARY_LESSEQ, $1, $3, yylineno); }
     | tINTVAL { $$ = new IntegerExp($1, yylineno); }
     | tFLOATVAL { $$ = new FloatExp($1, yylineno); }
     | tRUNEVAL { $$ = new RuneExp(*$1, yylineno); delete $1; }
     | tSTRINGVAL { $$ = new StringExp(*$1, yylineno); delete $1; }
     | tBOOLVAL { $$ = new BoolExp($1, yylineno); } 
-    | tBANG exp %prec pBANG { $$ = new UnaryExp("!", $2, yylineno); }
-    | tMINUS exp %prec pMINUS { $$ = new UnaryExp("-", $2, yylineno); }
-    | tPLUS exp %prec pPLUS { $$ = new UnaryExp("+", $2, yylineno); }
-    | tBWXOR exp %prec pBWXOR { $$ = new UnaryExp("^", $2, yylineno); } 
+    | tBANG exp %prec pBANG { $$ = new UnaryExp(UNARY_BANG, $2, yylineno); }
+    | tMINUS exp %prec pMINUS { $$ = new UnaryExp(UNARY_MINUS, $2, yylineno); }
+    | tPLUS exp %prec pPLUS { $$ = new UnaryExp(UNARY_PLUS, $2, yylineno); }
+    | tBWXOR exp %prec pBWXOR { $$ = new UnaryExp(UNARY_BWXOR, $2, yylineno); } 
     ;
 %%

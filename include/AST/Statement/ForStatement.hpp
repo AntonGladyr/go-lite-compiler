@@ -13,21 +13,21 @@ class ForStatement : public Statement {
 	public:	
 		Statement *initStmt = NULL;
 		Statement *postStmt = NULL;
-        	ExpressionStatement *exp = NULL;
+        	Expression *exp = NULL;
 		BlockStatement *blockStmt = NULL;
 
 		virtual void accept(Visitor& v) override;
 		virtual std::string toString();
 		
 		ForStatement(
-			ExpressionStatement *_exp,
+			Expression *_exp,
 			BlockStatement *_blockStmt,
 			int _lineno
 		) : exp(_exp), blockStmt(_blockStmt), Statement(_lineno) { }
 
 		ForStatement(
 			Statement *_initStmt,
-			ExpressionStatement *_exp,
+			Expression *_exp,
 			Statement *_postStmt,
 			BlockStatement *_blockStmt,
 			int _lineno

@@ -5,6 +5,11 @@
 #include "Services/Visitor.hpp"
 #include <AST/Expression/Expression.hpp>
 
+const std::string UNARY_BANG 	   = "!";
+const std::string UNARY_MINUS = "-";
+const std::string UNARY_PLUS  = "+";
+const std::string UNARY_BWXOR = "^";
+
 class UnaryExp : public Expression {
 	public:
 		std::string op;

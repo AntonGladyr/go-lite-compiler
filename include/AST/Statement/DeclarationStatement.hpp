@@ -20,7 +20,7 @@ class DeclarationStatement : public Statement {
 			VariableDeclaration *_decl,
 			int _lineno
 		) : decl(_decl), Statement(_lineno) { }
-		
+	
 		DeclarationStatement() { }
 		~DeclarationStatement();
 };

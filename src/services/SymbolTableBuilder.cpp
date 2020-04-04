@@ -382,11 +382,40 @@ void SymbolTableBuilder::visit(ExpressionStatement *expStmt) {
 	ASTTraversal::traverse(expStmt->exp, *this);
 }
 
-void SymbolTableBuilder::visit(ForStatement *forStmt) { }
+void SymbolTableBuilder::visit(ForStatement *forStmt) {
+	if (forStmt == NULL) return;
+	
+	if (isScopeOpened) {
+		// open new scope
+		symbolTable = symbolTable->scopeSymbolTable();
+		ss << getTabs() << "{" << std::endl;
+		numTabs++;
+
+		// check init stmt
+		if (forStmt->initStmt)
+			ASTTraversal::traverse(forStmt->initStmt, *this);
+		// check loop expression
+		if (forStmt->exp)
+			ASTTraversal::traverse(forStmt->exp, *this);	
+		// check loop post statement
+		if (forStmt->postStmt)
+			ASTTraversal::traverse(forStmt->postStmt, *this);	
+	} else {
+		// close scope
+		symbolTable = symbolTable->unscopeSymbolTable();
+		numTabs--;
+		ss << getTabs() << "}" << std::endl;
+	}
+}
 
 void SymbolTableBuilder::visit(IfElseStatement *ifElseStmt) {	
 	if (ifElseStmt == NULL) return;
+
+	// check if expression
+	if (ifElseStmt->exp)
+		ASTTraversal::traverse(ifElseStmt->exp, *this);
 	
+	// traverse all blocks
 	ASTTraversal::traverse(ifElseStmt->blockStmt, *this);
 	
 	if (ifElseStmt->ifStmt) {	
@@ -398,8 +427,6 @@ void SymbolTableBuilder::visit(IfElseStatement *ifElseStmt) {
 	}
 }
 
-void SymbolTableBuilder::visit(IfStatement *ifStmt) { }
-
 void SymbolTableBuilder::visit(SwitchStatement *switchStmt) {
 	if (switchStmt == NULL) return;
 	
@@ -407,6 +434,11 @@ void SymbolTableBuilder::visit(SwitchStatement *switchStmt) {
 	ss << getTabs() << "{" << std::endl;	
 	numTabs++;	
 	
+	// check switch expression
+	if (switchStmt->exp) {
+		ASTTraversal::traverse(switchStmt->exp, *this);
+	}
+
 	if (switchStmt->clauseList) {	
 		for(auto const& clause : *(switchStmt->clauseList)) {	
 			if (clause->first) {
@@ -422,13 +454,24 @@ void SymbolTableBuilder::visit(SwitchStatement *switchStmt) {
 	ss << getTabs() << "}" << std::endl;
 }
 
-void SymbolTableBuilder::visit(PrintStatement *printStmt) { }
+void SymbolTableBuilder::visit(PrintStatement *printStmt) {
+	if (printStmt == NULL) return;
+	
+	if (printStmt->expList) {
+		for(auto const& exp : *printStmt->expList) {
+			ASTTraversal::traverse(exp, *this);
+		}
+	}
+}
 
 void SymbolTableBuilder::visit(BreakStatement *breakStmt) { }
 
 void SymbolTableBuilder::visit(ContinueStatement *continueStmt) { }
 
-void SymbolTableBuilder::visit(IncDecStatement *incDecStmt) { }
+void SymbolTableBuilder::visit(IncDecStatement *incDecStmt) {
+	if (incDecStmt == NULL) return;
+	ASTTraversal::traverse(incDecStmt->exp, *this);
+}
 
 void SymbolTableBuilder::visit(ReturnStatement *returnStmt) {
 	if (returnStmt == NULL) return;
@@ -448,6 +491,8 @@ void SymbolTableBuilder::visit(ArrayExp *arrExp) {
 
 void SymbolTableBuilder::visit(BinaryOperatorExp *binOpExp) {
 	if (binOpExp == NULL) return;
+	ASTTraversal::traverse(binOpExp->lhs, *this);
+	ASTTraversal::traverse(binOpExp->rhs, *this);
 }
 
 void SymbolTableBuilder::visit(BoolExp *boolExp) {

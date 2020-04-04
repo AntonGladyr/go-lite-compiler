@@ -16,7 +16,6 @@
 #include "AST/Statement/ExpressionStatement.hpp"
 #include "AST/Statement/ForStatement.hpp"
 #include "AST/Statement/IfElseStatement.hpp"
-#include "AST/Statement/IfStatement.hpp"
 #include "AST/Statement/SwitchStatement.hpp"
 #include "AST/Statement/PrintStatement.hpp"
 #include "AST/Statement/BreakStatement.hpp"
@@ -59,8 +58,7 @@ class SymbolTableBuilder : public Visitor {
 		virtual void visit(TypeDeclarationStatement *typeDeclStmt) override;
 		virtual void visit(ExpressionStatement *expStmt) override;
 		virtual void visit(ForStatement *forStmt) override;
-		virtual void visit(IfElseStatement *ifElseStmt) override;
-		virtual void visit(IfStatement *ifStmt) override;
+		virtual void visit(IfElseStatement *ifElseStmt) override;	
 		virtual void visit(SwitchStatement *switchStmt) override;	
 		virtual void visit(PrintStatement *printStmt) override;
 		virtual void visit(BreakStatement *breakStmt) override;

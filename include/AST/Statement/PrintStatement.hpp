@@ -7,6 +7,8 @@
 #include "AST/Expression/Expression.hpp"
 
 class PrintStatement : public Statement {
+	private:
+		bool isPrintln;
 	public:
 		std::vector<Expression*> *expList = NULL;
 
@@ -17,6 +19,13 @@ class PrintStatement : public Statement {
 			std::vector<Expression*> *expList,
 			int _lineno	
 		) : expList(expList), Statement(_lineno) { }
+
+		PrintStatement(
+			std::vector<Expression*> *expList,
+			bool _isPrintln,
+			int _lineno	
+		) : expList(expList), isPrintln(_isPrintln), Statement(_lineno) { }
+
 
 		PrintStatement() { }
 		~PrintStatement();	

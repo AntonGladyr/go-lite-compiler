@@ -18,7 +18,13 @@ class IfElseStatement : public Statement {
 		
 		virtual void accept(Visitor& v) override;
 		virtual std::string toString();
-		
+
+		IfElseStatement(
+			Expression *_exp,
+			BlockStatement *_blockStmt,
+			int _lineno
+		) : exp(_exp), blockStmt(_blockStmt), Statement(_lineno) { }
+	
 		IfElseStatement(
 			Expression *_exp,
 			BlockStatement *_blockStmt,
