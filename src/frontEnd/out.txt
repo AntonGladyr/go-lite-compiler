@@ -137,7 +137,7 @@ Grammar
    70 blockstmt: tLBRACE stmt_list tRBRACE
    71          | tLBRACE tRBRACE
 
-   72 func_call: primary_exp tLPAREN exp_listpe tRPAREN
+   72 func_call: id_exp tLPAREN exp_listpe tRPAREN
 
    73 index: tLBRACKET exp tRBRACKET
    74      | tLBRACKET exp tRBRACKET index
@@ -347,9 +347,9 @@ func_call (123)
 index (124)
     on left: 73 74, on right: 74 77
 primary_exp (125)
-    on left: 75 76 77 78, on right: 72 80
+    on left: 75 76 77 78, on right: 80
 id_exp (126)
-    on left: 79, on right: 1 2 11 12 13 19 20 25 75 77
+    on left: 79, on right: 1 2 11 12 13 19 20 25 72 75 77
 exp (127)
     on left: 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97
     98 99 100 101 102 103 104 105 106 107 108 109 110, on right: 21
@@ -898,19 +898,18 @@ State 50
 
 State 51
 
-   72 func_call: primary_exp . tLPAREN exp_listpe tRPAREN
    80 exp: primary_exp .
-
-    tLPAREN  shift, and go to state 69
 
     $default  reduce using rule 80 (exp)
 
 
 State 52
 
+   72 func_call: id_exp . tLPAREN exp_listpe tRPAREN
    75 primary_exp: id_exp .
    77            | id_exp . index
 
+    tLPAREN    shift, and go to state 69
     tLBRACKET  shift, and go to state 70
 
     $default  reduce using rule 75 (primary_exp)
@@ -1268,7 +1267,7 @@ State 68
 
 State 69
 
-   72 func_call: primary_exp tLPAREN . exp_listpe tRPAREN
+   72 func_call: id_exp tLPAREN . exp_listpe tRPAREN
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -2032,7 +2031,7 @@ State 101
 
 State 102
 
-   72 func_call: primary_exp tLPAREN exp_listpe . tRPAREN
+   72 func_call: id_exp tLPAREN exp_listpe . tRPAREN
 
     tRPAREN  shift, and go to state 152
 
@@ -3109,7 +3108,7 @@ State 151
 
 State 152
 
-   72 func_call: primary_exp tLPAREN exp_listpe tRPAREN .
+   72 func_call: id_exp tLPAREN exp_listpe tRPAREN .
 
     $default  reduce using rule 72 (func_call)
 

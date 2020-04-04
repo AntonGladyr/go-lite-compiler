@@ -435,7 +435,7 @@ blockstmt: tLBRACE stmt_list tRBRACE { $$ = new BlockStatement($2, yylineno); }
     | tLBRACE tRBRACE { $$ = new BlockStatement(new std::vector<Statement*>(), yylineno); } 
     ;
 
-func_call : primary_exp tLPAREN exp_listpe tRPAREN { $$ = new FunctionCallExp($1, $3, yylineno); }
+func_call : id_exp tLPAREN exp_listpe tRPAREN { $$ = new FunctionCallExp($1, $3, yylineno); }
     ;
 
 index : tLBRACKET exp tRBRACKET { $$ = new std::vector<Expression*>(); $$->push_back($2); }

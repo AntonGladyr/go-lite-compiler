@@ -9,14 +9,18 @@
 
 class FunctionCallExp : public Expression {
 	public:	
-		Expression *exp = NULL;
+		IdentifierExp *idExp = NULL;
 		std::vector<Expression*> *expList = NULL;
 
 		virtual void accept(Visitor& v) override;
 		virtual std::string toString();
 			
-		FunctionCallExp(Expression *_exp, std::vector<Expression*> *_expList, int _lineno) :
-			exp(_exp), expList(_expList), Expression(_lineno) { }
+		FunctionCallExp(
+			IdentifierExp *_idExp,
+			std::vector<Expression*> *_expList,
+			int _lineno
+		) : idExp(_idExp), expList(_expList), Expression(_lineno) { }
+		
 		FunctionCallExp() { }
 		~FunctionCallExp();	
 };

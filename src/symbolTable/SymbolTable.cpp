@@ -54,14 +54,8 @@ Symbol *SymbolTable::putSymbol(
 		// check if init function, so we allow to declare init function multiple times at the top-level scope
 		if (isInitFunc(node)) break;
 		
-		if (s->name.compare(name) == 0) {
-			std::cerr << ss.str();
-			std::cerr << "Error:";
-			if (node) std::cerr << " (line " <<  node->lineno << ")";
-			std::cerr << " identifier " << name << " already declared on line "
-				  << s->node->lineno << std::endl;
-			return NULL;
-		}
+		// if id already declared, throw an error
+		if (isEqual(s->name, name, s, node)) return NULL;	
 	}
 	this->table[i] = new Symbol(name, category, type, this->table[i], node);
 	return this->table[i];
@@ -95,6 +89,23 @@ bool SymbolTable::isInitFunc(Node *node) {
 	}
 }
 
+bool SymbolTable::isEqual(
+	const std::string &id,
+	const std::string &newId,
+	Symbol *s,
+	Node *node
+) {
+	if (id.compare(newId) == 0) {
+		std::cerr << ss.str();
+		std::cerr << "Error:";
+		if (node) std::cerr << " (line " <<  node->lineno << ")";
+		std::cerr << " identifier " << id << " already declared on line "
+			  << s->node->lineno << std::endl;
+		return true;
+	}
+	
+	return false;
+}
 
 std::string SymbolTable::toString() {	
 	return ss.str(); 

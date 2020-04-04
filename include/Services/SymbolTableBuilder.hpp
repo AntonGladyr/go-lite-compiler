@@ -34,14 +34,19 @@ class SymbolTableBuilder : public Visitor {
 		Program *program = NULL;
 		SymbolTable *symbolTable = NULL;
 		int numTabs = 0;
-		std::stringstream ss; // for printing symbol table
-	
+		std::stringstream ss; // for printing symbol table	
 		void terminate();
 		// TODO: chanhge resolveType params to (Node *node)
 		void resolveType(const std::string &type, int lineno);
 		void insertFuncParams(Node *node);
 		void checkSpecialFunctions(Node *node);
-		void checkIdName(Node *node);
+		void checkIdName(Node *node); // check identifier name ('main' and 'init' must be a function)	
+		void checkAssignEquality(
+			int lhsSize,
+			int rhsSize,
+			Node *node
+		);
+		
 	public:	
 		SymbolTable *build(Program *prg);
 		virtual void visit(Program *prg) override;

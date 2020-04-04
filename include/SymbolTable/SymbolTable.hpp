@@ -13,6 +13,8 @@
 class SymbolTable {
 	private:
 		bool isInitFunc(Node *node);
+		bool isEqual(const std::string &id, const std::string &newId, Symbol *s, Node *node);
+		bool isTypeMappedToId(const std::string &id, const std::string &type, Node *node);
 	public:
 		Symbol *table[HashSize] = {};
 		SymbolTable *parent = NULL;	

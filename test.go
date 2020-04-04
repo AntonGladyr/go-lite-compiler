@@ -1,23 +1,21 @@
 package test
 
-var t1 int 
-
-//type int int
-
-//var test int = int
-
-//var type string = string
-
-//var int int = 0
-
-/*func test() {
-	//5 + 5
-}*/
-
-func true() {
+func main() {
+	int = 5
+	var int = 1
+	main(main)
+	//t(5) = main()
 }
 
-func qwerty() string {
+//func int() {
+//	5 + 5
+//}
+
+func true() {
+	return
+}
+
+func qwerty(s string) string {
 	return "test"
 }
 
@@ -32,12 +30,15 @@ func init() {
 
 //func main() {
 //}
-
+/*
 func main() {
-	//5+5
-	var main string = qwerty()
+	
+	//var main string = qwerty()
 	var qw int
 	var as int = 5
-	qw, as =  5
+	//qwerty() = test()
+	//main = main()
+	main = qwerty(t2)
+	//t[5], t[5] =  5, 5
 	//var test int = int
-}
+}*/

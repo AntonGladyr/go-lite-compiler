@@ -104,24 +104,35 @@ void SymbolTableBuilder::checkSpecialFunctions(Node *node) {
 		FunctionDeclaration *funcDecl = (FunctionDeclaration*)node;
 		
 		// return if not "main" nor "init"
-		if(funcDecl->idExp->id.compare(SPECIALFUNC_MAIN) != 0) return;
-		if(funcDecl->idExp->id.compare(SPECIALFUNC_INIT) != 0) return;
-		
+		if ((funcDecl->idExp->id.compare(SPECIALFUNC_MAIN) != 0) &&
+			(funcDecl->idExp->id.compare(SPECIALFUNC_INIT) != 0)) return;
+
 		if(funcDecl->type || funcDecl->params) {
-			std::cerr << "Error: (line " << funcDecl->idExp->lineno << ") "
-				  << "main must have no parameters and no return value" << std::endl;
+			std::cerr << ss.str();
+			std::cerr << "Error: (line " << funcDecl->idExp->lineno << ") " << funcDecl->idExp->id 
+				  << " must have no parameters and no return value" << std::endl;
 			terminate();
-		}	
+		}
 	}
 }
 
 // check if type is declared
 void SymbolTableBuilder::resolveType(const std::string &type, int lineno) {
-	if (symbolTable->getSymbol(symbolTable, type)) return;
+	Symbol *s = symbolTable->getSymbol(symbolTable, type);
 	
-	std::cerr << ss.str();
-	std::cerr << "Error: (line " << lineno << ") type \"" << type << "\" is not declared" << std::endl;	
-	terminate();
+	// check if identifier exists in the symbol table
+	if (s == NULL) {
+		std::cerr << ss.str();
+		std::cerr << "Error: (line " << lineno << ") type \"" << type << "\" is not declared" << std::endl;	
+		terminate();
+	}
+
+	// check if identifier has "type" category
+	if (s->category.compare(CATEGORY_TYPE) != 0) {
+		std::cerr << ss.str();
+		std::cerr << "Error: (line " << lineno << ") \"" << type << "\" is not a type" << std::endl;
+		terminate();
+	}
 }
 
 // check identifier name ('main' and 'init' must be a function)
@@ -137,6 +148,27 @@ void SymbolTableBuilder::checkIdName(Node *node) {
 			  << idExp->id << " must be a function" << std::endl;
 		 terminate();
 	}
+}
+
+// check if the number of ids is equal to the number of expressions
+void SymbolTableBuilder::checkAssignEquality(
+	int lhsSize,
+	int rhsSize,
+	Node *node
+) {
+	if (rhsSize == 0) return;
+	
+	if (lhsSize != rhsSize) {
+		std::cerr << ss.str();
+		std::cerr << "Error: (line " << node->lineno << ") ";
+		if (typeid(VariableDeclaration) == typeid(*node))
+			std::cerr << "variable declaration ";
+		if (typeid(AssignStatement) == typeid(*node))
+			std::cerr << "assignment ";
+		std::cerr << "lhs(" << lhsSize << ")"
+			  << " != rhs(" << rhsSize << ")" << std::endl;
+		terminate();
+	}	
 }
 
 //=====================END OF HELPER FUNCTIONS=====================
@@ -162,26 +194,26 @@ void SymbolTableBuilder::visit(Program *prg) {
 
 void SymbolTableBuilder::visit(VariableDeclaration *varDecl) {
 	if (varDecl == NULL) return;
-	
-	//check if number of ids equals to the number of the expressions
-	if (varDecl->expList) {
-		if (varDecl->expList->size() != 0) {
-			if (varDecl->idList->size() != varDecl->expList->size()) {
-				std::cerr << "Error: (line " << varDecl->lineno << ") "
-				 	  << "variable declaration lhs(" << varDecl->idList->size() << ")"
-				  	  << " != rhs(" << varDecl->expList->size() << ")" << std::endl;
-				terminate();
-			}
-		}
-	}	
+		
 	//copy string stream for printing errors
 	symbolTable->ss.str(ss.str());
-
-	// reverse iteration
+	
+	// check if expression identifiers exist in the symbol table
+	if (varDecl->expList) {
+		for(auto const& exp : *(varDecl->expList)) {
+			ASTTraversal::traverse(exp, *this);
+		}
+	}
+	
+	//check if number of ids equals to the number of the expressions
+	if (varDecl->expList)
+		checkAssignEquality(varDecl->idList->size(), varDecl->expList->size(), varDecl);
+		
+	// reverse iteration for identifiers
 	for (auto var = varDecl->idList->rbegin(); var != varDecl->idList->rend(); var++) {
 		std::stringstream type;
 		
-		// check if var name is not 'main' nor 'init'
+		// check if a variable name is not 'main' nor 'init'
 		// parent->parent => basetypes
 		if (symbolTable->parent->parent == NULL) checkIdName(*var);	
 		
@@ -214,7 +246,8 @@ void SymbolTableBuilder::visit(VariableDeclaration *varDecl) {
 		
 		// terminate if id already declared
 		if (symbol == NULL) terminate();
-
+		
+		// save to the node
 		(*var)->symbol = symbol;
 	}
 }
@@ -235,6 +268,7 @@ void SymbolTableBuilder::visit(TypeDeclaration *typeDecl) {
 	
 	//check for recursive type declarations
 	if(typeDecl->idExp->id.compare(typeDecl->symbolTypeToStr()) == 0) {
+		std::cerr << ss.str();
 		std::cerr << "Error: (line " << typeDecl->idExp->lineno
 			  << ") invalid recursive type " << typeDecl->symbolTypeToStr() << std::endl;
 		terminate();
@@ -331,24 +365,21 @@ void SymbolTableBuilder::visit(TypeDeclarationStatement *typeDeclStmt) {
 void SymbolTableBuilder::visit(AssignStatement *assignStmt) {
 	if (assignStmt == NULL) return;
 	
-	if(assignStmt->lhs->size() != assignStmt->rhs->size()) {
-		std::cerr << "Error: (line " << assignStmt->lineno << ") "
-			  << "assignment lhs(" << assignStmt->lhs->size() << ")"
-		          << " != rhs(" << assignStmt->rhs->size() << ")" << std::endl;
-		terminate();
-	}
+	checkAssignEquality(assignStmt->lhs->size(), assignStmt->rhs->size(), assignStmt);
 }
 
 void SymbolTableBuilder::visit(ExpressionStatement *expStmt) {
 	if (expStmt == NULL) return;
 	
-	if(typeid(FunctionCallExp) != typeid(expStmt->exp)) {
-		// copy string stream for printing errors
-		symbolTable->ss.str(ss.str());
+	// if a given expression is not a function call, throw an error
+	if(dynamic_cast<FunctionCallExp*>(expStmt->exp) == nullptr) {
+		std::cerr << ss.str();
 		std::cerr << "Error: (line " << expStmt->exp->lineno << ") "
 			  << "expression statements must be function calls" << std::endl;
 		terminate();
-	}	
+	}
+	
+	ASTTraversal::traverse(expStmt->exp, *this);
 }
 
 void SymbolTableBuilder::visit(ForStatement *forStmt) { }
@@ -425,10 +456,30 @@ void SymbolTableBuilder::visit(FloatExp *floatExp) {
 
 void SymbolTableBuilder::visit(FunctionCallExp *funcCallExp) {
 	if (funcCallExp == NULL) return;
+		
+	// copy string stream for printing errors
+	symbolTable->ss.str(ss.str());
+	
+	ASTTraversal::traverse(funcCallExp->idExp, *this);
+	
+	// check if parameter identifiers exist in the symbol table
+	if (funcCallExp->expList) {
+		for(auto const& exp : *funcCallExp->expList) {
+			ASTTraversal::traverse(exp, *this);
+		}
+	}
 }
 
 void SymbolTableBuilder::visit(IdentifierExp *idExp) {
 	if (idExp == NULL) return;
+		
+	// check if function identifier exists
+	if(symbolTable->getSymbol(symbolTable, idExp->id) == NULL) {
+		std::cerr << ss.str();
+		std::cerr << "Error: (line " << idExp->lineno << ") \""
+		  << idExp->id << "\" is not declared" << std::endl;
+		terminate();
+	}
 }
 
 void SymbolTableBuilder::visit(IntegerExp *intExp) {
