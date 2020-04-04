@@ -1,17 +1,14 @@
 package test
 
-func main() {
-	int = 5
-	var int = 1
-	main(main)
-	//t(5) = main()
+func test(f int) {
+	var f1 float64
+	return
+	return f1[int]
 }
 
-//func int() {
-//	5 + 5
-//}
+type qq int
 
-func true() {
+func true() qq {
 	return
 }
 
@@ -26,6 +23,13 @@ func init() {
 }
 
 func init() {
+}
+
+
+func main() {
+	var main [5][5]int = 0
+	main(main)
+	//t(5) = main()
 }
 
 //func main() {

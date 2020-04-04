@@ -430,12 +430,20 @@ void SymbolTableBuilder::visit(ContinueStatement *continueStmt) { }
 
 void SymbolTableBuilder::visit(IncDecStatement *incDecStmt) { }
 
-void SymbolTableBuilder::visit(ReturnStatement *returnStmt) { }
+void SymbolTableBuilder::visit(ReturnStatement *returnStmt) {
+	if (returnStmt == NULL) return;
+	ASTTraversal::traverse(returnStmt->exp, *this);
+}
 
 void SymbolTableBuilder::visit(EmptyStatement *emptyStmt) { }
 
 void SymbolTableBuilder::visit(ArrayExp *arrExp) {
 	if (arrExp == NULL) return;
+	ASTTraversal::traverse(arrExp->idExp, *this);
+	
+	for(auto const& exp : *arrExp->expList) {
+		ASTTraversal::traverse(exp, *this);
+	}
 }
 
 void SymbolTableBuilder::visit(BinaryOperatorExp *binOpExp) {
