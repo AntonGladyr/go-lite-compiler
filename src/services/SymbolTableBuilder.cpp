@@ -366,6 +366,18 @@ void SymbolTableBuilder::visit(TypeDeclarationStatement *typeDeclStmt) {
 void SymbolTableBuilder::visit(AssignStatement *assignStmt) {
 	if (assignStmt == NULL) return;
 	
+	if (assignStmt->lhs) {
+		for(auto const& exp : *(assignStmt->lhs)) {
+			ASTTraversal::traverse(exp, *this);
+		}
+	}
+
+	if (assignStmt->rhs) {
+		for(auto const& exp : *(assignStmt->rhs)) {
+			ASTTraversal::traverse(exp, *this);
+		}
+	}
+
 	checkAssignEquality(assignStmt->lhs->size(), assignStmt->rhs->size(), assignStmt);
 }
 
@@ -440,11 +452,17 @@ void SymbolTableBuilder::visit(SwitchStatement *switchStmt) {
 		ASTTraversal::traverse(switchStmt->exp, *this);
 	}
 
-	if (switchStmt->clauseList) {	
-		for(auto const& clause : *(switchStmt->clauseList)) {	
+	if (switchStmt->clauseList) {
+		for(auto const& clause : *(switchStmt->clauseList)) {
+			if (clause->expList) {
+				for(auto const& exp : *(clause->expList)) {
+					ASTTraversal::traverse(exp, *this);
+				}
+			}
+			
 			if (clause->blockStmt) {
 				ASTTraversal::traverse(clause->blockStmt, *this);
-			}	
+			}
 		}
 	}
 
