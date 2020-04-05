@@ -550,13 +550,23 @@ void SymbolTableBuilder::visit(FunctionCallExp *funcCallExp) {
 void SymbolTableBuilder::visit(IdentifierExp *idExp) {
 	if (idExp == NULL) return;	
 	
+	Symbol *symbol = symbolTable->getSymbol(symbolTable, idExp->name);
 	// check if identifier exists
-	if(symbolTable->getSymbol(symbolTable, idExp->name) == NULL) {
+	if(symbol == NULL) {
 		std::cerr << ss.str();
 		std::cerr << "Error: (line " << idExp->lineno << ") \""
 		  << idExp->name << "\" is not declared" << std::endl;
 		terminate();
 	}
+	
+	std::stringstream type;
+	
+	// if id name is the same as types/constants, wrap in braces
+	if (symbol->name.compare(symbol->type) == 0)
+		type << "{" << symbol->name << "}";
+	else
+		type << symbol->name;
+	idExp->type = type.str(); 
 }
 
 void SymbolTableBuilder::visit(IntegerExp *intExp) {	
@@ -585,13 +595,13 @@ void SymbolTableBuilder::visit(StringExp *strExp) {
 
 void SymbolTableBuilder::visit(BoolExp *boolExp) {	
 	if (boolExp == NULL) return;	
-	boolExp->type = BASETYPE_BOOL;
 }
 
 void SymbolTableBuilder::visit(UnaryExp *unaryExp) {
 	if (unaryExp == NULL) return;
 	
-	ASTTraversal::traverse(unaryExp->exp, *this);
+	// check child expression
+	ASTTraversal::traverse(unaryExp->exp, *this);	
 
 	// Logical negation: expr must resolve to a bool
 	if (unaryExp->op.compare(UNARY_BANG) == 0 && unaryExp->exp->type.compare(BASETYPE_BOOL) != 0)
@@ -629,6 +639,7 @@ void SymbolTableBuilder::visit(UnaryExp *unaryExp) {
 			unaryExp->exp->type, // received type
 			"integer type (int, rune)" // expected type
 		);
+	
 	//set type
 	unaryExp->type = unaryExp->exp->type;
 }

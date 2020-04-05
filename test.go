@@ -3,7 +3,7 @@ package test
 
 func main() {
 	//var main [5][5]int = 0
-	if ^"true" {
+	if +bool {
 		println("ok")
 	}
 	//switch {
