@@ -12,7 +12,10 @@ class StringExp : public Expression {
 		virtual void accept(Visitor& v) override;
 		virtual std::string toString();
 	
-		StringExp(const std::string &_stringValue, int _lineno);
+		StringExp(
+			const std::string &_stringValue,
+			int _lineno
+		);
 		StringExp() { }
 		~StringExp();
 	private:

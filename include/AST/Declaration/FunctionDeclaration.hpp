@@ -9,20 +9,23 @@
 #include "AST/Statement/Statement.hpp"
 #include "AST/Statement/BlockStatement.hpp"
 #include "AST/Expression/IdentifierExp.hpp"
+#include "AST/Declaration/TypeName.hpp"
+#include "AST/Declaration/FunctionParameter.hpp"
 
 class BlockStatement;
 class IdentifierExp;
+class FunctionParameter;
 //pair<id, pair<type, indexes>>
-typedef std::pair<IdentifierExp*, std::pair<std::string, std::vector<int>*>*> param_type;
+//typedef std::pair<IdentifierExp*, std::pair<std::string, std::vector<int>*>*> param_type;
 
 class FunctionDeclaration : public Declaration {
 	public:
 		IdentifierExp *idExp = NULL;
-		std::vector<param_type*> *params = NULL;
-		std::pair<std::string, std::vector<int>*> *type = NULL;
+		std::vector<FunctionParameter*> *params = NULL;
+		TypeName *type = NULL;
 		BlockStatement *blockStmt = NULL;
 		
-		std::pair<std::string, std::vector<int>*> getType() { return *type; }
+		TypeName getType() { return *type; }
 		std::string symbolSignatureToStr();
 		virtual void accept(Visitor& v) override;
 		virtual std::string symbolToStr() override ;
@@ -31,7 +34,7 @@ class FunctionDeclaration : public Declaration {
 		
 		FunctionDeclaration(
 			IdentifierExp *_idExp,
-			std::vector<param_type*> *_params,
+			std::vector<FunctionParameter*> *_params,
 			BlockStatement *_blockStmt,
 			int _lineno
 		) : idExp(_idExp), 
@@ -41,8 +44,8 @@ class FunctionDeclaration : public Declaration {
 		
 		FunctionDeclaration(
 			IdentifierExp *_idExp,
-			std::vector<param_type*> *_params,
-			std::pair<std::string, std::vector<int>*> *_type,
+			std::vector<FunctionParameter*> *_params,
+			TypeName *_type,
 			BlockStatement *_blockStmt,
 			int _lineno
 		) : idExp(_idExp), 

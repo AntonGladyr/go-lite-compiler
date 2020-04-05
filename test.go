@@ -1,10 +1,10 @@
 package test
 
-/*func test(f int) {
+func test(f test) {
 	var f1 float64
 	return
 	return f1[int]
-}*/
+}
 
 var str int = "string"
 
@@ -19,8 +19,6 @@ func true() qq {
 
 	}
 
-	if {
-	}
 	/*{
 	} else {
 		var variable = 100

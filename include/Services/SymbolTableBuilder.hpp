@@ -25,6 +25,7 @@
 #include "AST/Statement/EmptyStatement.hpp"
 #include "AST/Expression/IdentifierExp.hpp"
 #include "SymbolTable/SymbolTable.hpp"
+#include "AST/Declaration/TypeName.hpp"
 
 class SymbolTable;
 
@@ -34,9 +35,8 @@ class SymbolTableBuilder : public Visitor {
 		SymbolTable *symbolTable = NULL;
 		int numTabs = 0;
 		std::stringstream ss; // for printing symbol table	
-		void terminate();
-		// TODO: chanhge resolveType params to (Node *node)
-		void checkTypeName(const std::string &type, int lineno);
+		void terminate();	
+		void checkTypeName(TypeName *type);
 		void insertFuncParams(Node *node);
 		void checkSpecialFunctions(Node *node);
 		void checkIdName(Node *node); // check identifier name ('main' and 'init' must be a function)	

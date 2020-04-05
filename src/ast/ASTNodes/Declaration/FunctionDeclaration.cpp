@@ -15,23 +15,26 @@ std::string FunctionDeclaration::toString() {
 	std::stringstream ss;
 
 	//TODO: fix block output
-	ss << "func " << idExp->id;
+	ss << "func " << idExp->name;
 	ss << "(";
 	
 	//parameters	
 	if (params) {
 		for(auto const& param : *params) {
-			ss << param->first->id << " ";
+			ss << param->idExp->name << " ";
+			
+			if (param->type) {
+				if (param->type->indexes) {
+					for(auto const& index : *(param->type->indexes)) {
+						ss << "[" << std::to_string(index) << "]";
+					}
+				}
 				
-			if (param->second->second) {
-				for(auto const& index : *(param->second->second)) {
-					ss << "[" << std::to_string(index) << "]";
-				}	
+				ss << param->type->name;
+				if (&param != &params->back())
+					ss << ", ";
 			}
 			
-			ss << param->second->first;
-			if (&param != &params->back())
-				ss << ", ";
 		}
 	}
 	
@@ -40,13 +43,13 @@ std::string FunctionDeclaration::toString() {
 	//function type
 	//indexes	
 	if (type) {
-		if (type->second) {	
-			for(auto const& index : *(type->second)) {
+		if (type->indexes) {
+			for(auto const& index : *(type->indexes)) {
 				ss << "[" << std::to_string(index) << "]";
 			}	
 		}	
-		//type id
-		ss << type->first << " ";
+		//type name
+		ss << type->name << " ";
 	}
 
 	return ss.str();
@@ -54,7 +57,7 @@ std::string FunctionDeclaration::toString() {
 
 std::string FunctionDeclaration::symbolToStr() {
 	std::stringstream ss;
-	ss << idExp->id << " [" << CATEGORY_FUNC << "]" << " = ";
+	ss << idExp->name << " [" << CATEGORY_FUNC << "]" << " = ";
 	ss << symbolSignatureToStr();
 	return ss.str();
 }
@@ -64,13 +67,13 @@ std::string FunctionDeclaration::symbolTypeToStr() {
 	
 	if (type) {
 		// array indexes
-		if (type->second) {	
-			for(auto const& index : *(type->second)) {
+		if (type->indexes) {	
+			for(auto const& index : *(type->indexes)) {
 				ss << "[" << std::to_string(index) << "]";
 			}	
 		}	
 		// type id
-		ss << type->first;
+		ss << type->name;
 	} else {
 		ss << "void";
 	}
@@ -86,13 +89,13 @@ std::string FunctionDeclaration::symbolSignatureToStr() {
 	if (params) {
 		for(auto const& param : *params) {
 			// for each id print type
-			if (param->second->second) {
-				for(auto const& index : *(param->second->second)) {
+			if (param->type->indexes) {
+				for(auto const& index : *(param->type->indexes)) {
 					ss << "[" << std::to_string(index) << "]";
 				}	
 			}
 			
-			ss << param->second->first;
+			ss << param->type->name;
 			if (&param != &params->back())
 				ss << ", ";
 		}
@@ -112,17 +115,12 @@ FunctionDeclaration::~FunctionDeclaration() {
 
 	if (params) {
 		for(auto const& param : *params) {
-			delete param->second->second;
-			delete param->second;
 			delete param;
 		}
 		delete params;
 	}
 
-	if (type) {
-		if (type->second) delete type->second;
-		delete type;
-	}
+	if (type) delete type;
 	
 	delete blockStmt;
 	

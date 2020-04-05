@@ -7,6 +7,7 @@
 #include "AST/Declaration/Declaration.hpp"
 #include "AST/Expression/Expression.hpp"
 #include "AST/Expression/IdentifierExp.hpp"
+#include "AST/Declaration/TypeName.hpp"
 
 class IdentifierExp;
 
@@ -14,7 +15,7 @@ class VariableDeclaration : public Declaration {
 	public:		
 		std::vector<IdentifierExp*> *idList = NULL;
 		std::vector<Expression*> *expList = NULL;
-		std::pair<std::string, std::vector<int>*> *type = NULL;
+		TypeName *type = NULL;
 		
 		virtual void accept(Visitor& v) override;
 		virtual std::string symbolToStr() override ;
@@ -23,7 +24,7 @@ class VariableDeclaration : public Declaration {
 		
 		VariableDeclaration(
 			std::vector<IdentifierExp*> *_idList,
-			std::pair<std::string, std::vector<int>*> *_type,
+			TypeName *_type,
 			int _lineno
 		) : idList(_idList), type(_type), Declaration(_lineno) { }
 
@@ -35,7 +36,7 @@ class VariableDeclaration : public Declaration {
 		
 		VariableDeclaration(
 			std::vector<IdentifierExp*> *_idList,
-			std::pair<std::string, std::vector<int>*> *_type,
+			TypeName *_type,
 			std::vector<Expression*> *_expList,
 			int _lineno
 		); 

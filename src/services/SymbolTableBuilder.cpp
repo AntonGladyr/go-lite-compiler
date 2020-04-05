@@ -68,19 +68,21 @@ void SymbolTableBuilder::insertFuncParams(Node *node) {
 				//clear string stream
 				paramType.str(std::string());
 				
+				if (param->type == NULL) terminate();
+
 				// array indexes
-                       		if (param->second->second) {
-					for(auto const& index : *(param->second->second)) {
+                       		if (param->type->indexes) {
+					for(auto const& index : *(param->type->indexes)) {
 						paramType << "[" << std::to_string(index) << "]";
 					}
 				}
                           	// type
-				paramType << param->second->first;
+				paramType << param->type->name;
 				
 				//save pointer to the parent node in idExp
 				funcDecl->idExp->parentNode = funcDecl;	
 				Symbol *symbol = symbolTable->putSymbol(
-					param->first->id,
+					param->idExp->name,
 					CATEGORY_VAR,
 					paramType.str(),
 					funcDecl->idExp 
@@ -90,7 +92,7 @@ void SymbolTableBuilder::insertFuncParams(Node *node) {
 				if (symbol == NULL) terminate();
 				
 				// pass to stream for printing
-				ss << getTabs() << param->first->id << " [" << CATEGORY_VAR << "]"
+				ss << getTabs() << param->idExp->name << " [" << CATEGORY_VAR << "]"
 				   << " = " << paramType.str() << std::endl;
 			}
 		}
@@ -104,12 +106,12 @@ void SymbolTableBuilder::checkSpecialFunctions(Node *node) {
 		FunctionDeclaration *funcDecl = (FunctionDeclaration*)node;
 		
 		// return if not "main" nor "init"
-		if ((funcDecl->idExp->id.compare(SPECIALFUNC_MAIN) != 0) &&
-			(funcDecl->idExp->id.compare(SPECIALFUNC_INIT) != 0)) return;
+		if ((funcDecl->idExp->name.compare(SPECIALFUNC_MAIN) != 0) &&
+			(funcDecl->idExp->name.compare(SPECIALFUNC_INIT) != 0)) return;
 
 		if(funcDecl->type || funcDecl->params) {
 			std::cerr << ss.str();
-			std::cerr << "Error: (line " << funcDecl->idExp->lineno << ") " << funcDecl->idExp->id 
+			std::cerr << "Error: (line " << funcDecl->idExp->lineno << ") " << funcDecl->idExp->name 
 				  << " must have no parameters and no return value" << std::endl;
 			terminate();
 		}
@@ -117,20 +119,22 @@ void SymbolTableBuilder::checkSpecialFunctions(Node *node) {
 }
 
 // check if type is declared
-void SymbolTableBuilder::checkTypeName(const std::string &type, int lineno) {
-	Symbol *s = symbolTable->getSymbol(symbolTable, type);
+void SymbolTableBuilder::checkTypeName(TypeName *type) {
+	Symbol *s = symbolTable->getSymbol(symbolTable, type->name);
 	
 	// check if identifier exists in the symbol table
 	if (s == NULL) {
 		std::cerr << ss.str();
-		std::cerr << "Error: (line " << lineno << ") type \"" << type << "\" is not declared" << std::endl;	
+		std::cerr << "Error: (line " << type->lineno << ") type \""
+			  << type->name << "\" is not declared" << std::endl;	
 		terminate();
 	}
 
 	// check if identifier has "type" category
 	if (s->category.compare(CATEGORY_TYPE) != 0) {
 		std::cerr << ss.str();
-		std::cerr << "Error: (line " << lineno << ") \"" << type << "\" is not a type" << std::endl;
+		std::cerr << "Error: (line " << type->lineno << ") \""
+			  << type->name << "\" is not a type" << std::endl;
 		terminate();
 	}
 }
@@ -140,12 +144,12 @@ void SymbolTableBuilder::checkIdName(Node *node) {
 	if (typeid(IdentifierExp) != typeid(*node)) return;
 	
 	IdentifierExp * idExp = (IdentifierExp*)node;	
-	if (idExp->id.compare(SPECIALFUNC_MAIN) == 0 ||
-	    idExp->id.compare(SPECIALFUNC_INIT) == 0) 
+	if (idExp->name.compare(SPECIALFUNC_MAIN) == 0 ||
+	    idExp->name.compare(SPECIALFUNC_INIT) == 0) 
 	{
 		std::cerr << ss.str();
 		std::cerr << "Error: (line " << idExp->lineno << ") "
-			  << idExp->id << " must be a function" << std::endl;
+			  << idExp->name << " must be a function" << std::endl;
 		 terminate();
 	}
 }
@@ -193,8 +197,7 @@ void SymbolTableBuilder::visit(Program *prg) {
 }
 
 void SymbolTableBuilder::visit(VariableDeclaration *varDecl) {
-	if (varDecl == NULL) return;
-		
+	if (varDecl == NULL) return;	
 	//copy string stream for printing errors
 	symbolTable->ss.str(ss.str());
 	
@@ -208,37 +211,33 @@ void SymbolTableBuilder::visit(VariableDeclaration *varDecl) {
 	//check if number of ids equals to the number of the expressions
 	if (varDecl->expList)
 		checkAssignEquality(varDecl->idList->size(), varDecl->expList->size(), varDecl);
-		
 	// reverse iteration for identifiers
 	for (auto var = varDecl->idList->rbegin(); var != varDecl->idList->rend(); var++) {
-		std::stringstream type;
-		
+		std::stringstream type;	
 		// check if a variable name is not 'main' nor 'init'
 		// parent->parent scope => basetypes
-		if (symbolTable->parent->parent == NULL) checkIdName(*var);	
-		
+		if (symbolTable->parent->parent == NULL) checkIdName(*var);		
 		if (varDecl->type) {
 			//check if type exists
-			checkTypeName(varDecl->type->first, (*var)->lineno);
-			
-			if (varDecl->type->second) {
-				for(auto const& index : *(varDecl->type->second)) {
+			checkTypeName(varDecl->type);	
+			if (varDecl->type->indexes) {	
+				for(auto const& index : *(varDecl->type->indexes)) {
 					type << "[" << std::to_string(index) << "]";
-				}
+				}	
 			}
 			
-			type << varDecl->type->first;
+			type << varDecl->type->name;
 		} else {
 			type << BASETYPE_UNDEFINED;
 		}
 		
-		ss << getTabs() << (*var)->id << " [" << CATEGORY_VAR << "]" << " = ";
+		ss << getTabs() << (*var)->name << " [" << CATEGORY_VAR << "]" << " = ";
 		ss << type.str() << std::endl;
 		
 		//save pointer to the parent node in idExp
 		(*var)->parentNode = varDecl;	
 		Symbol *symbol = symbolTable->putSymbol(
-			(*var)->id,
+			(*var)->name,
 			CATEGORY_VAR,
 			type.str(),
 			*var
@@ -264,10 +263,10 @@ void SymbolTableBuilder::visit(TypeDeclaration *typeDecl) {
 
 	//check if type exists
 	if (typeDecl->type)
-		checkTypeName(typeDecl->type->first, typeDecl->idExp->lineno);
+		checkTypeName(typeDecl->type);
 	
 	//check for recursive type declarations
-	if(typeDecl->idExp->id.compare(typeDecl->symbolTypeToStr()) == 0) {
+	if(typeDecl->idExp->name.compare(typeDecl->symbolTypeToStr()) == 0) {
 		std::cerr << ss.str();
 		std::cerr << "Error: (line " << typeDecl->idExp->lineno
 			  << ") invalid recursive type " << typeDecl->symbolTypeToStr() << std::endl;
@@ -277,7 +276,7 @@ void SymbolTableBuilder::visit(TypeDeclaration *typeDecl) {
 	//save pointer to the parent node in idExp
 	typeDecl->idExp->parentNode = typeDecl;
 	Symbol *symbol = symbolTable->putSymbol(
-		typeDecl->idExp->id,
+		typeDecl->idExp->name,
 		CATEGORY_TYPE,
 		typeDecl->symbolTypeToStr(),
 		typeDecl->idExp
@@ -302,12 +301,12 @@ void SymbolTableBuilder::visit(FunctionDeclaration *funcDecl) {
 	
 	// check if return type exists
 	if (funcDecl->type)
-		checkTypeName(funcDecl->type->first, funcDecl->idExp->lineno);
+		checkTypeName(funcDecl->type);
 
 	// check if parameter types exist
 	if (funcDecl->params) {
 		for (auto const& param : *(funcDecl->params)) {
-			checkTypeName(param->second->first, funcDecl->idExp->lineno);
+			checkTypeName(param->type);
 		}
 	}
 	
@@ -316,7 +315,7 @@ void SymbolTableBuilder::visit(FunctionDeclaration *funcDecl) {
 	funcDecl->blockStmt->parentNode = funcDecl;
 	funcDecl->idExp->parentNode = funcDecl;
 	Symbol *symbol = symbolTable->putSymbol(
-		funcDecl->idExp->id,
+		funcDecl->idExp->name,
 		CATEGORY_FUNC,
 		funcDecl->symbolTypeToStr(),
 		funcDecl->idExp
@@ -529,10 +528,10 @@ void SymbolTableBuilder::visit(IdentifierExp *idExp) {
 	if (idExp == NULL) return;
 		
 	// check if identifier exists
-	if(symbolTable->getSymbol(symbolTable, idExp->id) == NULL) {
+	if(symbolTable->getSymbol(symbolTable, idExp->name) == NULL) {
 		std::cerr << ss.str();
 		std::cerr << "Error: (line " << idExp->lineno << ") \""
-		  << idExp->id << "\" is not declared" << std::endl;
+		  << idExp->name << "\" is not declared" << std::endl;
 		terminate();
 	}
 }

@@ -13,7 +13,7 @@ void Program::accept(Visitor& v) {
 std::string Program::toString() {
 	//TODO: fix declarations output
 	std::stringstream ss;
-	ss << "package " << package->id;
+	ss << "package " << package->name;
 	return ss.str();
 }
 

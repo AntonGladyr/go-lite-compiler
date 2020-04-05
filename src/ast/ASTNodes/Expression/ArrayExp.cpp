@@ -10,7 +10,7 @@ void ArrayExp::accept(Visitor& v) {
 
 std::string ArrayExp::toString() {
 	std::stringstream ss;
-	ss << idExp->id;
+	ss << idExp->name;
 	for(auto const& exp: *expList) {
 		ss << "[" << exp->toString() << "]";
 	}

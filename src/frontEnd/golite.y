@@ -85,6 +85,8 @@ void yyerror(const char *s) {
 	#include "AST/Statement/SwitchStatement.hpp"
 	#include "AST/Statement/ReturnStatement.hpp"
 	#include "AST/Statement/EmptyStatement.hpp"
+	#include "AST/Declaration/FunctionParameter.hpp"
+	#include "AST/Declaration/TypeName.hpp"
 	#include <vector>
         #include <string>
 	#include <memory>	
@@ -134,11 +136,11 @@ void yyerror(const char *s) {
 	case_clause *caseClause;
 	EmptyStatement *emptyStmt;
 		
-	std::pair<std::string, std::vector<int>*> *type;
+	TypeName *type;
 	std::vector<IdentifierExp*> *id_list;
     	std::vector<Expression*> *exp_list;	
-	param_type *param;
-	std::vector<param_type*> *params_list;
+	FunctionParameter *param;
+	std::vector<FunctionParameter*> *params_list;
 }
 
 /* Token directives define the token types to be returned by the scanner (excluding character
@@ -307,15 +309,13 @@ stmt_list : stmt { $$ = new std::vector<Statement*>(); $$->push_back($1); }
     | stmt_list stmt { $1->push_back($2); }
     ;
    
-type : tIDENTIFIER { $$ = new std::pair<std::string, std::vector<int>*>;  
-		     $$->second = new std::vector<int>(); $$->first = *$1; delete $1; }
+type : tIDENTIFIER { $$ = new TypeName(*$1, NULL, yylineno); delete $1; } 
     | tLBRACKET tINTVAL tRBRACKET type {
-	$$ = new std::pair<std::string, std::vector<int>*>;
-	$$->first = $4->first;  $$->second = new std::vector<int>();
-	$$->second->push_back($2);
-	$$->second->insert($$->second->end(), $4->second->begin(), $4->second->end());
+	$$ = new TypeName(); $$->name = $4->name; $$->indexes = new std::vector<int>();	
+	$$->indexes->push_back($2);	
+	if ($4->indexes) { $$->indexes->insert($$->indexes->end(), $4->indexes->begin(), $4->indexes->end()); }	
     }
-    | tLPAREN type tRPAREN { $$ = new std::pair<std::string, std::vector<int>*>; $$ = $2; }
+    | tLPAREN type tRPAREN { $$ = new TypeName(); $$ = $2; }
     ;
 
 id_listne : id_exp { $$ = new std::vector<IdentifierExp*>(); $$->push_back($1); }
@@ -330,10 +330,10 @@ exp_listpe : exp_list { $$ = $1; }
     | %empty { $$ = new std::vector<Expression*>(); }
     ;
 
-param : id_exp type { $$ = new param_type(); $$->first = $1; $$->second = $2; }
+param : id_exp type { $$ = new FunctionParameter($1, $2, yylineno); }
     ;
 
-paramsne : param { $$ = new std::vector<param_type*>(); $$->push_back($1); }
+paramsne : param { $$ = new std::vector<FunctionParameter*>(); $$->push_back($1); }
     | paramsne tCOMMA param { $1->push_back($3); }
     ;
 

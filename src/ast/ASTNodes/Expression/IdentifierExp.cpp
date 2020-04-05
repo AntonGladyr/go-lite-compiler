@@ -8,7 +8,7 @@ void IdentifierExp::accept(Visitor& v) {
 }
 
 std::string IdentifierExp::toString() {
-	return id;
+	return name;
 }
 
 IdentifierExp::~IdentifierExp() {

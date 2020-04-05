@@ -11,7 +11,7 @@ void FunctionCallExp::accept(Visitor& v) {
 
 std::string FunctionCallExp::toString() {
 	std::stringstream ss;
-	ss << idExp->id << "(" << expList << ")";
+	ss << idExp->name << "(" << expList << ")";
 	return ss.str();
 }
 

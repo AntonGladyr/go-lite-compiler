@@ -17,13 +17,13 @@ std::string VariableDeclaration::toString() {
 
 	if (type) {
 		ss << " ";
-		if (type->second) {	
-			for(auto const& index : *(type->second)) {
+		if (type->indexes) {
+			for(auto const& index : *(type->indexes)) {
 				ss << "[" << std::to_string(index) << "]";
 			}
 		}
 		
-		ss << type->first;	
+		ss << type->name;
 	}
 		
 	if (expList)
@@ -48,7 +48,7 @@ VariableDeclaration::VariableDeclaration(
 		
 VariableDeclaration::VariableDeclaration(
 	std::vector<IdentifierExp*> *_idList,
-	std::pair<std::string, std::vector<int>*> *_type,
+	TypeName *_type,
 	std::vector<Expression*> *_expList,
 	int _lineno
 ) : idList(_idList), type(_type), expList(_expList), Declaration(_lineno) {
@@ -60,20 +60,18 @@ VariableDeclaration::VariableDeclaration(
 VariableDeclaration::~VariableDeclaration() {
 	for(auto const& id : *idList) {
 		delete id;
-	}
-	delete idList;
+	}	
+
+	delete idList;	
 
 	if (expList) {
 		for(auto const& exp : *expList) {
 			delete exp;
 		}
 		delete expList;
-	}
+	}	
 
-	if (type) {
-		if (type->second) delete type->second;
-		delete type;
-	}
+	if (type) delete type;
 	
 	// for testing purposes	
 	// std::cout << "VariableDeclaration destroyed" << std::endl;

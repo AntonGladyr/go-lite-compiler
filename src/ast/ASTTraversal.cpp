@@ -53,7 +53,7 @@ void ASTTraversal::traverse(Node *node, Visitor& visitor) {
 		return;
 	}
 	
-	if (typeid(VariableDeclaration) == typeid(*node)) {
+	if (typeid(VariableDeclaration) == typeid(*node)) {	
 		VariableDeclaration *varDecl = (VariableDeclaration*)node;
 		varDecl->accept(visitor);
 	}

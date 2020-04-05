@@ -85,7 +85,7 @@ bool SymbolTable::isInitFunc(Node *node) {
 
 	if (typeid(FunctionDeclaration) == typeid(*(idExp->parentNode))) {
 		FunctionDeclaration *funcDecl = (FunctionDeclaration*)idExp->parentNode;	
-		return (funcDecl->idExp->id.compare(SPECIALFUNC_INIT) == 0);
+		return (funcDecl->idExp->name.compare(SPECIALFUNC_INIT) == 0);
 	}
 }
 

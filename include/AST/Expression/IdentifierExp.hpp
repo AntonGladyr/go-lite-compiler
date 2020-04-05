@@ -8,7 +8,7 @@
 
 class IdentifierExp : public Expression {
 	public:
-		std::string id;
+		std::string name;
 		Symbol *symbol = NULL;
 		Node *parentNode = NULL;
 
@@ -16,9 +16,9 @@ class IdentifierExp : public Expression {
 		virtual std::string toString();
 	
 		IdentifierExp(
-			const std::string &_id,
+			const std::string &_name,
 			int _lineno
-		) : id(_id), Expression(_lineno) { }
+		) : name(_name), Expression(_lineno) { }
 		
 		IdentifierExp() { }
 		~IdentifierExp();

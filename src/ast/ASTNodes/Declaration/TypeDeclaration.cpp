@@ -13,41 +13,39 @@ void TypeDeclaration::accept(Visitor& v) {
 
 std::string TypeDeclaration::toString() {
 	std::stringstream ss;	
-	ss << "type " << idExp->id << " ";
-	if (type->second) {
-		for(auto const& index: *(type->second)) {
+	ss << "type " << idExp->name << " ";
+	if (type->indexes) {
+		for(auto const& index: *(type->indexes)) {
 			ss << "[" << std::to_string(index) << "]";
 		}
 	}
 	
-	ss << type->first;
+	ss << type->name;
 	
 	return ss.str();
 }
 
 std::string TypeDeclaration::symbolToStr() {
 	std::stringstream ss;
-	ss << idExp->id << " [" << CATEGORY_TYPE << "]" << " = ";
-	ss << idExp->id << " -> ";
+	ss << idExp->name << " [" << CATEGORY_TYPE << "]" << " = ";
+	ss << idExp->name << " -> ";
 	ss << symbolTypeToStr();
 	return ss.str();
 }
 
 std::string TypeDeclaration::symbolTypeToStr() {
 	std::stringstream ss;	
-	if (type->second) {
-		for(auto const& index: *(type->second)) {
+	if (type->indexes) {
+		for(auto const& index: *(type->indexes)) {
 			ss << "[" << std::to_string(index) << "]";
 		}
 	}
-	ss << type->first;
+	ss << type->name;
 	return ss.str();
 }
 
 TypeDeclaration::~TypeDeclaration() {
-	delete idExp;
-	
-	if (type->second) delete type->second;
+	delete idExp;	
 	
 	delete type;
 	
