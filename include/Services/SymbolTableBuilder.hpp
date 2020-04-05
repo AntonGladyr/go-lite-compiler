@@ -34,7 +34,8 @@ class SymbolTableBuilder : public Visitor {
 		Program *program = NULL;
 		SymbolTable *symbolTable = NULL;
 		int numTabs = 0;
-		std::stringstream ss; // for printing symbol table	
+		std::stringstream ss; // for printing symbol table
+		
 		void terminate();	
 		void checkTypeName(TypeName *type);
 		void insertFuncParams(Node *node);
@@ -44,6 +45,12 @@ class SymbolTableBuilder : public Visitor {
 			int lhsSize,
 			int rhsSize,
 			Node *node
+		);
+		void typeCompatibilityError(
+			int lineno,
+			const std::string &expName,
+			const std::string &receivedType,
+			const std::string &expectedType
 		);
 		
 	public:	

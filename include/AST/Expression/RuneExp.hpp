@@ -3,9 +3,9 @@
 
 #include <string>
 #include "Services/Visitor.hpp"
-#include "AST/Expression/Expression.hpp"
+#include "AST/Expression/IntegerTypeExp.hpp"
 
-class RuneExp : public Expression {
+class RuneExp : public IntegerTypeExp {
 	public:
 		std::string value;
 

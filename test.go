@@ -3,13 +3,9 @@ package test
 
 func main() {
 	//var main [5][5]int = 0
-	main()	
-	switch {
-		case 5 > 0 : main()
-			main = qwert()
-		case 1 > 0: main()
+	if ^"true" {
+		println("ok")
 	}
-
 	//switch {
 		//case 1: main()
 		//case "string" : main()

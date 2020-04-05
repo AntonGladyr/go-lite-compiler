@@ -5,7 +5,7 @@
 #include <sstream>
 #include "AST/Expression/RuneExp.hpp"
 
-RuneExp::RuneExp(const std::string &_runeValue, int _lineno) : value(_runeValue), Expression(_lineno) {
+RuneExp::RuneExp(const std::string &_runeValue, int _lineno) : value(_runeValue), IntegerTypeExp(_lineno) {
 	value.erase(remove(value.begin(), value.end(), '\''), value.end());
 }
 

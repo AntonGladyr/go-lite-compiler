@@ -175,6 +175,19 @@ void SymbolTableBuilder::checkAssignEquality(
 	}	
 }
 
+// prints an error for incompatible types
+void SymbolTableBuilder::typeCompatibilityError(
+	int lineno,
+	const std::string &expName,
+	const std::string &receivedType,
+	const std::string &expectedType
+) {
+	std::cerr << "Error: (line " << lineno << ") incompatible type in " << expName
+		  << " [received " << receivedType << ", expected " << expectedType << "]" << std::endl;
+	terminate();
+}
+
+
 //=====================END OF HELPER FUNCTIONS=====================
 //=================================================================
 
@@ -215,8 +228,10 @@ void SymbolTableBuilder::visit(VariableDeclaration *varDecl) {
 	for (auto var = varDecl->idList->rbegin(); var != varDecl->idList->rend(); var++) {
 		std::stringstream type;	
 		// check if a variable name is not 'main' nor 'init'
-		// parent->parent scope => basetypes
-		if (symbolTable->parent->parent == NULL) checkIdName(*var);		
+		// (parent->parent scope => basetypes)
+		if (symbolTable->parent->parent == NULL) checkIdName(*var);
+		
+		//check type name
 		if (varDecl->type) {
 			//check if type exists
 			checkTypeName(varDecl->type);	
@@ -512,16 +527,8 @@ void SymbolTableBuilder::visit(BinaryOperatorExp *binOpExp) {
 	ASTTraversal::traverse(binOpExp->rhs, *this);
 }
 
-void SymbolTableBuilder::visit(BoolExp *boolExp) {
-	if (boolExp == NULL) return;
-}
-
 void SymbolTableBuilder::visit(BuiltinsExp *builtinsExp) {
 	if (builtinsExp == NULL) return;
-}
-
-void SymbolTableBuilder::visit(FloatExp *floatExp) {
-	if (floatExp == NULL) return;
 }
 
 void SymbolTableBuilder::visit(FunctionCallExp *funcCallExp) {
@@ -541,8 +548,8 @@ void SymbolTableBuilder::visit(FunctionCallExp *funcCallExp) {
 }
 
 void SymbolTableBuilder::visit(IdentifierExp *idExp) {
-	if (idExp == NULL) return;
-		
+	if (idExp == NULL) return;	
+	
 	// check if identifier exists
 	if(symbolTable->getSymbol(symbolTable, idExp->name) == NULL) {
 		std::cerr << ss.str();
@@ -552,20 +559,78 @@ void SymbolTableBuilder::visit(IdentifierExp *idExp) {
 	}
 }
 
-void SymbolTableBuilder::visit(IntegerExp *intExp) {
+void SymbolTableBuilder::visit(IntegerExp *intExp) {	
 	if (intExp == NULL) return;
+	//set type
+	intExp->type = BASETYPE_INT;
+}
+
+void SymbolTableBuilder::visit(FloatExp *floatExp) {
+	if (floatExp == NULL) return;
+	//set type
+	floatExp->type = BASETYPE_FLOAT;
 }
 
 void SymbolTableBuilder::visit(RuneExp *runeExp) {
 	if (runeExp == NULL) return;
+	//set type
+	runeExp->type = BASETYPE_RUNE;
 }
 
-void SymbolTableBuilder::visit(StringExp *strExp) {
+void SymbolTableBuilder::visit(StringExp *strExp) {	
 	if (strExp == NULL) return;
+	//set type
+	strExp->type = BASETYPE_STRING;
+}
+
+void SymbolTableBuilder::visit(BoolExp *boolExp) {	
+	if (boolExp == NULL) return;	
+	boolExp->type = BASETYPE_BOOL;
 }
 
 void SymbolTableBuilder::visit(UnaryExp *unaryExp) {
 	if (unaryExp == NULL) return;
+	
+	ASTTraversal::traverse(unaryExp->exp, *this);
+
+	// Logical negation: expr must resolve to a bool
+	if (unaryExp->op.compare(UNARY_BANG) == 0 && unaryExp->exp->type.compare(BASETYPE_BOOL) != 0)
+		typeCompatibilityError(
+			unaryExp->lineno,    // line number
+			"unary op !",        // expression type
+			unaryExp->exp->type, // received type
+			BASETYPE_BOOL	     // expected type
+		);
+	
+	// Unary plus: expr must resolve to a numeric type (int, float64, rune)
+	//if (unaryExp->op.compare(UNARY_PLUS) == 0 && typeid(NumericTypeExp) != typeid(*unaryExp->exp)) {
+	if (unaryExp->op.compare(UNARY_PLUS) == 0 && dynamic_cast<NumericTypeExp*>(unaryExp->exp) == nullptr)
+		typeCompatibilityError(
+			unaryExp->lineno,    // line number
+			"unary op +",        // expression type
+			unaryExp->exp->type, // received type
+			"numeric type (int, float64, rune)" // expected type
+		);
+	
+	// Negation: expr must resolve to a numeric type (int, float64, rune)
+	if (unaryExp->op.compare(UNARY_MINUS) == 0 && dynamic_cast<NumericTypeExp*>(unaryExp->exp) == nullptr)	
+		typeCompatibilityError(
+			unaryExp->lineno,    // line number
+			"unary op -",        // expression type
+			unaryExp->exp->type, // received type
+			"numeric type (int, float64, rune)" // expected type
+		);
+	
+	// Bitwise negation: expr must resolve to an integer type (int, rune)
+	if (unaryExp->op.compare(UNARY_BWXOR) == 0 && dynamic_cast<IntegerTypeExp*>(unaryExp->exp) == nullptr)	
+		typeCompatibilityError(
+			unaryExp->lineno,    // line number
+			"unary op ^",        // expression type
+			unaryExp->exp->type, // received type
+			"integer type (int, rune)" // expected type
+		);
+	//set type
+	unaryExp->type = unaryExp->exp->type;
 }
 
 

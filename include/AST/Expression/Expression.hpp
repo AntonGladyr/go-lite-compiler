@@ -1,5 +1,5 @@
-#ifndef EXPRESSIONS_EXPRESSION_H
-#define EXPRESSIONS_EXPRESSION_H
+#ifndef EXPRESSIONS_EXPRESSION_HPP
+#define EXPRESSIONS_EXPRESSION_HPP
 
 #include <iostream>
 #include <string>
@@ -7,7 +7,8 @@
 
 class Expression : public Node {
 	public:
-		virtual void accept(Visitor& v) { };	
+		std::string type;
+		virtual void accept(Visitor& v) { };
 		virtual std::string toString() { };
 		
 		Expression(int _lineno) : Node(_lineno) { }
@@ -16,4 +17,3 @@ class Expression : public Node {
 };
 
 #endif
-
