@@ -442,11 +442,9 @@ void SymbolTableBuilder::visit(SwitchStatement *switchStmt) {
 
 	if (switchStmt->clauseList) {	
 		for(auto const& clause : *(switchStmt->clauseList)) {	
-			if (clause->first) {
-				if (clause->first->second) {
-					ASTTraversal::traverse(clause->first->second, *this);
-				}
-			}
+			if (clause->blockStmt) {
+				ASTTraversal::traverse(clause->blockStmt, *this);
+			}	
 		}
 	}
 

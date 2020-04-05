@@ -83,6 +83,7 @@ void yyerror(const char *s) {
 	#include "AST/Statement/IncDecStatement.hpp"
 	#include "AST/Statement/PrintStatement.hpp"
 	#include "AST/Statement/SwitchStatement.hpp"
+	#include "AST/Statement/CaseClause.hpp"
 	#include "AST/Statement/ReturnStatement.hpp"
 	#include "AST/Statement/EmptyStatement.hpp"
 	#include "AST/Declaration/FunctionParameter.hpp"
@@ -131,9 +132,9 @@ void yyerror(const char *s) {
 	IfElseStatement *ifElseStmt;
 	IncDecStatement *incDecStmt;
 	PrintStatement *printStmt;
-	SwitchStatement *switchStmt;
-	clause_list *caseBlock;
-	case_clause *caseClause;
+	SwitchStatement *switchStmt;	
+	CaseClause *caseClause;
+	std::vector<CaseClause*> *caseBlock;
 	EmptyStatement *emptyStmt;
 		
 	TypeName *type;
@@ -315,7 +316,7 @@ type : tIDENTIFIER { $$ = new TypeName(*$1, NULL, yylineno); delete $1; }
 	$$->indexes->push_back($2);	
 	if ($4->indexes) { $$->indexes->insert($$->indexes->end(), $4->indexes->begin(), $4->indexes->end()); }	
     }
-    | tLPAREN type tRPAREN { $$ = new TypeName(); $$ = $2; }
+    | tLPAREN type tRPAREN { $$ = new TypeName(); $$ = $2; /*TODO: fix*/ }
     ;
 
 id_listne : id_exp { $$ = new std::vector<IdentifierExp*>(); $$->push_back($1); }
@@ -393,18 +394,11 @@ switchstmt : tSWITCH tLBRACE case_block tRBRACE { $$ = new SwitchStatement(NULL,
     ;
 
 case_block : default_clause 
-	{ $$ = new clause_list(); 
-	std::pair<case_clause*, SWITCH_CLAUSE> *clausePair = new std::pair<case_clause*, SWITCH_CLAUSE>();
-	clausePair->first = $1; clausePair->second = SWITCH_CLAUSE::DEFAULT;
-	$$->push_back(clausePair); }	
+	{ $$ = new std::vector<CaseClause*>(); $$->push_back($1); }
     | case_clause case_block
-	{ 
-	  $$ = new clause_list();
-	  std::pair<case_clause*, SWITCH_CLAUSE> *clausePair = new std::pair<case_clause*, SWITCH_CLAUSE>();
-	  clausePair->first = $1; clausePair->second = SWITCH_CLAUSE::CASE;
-	  $$->push_back(clausePair);
-	  $$->insert($$->end(), $2->begin(), $2->end()); } 
-    | %empty { $$ = new clause_list(); }
+	{ $$ = new std::vector<CaseClause*>(); $$->push_back($1);	
+	  if ($2) $$->insert($$->end(), $2->begin(), $2->end()); } 
+    | %empty { $$ = NULL; }
     ;
 
 switch_stmts : stmt_list
@@ -412,11 +406,13 @@ switch_stmts : stmt_list
     ;
 
 case_clause : tCASE exp_list tCOLON switch_stmts 
-	{  $$ = new case_clause(); $$->first = $2; $$->second = new BlockStatement($4, yylineno); }
+	{ $$ = new CaseClause($2, new BlockStatement($4, yylineno), SWITCH_CLAUSE::CASE, yylineno);
+	 /*$$ = new case_clause(); $$->first = $2; $$->second = new BlockStatement($4, yylineno);*/ }
     ; 
 
 default_clause : tDEFAULT tCOLON switch_stmts
-	{ $$ = new case_clause(); $$->first = NULL; $$->second = new BlockStatement($3, yylineno); }
+	{ $$ = new CaseClause(NULL, new BlockStatement($3, yylineno), SWITCH_CLAUSE::DEFAULT, yylineno);
+	/*$$ = new case_clause(); $$->first = NULL; $$->second = new BlockStatement($3, yylineno);*/ }
     ;
 
 incdecstmt : exp tINC { $$ = new IncDecStatement($1, IncDecOp::INC, yylineno); } 

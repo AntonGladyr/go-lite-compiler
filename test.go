@@ -1,6 +1,23 @@
 package test
 
-func test(f test) {
+
+func main() {
+	//var main [5][5]int = 0
+	main()
+	
+	switch {
+		case 5 > 0 : main()
+		case 1 > 0: main()
+	}
+
+	//switch {
+		//case 1: main()
+		//case "string" : main()
+	//}
+	//t(5) = main()
+}
+
+func test(f int) {
 	var f1 float64
 	return
 	return f1[int]
@@ -42,12 +59,6 @@ func init() {
 func init() {
 }
 
-
-func main() {
-	var main [5][5]int = 0
-	main(main)
-	//t(5) = main()
-}
 
 //func main() {
 //}

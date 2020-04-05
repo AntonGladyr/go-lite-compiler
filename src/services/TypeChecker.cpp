@@ -78,15 +78,13 @@ void TypeChecker::visit(SwitchStatement *switchStmt) {
 		
 	if (switchStmt->clauseList) {	
 		for(auto const& clause : *(switchStmt->clauseList)) {	
-			if (clause->first) {
-				if (clause->first->first) {
-					// case expressions	
-				}
+			if (clause->expList) {
+				// case expressions
+			}
 
-				if (clause->first->second) {
-					// case/default block
-					ASTTraversal::traverse(clause->first->second, *this);
-				}
+			if (clause->blockStmt) {
+				// case/default block statement
+				ASTTraversal::traverse(clause->blockStmt, *this);
 			}
 		}
 	}

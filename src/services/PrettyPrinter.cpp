@@ -93,25 +93,23 @@ void PrettyPrinter::visit(SwitchStatement *switchStmt) {
 	numTabs++;
 	if (switchStmt->clauseList) {	
 		for(auto const& clause : *(switchStmt->clauseList)) {
-			if (clause->second == SWITCH_CLAUSE::CASE) {
+			if (clause->clauseType == SWITCH_CLAUSE::CASE) {
 				std::cout << getTabs() << "case";
 			}
 
-			if (clause->second == SWITCH_CLAUSE::DEFAULT) {	
+			if (clause->clauseType == SWITCH_CLAUSE::DEFAULT) {	
 				std::cout << getTabs() << "default";
 			}
 			
-			if (clause->first) {
-				if (clause->first->first) {
-					std::cout << " " << *(clause->first->first);
-				}
-
-				std::cout << ":";
-
-				if (clause->first->second) {
-					ASTTraversal::traverse(clause->first->second, *this);
-				}
+			if (clause->expList) {
+				std::cout << " " << *(clause->expList);
 			}
+
+			std::cout << ":";
+
+			if (clause->blockStmt) {
+				ASTTraversal::traverse(clause->blockStmt, *this);
+			}	
 		}
 	}
 	

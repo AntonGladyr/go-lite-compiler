@@ -15,8 +15,6 @@
 class BlockStatement;
 class IdentifierExp;
 class FunctionParameter;
-//pair<id, pair<type, indexes>>
-//typedef std::pair<IdentifierExp*, std::pair<std::string, std::vector<int>*>*> param_type;
 
 class FunctionDeclaration : public Declaration {
 	public:
