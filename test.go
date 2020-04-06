@@ -1,9 +1,10 @@
 package test
 
+//var test1 int = "str"
 
 func main() {
 	//var main [5][5]int = 0
-	if +bool {
+	if -true {
 		println("ok")
 	}
 	//switch {

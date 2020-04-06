@@ -563,9 +563,9 @@ void SymbolTableBuilder::visit(IdentifierExp *idExp) {
 	
 	// if id name is the same as types/constants, wrap in braces
 	if (symbol->name.compare(symbol->type) == 0)
-		type << "{" << symbol->name << "}";
+		type << "{" << symbol->type << "}";
 	else
-		type << symbol->name;
+		type << symbol->type;
 	idExp->type = type.str(); 
 }
 
