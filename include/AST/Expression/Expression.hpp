@@ -7,6 +7,8 @@
 
 class Expression : public Node {
 	public:
+		Symbol *symbol = NULL;
+
 		std::string type;
 		virtual void accept(Visitor& v) { };
 		virtual std::string toString() { };

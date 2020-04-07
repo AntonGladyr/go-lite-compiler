@@ -86,10 +86,10 @@ ESCAPE [abfnrtv\\'"]
 <LINE_COMMENT><<EOF>> yyterminate();
 	
 "/*"	BEGIN(COMMENT);
-<COMMENT>"/*"	{ fprintf(stderr, "Error: (line %d) Multiple comments opened\n", yylineno); exit(1); }
+<COMMENT>"/*"	{ fprintf(stderr, "Error: (line %d) Multiple comments opened\n", yylineno); std::exit(EXIT_FAILURE); }
 <COMMENT>"*/"	BEGIN(INITIAL);
 <COMMENT><<EOF>> {
-	fprintf(stderr, "Error: (line %d) Reached end of file while scanning block comment\n", yylineno); exit(1);
+	fprintf(stderr, "Error: (line %d) Reached end of file while scanning block comment\n", yylineno); std::exit(EXIT_FAILURE);
 }
 <COMMENT>.|"\n"	;
 
@@ -237,7 +237,7 @@ ESCAPE [abfnrtv\\'"]
 	RETURN(tSTRINGVAL);
 }
 
-. { fprintf(stderr, "Error: (line %d) unexpected character '%s'\n", yylineno, yytext); exit(1); }
+. { fprintf(stderr, "Error: (line %d) unexpected character '%s'\n", yylineno, yytext); std::exit(EXIT_FAILURE); }
 
 %%
 

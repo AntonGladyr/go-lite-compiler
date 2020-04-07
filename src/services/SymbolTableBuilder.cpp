@@ -54,7 +54,7 @@ void SymbolTableBuilder::terminate() {
 	symbolTable = NULL;
 	delete program;
 	program = NULL;	
-	exit(1);
+	std::exit(EXIT_FAILURE);
 }
 
 // helper function for inserting function parameters into scope
@@ -210,7 +210,8 @@ void SymbolTableBuilder::visit(Program *prg) {
 }
 
 void SymbolTableBuilder::visit(VariableDeclaration *varDecl) {
-	if (varDecl == NULL) return;	
+	if (varDecl == NULL) return;
+
 	//copy string stream for printing errors
 	symbolTable->ss.str(ss.str());
 	
@@ -224,6 +225,7 @@ void SymbolTableBuilder::visit(VariableDeclaration *varDecl) {
 	//check if number of ids equals to the number of the expressions
 	if (varDecl->expList)
 		checkAssignEquality(varDecl->idList->size(), varDecl->expList->size(), varDecl);
+	
 	// reverse iteration for identifiers
 	for (auto var = varDecl->idList->rbegin(); var != varDecl->idList->rend(); var++) {
 		std::stringstream type;	
@@ -523,8 +525,44 @@ void SymbolTableBuilder::visit(ArrayExp *arrExp) {
 
 void SymbolTableBuilder::visit(BinaryOperatorExp *binOpExp) {
 	if (binOpExp == NULL) return;
+	
 	ASTTraversal::traverse(binOpExp->lhs, *this);
 	ASTTraversal::traverse(binOpExp->rhs, *this);
+	
+	// find the type of the binary operation
+	//TODO: input can be numeric type
+	bool isIntegerOp = integerOpList.find(binOpExp->op) != integerOpList.end();	
+	bool isNumericOp = numericOpList.find(binOpExp->op) != numericOpList.end();	
+	bool isOrderedOp = orderedOpList.find(binOpExp->op) != orderedOpList.end();	
+	bool isBoolOp = boolOpList.find(binOpExp->op) != boolOpList.end();	
+	bool isComparableOp = comparableOpList.find(binOpExp->op) != comparableOpList.end();
+	
+	// find the type of the lhs
+	bool isBoolLhs = lhs->type.compare(BASETYPE_BOOL) == 0;
+	bool isComparableLhs = lhs->symbol && lhs->symbol->category.compare(CATEGORY_FUNC) != 0; // anything except functions
+	bool isOrderedLhs = orderedTypesList.find(lhs->type) != orderedTypesList.end();
+	bool isNumericLhs = numericTypesList.find(lhs->type) != numericTypesList.end();
+	bool isIntegerLhs = integerTypesList.find(lhs->type) != integerTypesList.end();
+	
+	// find the type of the rhs
+	bool isBoolRhs = rhs->type.compare(BASETYPE_BOOL) == 0;
+	bool isComparableRhs = rhs->symbol && rhs->symbol->category.compare(CATEGORY_FUNC) != 0; // anything except functions
+	bool isOrderedRhs = orderedTypesList.find(rhs->type) != orderedTypesList.end();
+	bool isNumericRhs = numericTypesList.find(rhs->type) != numericTypesList.end();
+	bool isIntegerRhs = integerTypesList.find(rhs->type) != integerTypesList.end();
+	
+	if (lhs->type.compare(BASETYPE_STRING) && binOpExp->op.compare(BINARY_PLUS) && rhs->type.compare(BASETYPE_STRING))
+		binOpExp->type = BASETYPE_STRING;
+	else if (lhs->type.compare(BASETYPE_BOOL) && isBoolOp && rhs->type.compare(BASETYPE_BOOL))
+		binOpExp->type = BASETYPE_BOOL;
+	else if (isComparableLhs && isComparableOp && isComparableRhs)
+		binOpExp->type = 
+	else if (isOrderedLhs && isOrderedOp && isOrderedRhs)
+	else if (isNumericLhs && isNumericOp && isNumericRhs)
+	else if (isIntegerLhs && isIntegerOp && isIntegerRhs)
+	else {
+		terminate();
+	}
 }
 
 void SymbolTableBuilder::visit(BuiltinsExp *builtinsExp) {
@@ -560,13 +598,17 @@ void SymbolTableBuilder::visit(IdentifierExp *idExp) {
 	}
 	
 	std::stringstream type;
-	
+	   
 	// if id name is the same as types/constants, wrap in braces
 	if (symbol->name.compare(symbol->type) == 0)
 		type << "{" << symbol->type << "}";
 	else
 		type << symbol->type;
-	idExp->type = type.str(); 
+	
+	// save type of the id
+	idExp->type = type.str();
+	// save symbol pointer to the identifier expression
+	idExp->symbol = symbol;
 }
 
 void SymbolTableBuilder::visit(IntegerExp *intExp) {	
@@ -612,8 +654,9 @@ void SymbolTableBuilder::visit(UnaryExp *unaryExp) {
 			BASETYPE_BOOL	     // expected type
 		);
 	
+	//TODO: fix for id expressions: <dynamic_cast<NumericTypeExp*>(unaryExp->exp)>
 	// Unary plus: expr must resolve to a numeric type (int, float64, rune)
-	//if (unaryExp->op.compare(UNARY_PLUS) == 0 && typeid(NumericTypeExp) != typeid(*unaryExp->exp)) {
+	//if (unaryExp->op.compare(UNARY_PLUS) == 0 && typeid(NumericTypeExp) != typeid(*unaryExp->exp)) {	
 	if (unaryExp->op.compare(UNARY_PLUS) == 0 && dynamic_cast<NumericTypeExp*>(unaryExp->exp) == nullptr)
 		typeCompatibilityError(
 			unaryExp->lineno,    // line number

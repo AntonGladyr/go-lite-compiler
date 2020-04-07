@@ -25,6 +25,25 @@ const std::string BINARY_LESS  	 =  "<";
 const std::string BINARY_GREATEREQ = ">=";
 const std::string BINARY_LESSEQ    = "<=";
 
+const std::set<std::string> integerOpList = {
+	BINARY_REMAIN, BINARY_BWOR, BINARY_BWAND, BINARY_LEFTSHIFT, BINARY_RIGHTSHIFT, BINARY_BWANDNOT, BINARY_BWXOR
+};
+
+const std::set<std::string> numericOpList = { BINARY_PLUS, BINARY_MINUS, BINARY_TIMES, BINARY_DIV };
+
+const std::set<std::string> orderedOpList = { BINARY_LESS, BINARY_GREATER, BINARY_GREATEREQ BINARY_LESSEQ };
+
+const std::set<std::string> boolOpList = { BINARY_OR, BINARY_AND };
+
+const std::set<std::string> comparableOpList = { BINARY_EQUAL, BINARY_NOTEQ };
+
+const std::set<std::string> orderedTypesList = { BASETYPE_INT, BASETYPE_FLOAT, BASETYPE_STRING };
+
+const std::set<std::string> numericTypesList = { BASETYPE_INT, BASETYPE_FLOAT, BASETYPE_RUNE }
+
+const std::set<std::string> integerTypesList = { BASETYPE_INT, BASETYPE_RUNE }
+
+
 class BinaryOperatorExp : public Expression {
 	public:
 		std::string op;
