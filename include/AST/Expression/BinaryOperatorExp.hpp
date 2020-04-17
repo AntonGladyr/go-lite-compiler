@@ -2,6 +2,7 @@
 #define BINARYOPERATOREXP_HPP
 
 #include <string>
+#include <set>
 #include "Services/Visitor.hpp"
 #include "AST/Expression/Expression.hpp"
 
@@ -31,17 +32,11 @@ const std::set<std::string> integerOpList = {
 
 const std::set<std::string> numericOpList = { BINARY_PLUS, BINARY_MINUS, BINARY_TIMES, BINARY_DIV };
 
-const std::set<std::string> orderedOpList = { BINARY_LESS, BINARY_GREATER, BINARY_GREATEREQ BINARY_LESSEQ };
+const std::set<std::string> orderedOpList = { BINARY_LESS, BINARY_GREATER, BINARY_GREATEREQ, BINARY_LESSEQ };
 
 const std::set<std::string> boolOpList = { BINARY_OR, BINARY_AND };
 
 const std::set<std::string> comparableOpList = { BINARY_EQUAL, BINARY_NOTEQ };
-
-const std::set<std::string> orderedTypesList = { BASETYPE_INT, BASETYPE_FLOAT, BASETYPE_STRING };
-
-const std::set<std::string> numericTypesList = { BASETYPE_INT, BASETYPE_FLOAT, BASETYPE_RUNE }
-
-const std::set<std::string> integerTypesList = { BASETYPE_INT, BASETYPE_RUNE }
 
 
 class BinaryOperatorExp : public Expression {

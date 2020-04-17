@@ -11,6 +11,7 @@
 #include "AST/Expression/IdentifierExp.hpp"
 #include "AST/Declaration/TypeName.hpp"
 #include "AST/Declaration/FunctionParameter.hpp"
+#include "TypeDescriptorTable/TypeDescriptor.hpp"
 
 class BlockStatement;
 class IdentifierExp;

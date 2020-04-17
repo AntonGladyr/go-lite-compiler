@@ -57,7 +57,10 @@ Symbol *SymbolTable::putSymbol(
 		// if id already declared, throw an error
 		if (isEqual(s->name, name, s, node)) return NULL;	
 	}
-	this->table[i] = new Symbol(name, category, type, this->table[i], node);
+	
+	std::string baseType = findBaseType(this, type);
+	this->table[i] = new Symbol(name, category, type, baseType, this->table[i], node);
+
 	return this->table[i];
 }
 
@@ -105,6 +108,24 @@ bool SymbolTable::isEqual(
 	}
 	
 	return false;
+}
+
+std::string SymbolTable::findBaseType(SymbolTable *t, std::string type) {	
+	int i = Hash(type);
+
+	 // Check the current scope
+	for (Symbol *s = t->table[i]; s; s = s->next) {
+		if ( s->category.compare(CATEGORY_VAR) == 0 &&
+		     s->name.compare(type) == 0 ) 
+			type = s->name; // base type
+	}
+
+	// Check for existence of a parent scope
+	if (t->parent == NULL)
+		return type;
+	
+	// Check the parent scopes
+	return findBaseType(t->parent, type);
 }
 
 std::string SymbolTable::toString() {	
