@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 #include "AST/Node.hpp"
-#include "TypeDescriptorTable/TypeDescriptor.hpp"
+#include "TypeDescriptor/TypeDescriptor.hpp"
 #include "SymbolTable/Symbol.hpp"
 
 class Expression : public Node {

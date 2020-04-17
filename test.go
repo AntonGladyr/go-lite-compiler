@@ -4,7 +4,7 @@ package test
 
 func main() {
 	//var main [5][5]int = 0
-	if ^'t' {
+	if !'t' {
 		println("ok")
 	}
 	//switch {

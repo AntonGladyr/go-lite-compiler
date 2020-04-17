@@ -2,7 +2,7 @@
 #define TYPE_DESCRIPTOR_CPP
 
 #include <iostream>
-#include "TypeDescriptorTable/TypeDescriptor.hpp"
+#include "TypeDescriptor/TypeDescriptor.hpp"
 
 bool TypeDescriptor::isComparableType() {
 	return false;

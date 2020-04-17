@@ -3,16 +3,16 @@
 
 #include <string>
 #include "Services/Visitor.hpp"
-#include "AST/Expression/NumericTypeExp.hpp"
+#include "AST/Expression/Expression.hpp"
 
-class FloatExp : public NumericTypeExp {
+class FloatExp : public Expression {
 	public:
 		double value;
 
 		virtual void accept(Visitor& v) override;
 		virtual std::string toString();
 	
-		FloatExp(double _floatValue, int _lineno) : value(_floatValue), NumericTypeExp(_lineno) { }
+		FloatExp(double _floatValue, int _lineno) : value(_floatValue), Expression(_lineno) { }
 		FloatExp() { }
 		~FloatExp();
 };
