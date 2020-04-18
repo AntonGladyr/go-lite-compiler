@@ -541,7 +541,7 @@ void SymbolTableBuilder::visit(BinaryOperatorExp *binOpExp) {
 	if (binOpExp->lhs->symbol) 
 		isFuncLhs = binOpExp->lhs->symbol->category.compare(CATEGORY_FUNC) == 0;
 	if (binOpExp->rhs->symbol) 
-		isFuncLhs = binOpExp->rhs->symbol->category.compare(CATEGORY_FUNC) == 0;
+		isFuncRhs = binOpExp->rhs->symbol->category.compare(CATEGORY_FUNC) == 0;
 	
 	// resolve binary operation type
 	if ( binOpExp->lhs->type.isStringType() &&     // "string"
