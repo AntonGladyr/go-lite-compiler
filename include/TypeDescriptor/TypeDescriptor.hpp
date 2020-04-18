@@ -37,18 +37,21 @@ class TypeDescriptor {
 
 		// there are 6 type groups: bool, comparable, ordered, numeric, string, integer
 		// the next functions help to identify a group type of the current type descriptor
-		bool isComparableType();
 		bool isOrderedType();
 		bool isNumericType();
 		bool isIntegerType();
 		bool isStringType();
 		bool isBoolType();
+		static std::string resolveNumericType(
+			const std::string &lhsType, 
+			const std::string &rhsType
+		);
 
 		TypeDescriptor() { }
 		TypeDescriptor(
-			std::string _name,
-			std::string _baseType,
-			std::string _category,
+			const std::string &_name,
+			const std::string &_baseType,
+			const std::string &_category,
 			Node *_node	
 		) : name(_name), baseType(_baseType), category(_category), node(_node) { }
 };

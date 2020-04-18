@@ -6,6 +6,8 @@ type str string
 type float float64
 type float2 float
 
+var zzzz = 5 + 5.5
+
 func main() {
 	type t z
 	type z bool
@@ -20,7 +22,7 @@ func main() {
 	var y str3 = str3("str")
 	var fl float3 = float3(5.5)
 	
-	if +5 {
+	if 5 + 5.5 {
 	}
 
 

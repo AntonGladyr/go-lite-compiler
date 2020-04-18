@@ -47,6 +47,12 @@ class BinaryOperatorExp : public Expression {
 		
 		virtual void accept(Visitor& v) override;
 		virtual std::string toString();
+
+		bool isIntegerOperator();
+		bool isNumericOperator();
+		bool isOrderedOperator();
+		bool isBoolOperator();
+		bool isComparableOperator();
 		
 		BinaryOperatorExp(
 			const std::string &_op, 

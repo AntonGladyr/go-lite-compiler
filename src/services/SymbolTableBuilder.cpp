@@ -526,46 +526,93 @@ void SymbolTableBuilder::visit(ArrayExp *arrExp) {
 	}
 }
 
-void SymbolTableBuilder::visit(BinaryOperatorExp *binOpExp) {
+void SymbolTableBuilder::visit(BinaryOperatorExp *binOpExp) {	
 	if (binOpExp == NULL) return;
 	
 	ASTTraversal::traverse(binOpExp->lhs, *this);
-	ASTTraversal::traverse(binOpExp->rhs, *this);
+	ASTTraversal::traverse(binOpExp->rhs, *this);	
 	
-	// find the type of the binary operation: lhs op rhs -> type
-	//TODO: input can be numeric type
-	/*bool isIntegerOp = integerOpList.find(binOpExp->op) != integerOpList.end();	
-	bool isNumericOp = numericOpList.find(binOpExp->op) != numericOpList.end();	
-	bool isOrderedOp = orderedOpList.find(binOpExp->op) != orderedOpList.end();	
-	bool isBoolOp = boolOpList.find(binOpExp->op) != boolOpList.end();	
-	bool isComparableOp = comparableOpList.find(binOpExp->op) != comparableOpList.end();
 	
-	// find the type of the lhs
-	bool isBoolLhs = lhs->type.compare(BASETYPE_BOOL) == 0;
-	bool isComparableLhs = lhs->symbol && lhs->symbol->category.compare(CATEGORY_FUNC) != 0; // anything except functions
-	bool isOrderedLhs = orderedTypesList.find(lhs->type) != orderedTypesList.end();
-	bool isNumericLhs = numericTypesList.find(lhs->type) != numericTypesList.end();
-	bool isIntegerLhs = integerTypesList.find(lhs->type) != integerTypesList.end();
+	// for comparable operators
+	bool isFuncLhs = false;
+	bool isFuncRhs = false;
 	
-	// find the type of the rhs
-	bool isBoolRhs = rhs->type.compare(BASETYPE_BOOL) == 0;
-	bool isComparableRhs = rhs->symbol && rhs->symbol->category.compare(CATEGORY_FUNC) != 0; // anything except functions
-	bool isOrderedRhs = orderedTypesList.find(rhs->type) != orderedTypesList.end();
-	bool isNumericRhs = numericTypesList.find(rhs->type) != numericTypesList.end();
-	bool isIntegerRhs = integerTypesList.find(rhs->type) != integerTypesList.end();
+	//check is func
+	if (binOpExp->lhs->symbol) 
+		isFuncLhs = binOpExp->lhs->symbol->category.compare(CATEGORY_FUNC) == 0;
+	if (binOpExp->rhs->symbol) 
+		isFuncLhs = binOpExp->rhs->symbol->category.compare(CATEGORY_FUNC) == 0;
 	
-	if (lhs->type.compare(BASETYPE_STRING) && binOpExp->op.compare(BINARY_PLUS) && rhs->type.compare(BASETYPE_STRING))
-		binOpExp->type = BASETYPE_STRING;
-	else if (lhs->type.compare(BASETYPE_BOOL) && isBoolOp && rhs->type.compare(BASETYPE_BOOL))
-		binOpExp->type = BASETYPE_BOOL;
-	else if (isComparableLhs && isComparableOp && isComparableRhs)
-		binOpExp->type = 
-	else if (isOrderedLhs && isOrderedOp && isOrderedRhs)
-	else if (isNumericLhs && isNumericOp && isNumericRhs)
-	else if (isIntegerLhs && isIntegerOp && isIntegerRhs)
+	// resolve binary operation type
+	if ( binOpExp->lhs->type.isStringType() &&     // "string"
+	     binOpExp->op.compare(BINARY_PLUS) == 0 && // +
+	     binOpExp->rhs->type.isStringType()        // "string"
+	) binOpExp->type = TypeDescriptor(
+				BASETYPE_STRING,
+				BASETYPE_STRING,
+				CATEGORY_CONST,
+				binOpExp
+			); // string concatenation
+	
+	else if ( binOpExp->lhs->type.isBoolType() && // bool
+                  binOpExp->isBoolOperator() &&       // { ||, && }
+		  binOpExp->rhs->type.isBoolType()    // bool
+	) binOpExp->type = TypeDescriptor(
+				BASETYPE_BOOL,
+				BASETYPE_BOOL,
+				CATEGORY_CONST,
+				binOpExp
+			); // bool type operations
+	
+	else if ( !isFuncLhs && // anything except func type
+		  binOpExp->isComparableOperator() && // { ==, != }
+		  isFuncRhs && // anything except func type
+		  binOpExp->lhs->type.baseType.compare(binOpExp->rhs->type.baseType) == 0 // lhs type equals to the rhs type
+	) binOpExp->type = TypeDescriptor(
+				BASETYPE_BOOL,
+				BASETYPE_BOOL,
+				CATEGORY_CONST,
+				binOpExp
+			); // comparable type operations
+	
+	else if ( binOpExp->lhs->type.isOrderedType() && // { int, float64, string }
+		  binOpExp->isOrderedOperator() &&       // { < , > , <= , >= }
+		  binOpExp->rhs->type.isOrderedType()    // { int, float64, string }
+	) binOpExp->type = TypeDescriptor(
+				BASETYPE_BOOL,
+				BASETYPE_BOOL,
+				CATEGORY_CONST,
+				binOpExp
+			); // ordered type operations
+		
+	else if ( binOpExp->lhs->type.isNumericType() && // { int, float64, rune }
+		  binOpExp->isNumericOperator() &&       // { + , - , * , / }
+		  binOpExp->rhs->type.isNumericType()    // { int, float64, rune }
+	) binOpExp->type = TypeDescriptor(
+				TypeDescriptor::resolveNumericType( binOpExp->lhs->type.baseType,
+								    binOpExp->rhs->type.baseType ),
+				TypeDescriptor::resolveNumericType( binOpExp->lhs->type.baseType,
+								    binOpExp->rhs->type.baseType ),
+				CATEGORY_CONST,
+				binOpExp
+			); // numeric type operations
+	
+	else if ( binOpExp->lhs->type.isIntegerType() && // { int, rune }
+		  binOpExp->isIntegerOperator() &&       // { % , | , & , << , >> , &^ , ^ }
+		  binOpExp->rhs->type.isIntegerType()    // { int, rune }
+	) binOpExp->type = TypeDescriptor(
+				BASETYPE_INT,
+				BASETYPE_INT,
+				CATEGORY_CONST,
+				binOpExp
+			); // integer type operations	
 	else {
+		std::cerr << "Error: (line " << binOpExp->lineno << ") "
+			  << "assigment lhs type is incompatible with rhs type "
+			  << "[" << binOpExp->lhs->type.name << " != "
+			  << binOpExp->rhs->type.name << "]" << std::endl;
 		terminate();
-	}*/
+	}
 }
 
 void SymbolTableBuilder::visit(BuiltinsExp *builtinsExp) {
@@ -627,7 +674,7 @@ void SymbolTableBuilder::visit(IntegerExp *intExp) {
 				BASETYPE_INT,
 				BASETYPE_INT,
 				CATEGORY_TYPE,
-				NULL
+				intExp
 			);
 }
 
@@ -638,7 +685,7 @@ void SymbolTableBuilder::visit(FloatExp *floatExp) {
 				BASETYPE_FLOAT,
 				BASETYPE_FLOAT,
 				CATEGORY_TYPE,
-				NULL
+				floatExp
 			);
 }
 
@@ -649,7 +696,7 @@ void SymbolTableBuilder::visit(RuneExp *runeExp) {
 				BASETYPE_RUNE,
 				BASETYPE_RUNE,
 				CATEGORY_TYPE,
-				NULL
+				runeExp
 			);
 }
 
@@ -660,7 +707,7 @@ void SymbolTableBuilder::visit(StringExp *strExp) {
 				BASETYPE_STRING,
 				BASETYPE_STRING,
 				CATEGORY_TYPE,
-				NULL
+				strExp
 			);
 }
 
@@ -671,7 +718,7 @@ void SymbolTableBuilder::visit(BoolExp *boolExp) {
 				BASETYPE_BOOL,
 				BASETYPE_BOOL,
 				CATEGORY_TYPE,
-				NULL
+				boolExp
 			);
 }
 
