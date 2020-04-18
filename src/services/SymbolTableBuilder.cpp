@@ -682,7 +682,7 @@ void SymbolTableBuilder::visit(UnaryExp *unaryExp) {
 	ASTTraversal::traverse(unaryExp->exp, *this);	
 
 	// Logical negation: expr must resolve to a bool
-	if (unaryExp->op.compare(UNARY_BANG) == 0 && unaryExp->exp->type.name.compare(BASETYPE_BOOL) != 0)
+	if (unaryExp->op.compare(UNARY_BANG) == 0 && !unaryExp->exp->type.isBoolType())
 		typeCompatibilityError(
 			unaryExp->lineno,    // line number
 			"unary op !",        // expression type

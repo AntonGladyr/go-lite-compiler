@@ -1,7 +1,6 @@
 #ifndef TYPE_DESCRIPTOR_CPP
 #define TYPE_DESCRIPTOR_CPP
 
-#include <iostream>
 #include "TypeDescriptor/TypeDescriptor.hpp"
 
 bool TypeDescriptor::isComparableType() {
@@ -23,8 +22,8 @@ bool TypeDescriptor::isStringType() {
 	return false;
 }
 
-bool TypeDescriptor::isBoolType() {
-	return false;
+bool TypeDescriptor::isBoolType() {	
+	return baseType.compare(BASETYPE_BOOL) == 0;
 }
 
 #endif

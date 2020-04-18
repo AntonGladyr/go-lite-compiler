@@ -66,7 +66,7 @@ Symbol *SymbolTable::putSymbol(
 
 Symbol *SymbolTable::getSymbol(SymbolTable *t, const std::string &name) {
 	int i = Hash(name);
-
+	
 	 // Check the current scope
 	for (Symbol *s = t->table[i]; s; s = s->next) {	
 		if (s->name.compare(name) == 0) return s;
@@ -110,22 +110,14 @@ bool SymbolTable::isEqual(
 	return false;
 }
 
-std::string SymbolTable::findBaseType(SymbolTable *t, std::string type) {	
-	int i = Hash(type);
-
-	 // Check the current scope
-	for (Symbol *s = t->table[i]; s; s = s->next) {
-		if ( s->category.compare(CATEGORY_VAR) == 0 &&
-		     s->name.compare(type) == 0 ) 
-			type = s->name; // base type
-	}
-
-	// Check for existence of a parent scope
-	if (t->parent == NULL)
-		return type;
+std::string SymbolTable::findBaseType(SymbolTable *t, std::string type) {
+	Symbol *s = NULL;
 	
-	// Check the parent scopes
-	return findBaseType(t->parent, type);
+	while (true) {
+		s = getSymbol(t, type);
+		if (s == NULL || s->name.compare(s->type) == 0) return type;
+		type = s->type;
+	}
 }
 
 std::string SymbolTable::toString() {	
