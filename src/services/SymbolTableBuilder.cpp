@@ -143,7 +143,7 @@ void SymbolTableBuilder::checkTypeName(TypeName *type) {
 void SymbolTableBuilder::checkIdName(Node *node) {	
 	if (typeid(IdentifierExp) != typeid(*node)) return;
 	
-	IdentifierExp * idExp = (IdentifierExp*)node;	
+	IdentifierExp * idExp = (IdentifierExp*)node;
 	if (idExp->name.compare(SPECIALFUNC_MAIN) == 0 ||
 	    idExp->name.compare(SPECIALFUNC_INIT) == 0) 
 	{
@@ -173,6 +173,41 @@ void SymbolTableBuilder::checkAssignEquality(
 			  << " != rhs(" << rhsSize << ")" << std::endl;
 		terminate();
 	}	
+}
+
+// throws an error for malformed binary expressions
+void SymbolTableBuilder::binaryExpError(
+	const std::string &lhsType,
+	const std::string &rhsType,
+	int lineno
+) {	
+	std::cerr << "Error: (line " << lineno << ") "
+		  << "assigment lhs type is incompatible with rhs type "
+		  << "[" << lhsType << " != " << rhsType << "]" << std::endl;
+	terminate();	
+}
+
+// return type name of an expression
+std::string SymbolTableBuilder::getReceivedTypeName(Expression *exp) {
+	std::stringstream receivedType;
+	bool isTypeName = hasTypeName(exp);
+	
+	if (typeid(IdentifierExp) == typeid(*exp) && isTypeName) {
+		IdentifierExp * idExp = (IdentifierExp*)exp;
+		receivedType << "{" << idExp->name << "}";
+	}
+	else receivedType << exp->type.name;
+
+	return receivedType.str();
+}
+
+// check if an identifier has the same name as a type
+bool SymbolTableBuilder::hasTypeName(Expression *exp) {
+	if (typeid(IdentifierExp) != typeid(*exp)) return false;
+	
+	IdentifierExp * idExp = (IdentifierExp*)exp;
+	Symbol *s = symbolTable->getSymbol(symbolTable, idExp->name);
+	return s->category.compare(CATEGORY_TYPE) == 0;
 }
 
 // prints an error for incompatible types
@@ -501,10 +536,6 @@ void SymbolTableBuilder::visit(PrintStatement *printStmt) {
 	}
 }
 
-void SymbolTableBuilder::visit(BreakStatement *breakStmt) { }
-
-void SymbolTableBuilder::visit(ContinueStatement *continueStmt) { }
-
 void SymbolTableBuilder::visit(IncDecStatement *incDecStmt) {
 	if (incDecStmt == NULL) return;
 	ASTTraversal::traverse(incDecStmt->exp, *this);
@@ -531,12 +562,21 @@ void SymbolTableBuilder::visit(BinaryOperatorExp *binOpExp) {
 	
 	ASTTraversal::traverse(binOpExp->lhs, *this);
 	ASTTraversal::traverse(binOpExp->rhs, *this);	
-	
-	
+		
+	// check if a given identifier is a type name
+	// to avoid expressions with type name, i.e.: int + int
+	//throw an error if such expression occurs
+	if (hasTypeName(binOpExp->lhs) || hasTypeName(binOpExp->rhs)) 
+		binaryExpError(
+			getReceivedTypeName(binOpExp->lhs),
+			getReceivedTypeName(binOpExp->rhs),
+			binOpExp->lineno
+		);
+
 	// for comparable operators
 	bool isFuncLhs = false;
-	bool isFuncRhs = false;
-	
+	bool isFuncRhs = false;	
+
 	//check is func
 	if (binOpExp->lhs->symbol) 
 		isFuncLhs = binOpExp->lhs->symbol->category.compare(CATEGORY_FUNC) == 0;
@@ -607,11 +647,11 @@ void SymbolTableBuilder::visit(BinaryOperatorExp *binOpExp) {
 				binOpExp
 			); // integer type operations	
 	else {
-		std::cerr << "Error: (line " << binOpExp->lineno << ") "
-			  << "assigment lhs type is incompatible with rhs type "
-			  << "[" << binOpExp->lhs->type.name << " != "
-			  << binOpExp->rhs->type.name << "]" << std::endl;
-		terminate();
+		binaryExpError(
+			binOpExp->lhs->type.name,
+			binOpExp->rhs->type.name,
+			binOpExp->lineno
+		);
 	}
 }
 
@@ -633,6 +673,8 @@ void SymbolTableBuilder::visit(FunctionCallExp *funcCallExp) {
 			ASTTraversal::traverse(exp, *this);
 		}
 	}
+	
+	funcCallExp->type = funcCallExp->idExp->type; // resolve type
 }
 
 void SymbolTableBuilder::visit(IdentifierExp *idExp) {
@@ -726,43 +768,48 @@ void SymbolTableBuilder::visit(UnaryExp *unaryExp) {
 	if (unaryExp == NULL) return;	
 	
 	// check child expression
-	ASTTraversal::traverse(unaryExp->exp, *this);	
+	ASTTraversal::traverse(unaryExp->exp, *this);
 
+	bool isTypeName = hasTypeName(unaryExp->exp); // to check if a given identifier is a type name
+			
 	// Logical negation: expr must resolve to a bool
-	if (unaryExp->op.compare(UNARY_BANG) == 0 && !unaryExp->exp->type.isBoolType())
-		typeCompatibilityError(
+	if ( unaryExp->op.compare(UNARY_BANG) == 0 && 
+	     (!unaryExp->exp->type.isBoolType() || isTypeName)
+	) typeCompatibilityError(
 			unaryExp->lineno,    // line number
 			"unary op !",        // expression type
-			unaryExp->exp->type.name, // received type
+			getReceivedTypeName(unaryExp->exp),  // received type
 			BASETYPE_BOOL	     // expected type
 		);
 	
-	
 	// Unary plus: expr must resolve to a numeric type (int, float64, rune)
 	// if unary plus and expression type is NOT numeric -> throw an error		
-	if (unaryExp->op.compare(UNARY_PLUS) == 0 && !unaryExp->exp->type.isNumericType())
-		typeCompatibilityError(
+	if ( unaryExp->op.compare(UNARY_PLUS) == 0 && 
+	     (!unaryExp->exp->type.isNumericType() || isTypeName)
+	) typeCompatibilityError(
 			unaryExp->lineno,    // line number
 			"unary op +",        // expression type
-			unaryExp->exp->type.name, // received type
+			getReceivedTypeName(unaryExp->exp),  // received type
 			"numeric type (int, float64, rune)" // expected type
 		);
 	
 	// Negation: expr must resolve to a numeric type (int, float64, rune)
-	if (unaryExp->op.compare(UNARY_MINUS) == 0 && !unaryExp->exp->type.isNumericType())	
-		typeCompatibilityError(
+	if ( unaryExp->op.compare(UNARY_MINUS) == 0 &&
+	     (!unaryExp->exp->type.isNumericType() || isTypeName)
+	) typeCompatibilityError(
 			unaryExp->lineno,    // line number
 			"unary op -",        // expression type
-			unaryExp->exp->type.name, // received type
+			getReceivedTypeName(unaryExp->exp),  // received type
 			"numeric type (int, float64, rune)" // expected type
 		);
 	
 	// Bitwise negation: expr must resolve to an integer type (int, rune)
-	if (unaryExp->op.compare(UNARY_BWXOR) == 0 && !unaryExp->exp->type.isIntegerType())
-		typeCompatibilityError(
+	if ( unaryExp->op.compare(UNARY_BWXOR) == 0 && 
+	     (!unaryExp->exp->type.isIntegerType() || isTypeName)
+	) typeCompatibilityError(
 			unaryExp->lineno,    // line number
 			"unary op ^",        // expression type
-			unaryExp->exp->type.name, // received type
+			getReceivedTypeName(unaryExp->exp),  // received type
 			"integer type (int, rune)" // expected type
 		);
 	
@@ -770,6 +817,9 @@ void SymbolTableBuilder::visit(UnaryExp *unaryExp) {
 	unaryExp->type = unaryExp->exp->type;
 }
 
+void SymbolTableBuilder::visit(BreakStatement *breakStmt) { }
+
+void SymbolTableBuilder::visit(ContinueStatement *continueStmt) { }
 
 
 std::string SymbolTableBuilder::getTabs() {

@@ -45,13 +45,20 @@ class SymbolTableBuilder : public Visitor {
 			int lhsSize,
 			int rhsSize,
 			Node *node
-		);
+		);	
 		void typeCompatibilityError(
 			int lineno,
 			const std::string &expName,
 			const std::string &receivedType,
 			const std::string &expectedType
 		);
+		void binaryExpError(
+			const std::string &lhsType,
+			const std::string &rhsType,
+			int lineno
+		);
+		bool hasTypeName(Expression *exp);
+		std::string getReceivedTypeName(Expression *exp);
 		
 	public:	
 		SymbolTable *build(Program *prg);
