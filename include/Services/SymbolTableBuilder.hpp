@@ -45,7 +45,10 @@ class SymbolTableBuilder : public Visitor {
 			int lhsSize,
 			int rhsSize,
 			Node *node
-		);	
+		);
+		void checkIsInitFunc(FunctionCallExp *funcCallExp);
+		void checkNumberOfFuncArgs(FunctionCallExp *funcCallExp);
+		void checkArgTypes(FunctionCallExp *funcCallExp);
 		void typeCompatibilityError(
 			int lineno,
 			const std::string &expName,

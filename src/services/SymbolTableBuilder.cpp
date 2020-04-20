@@ -143,7 +143,7 @@ void SymbolTableBuilder::checkTypeName(TypeName *type) {
 void SymbolTableBuilder::checkIdName(Node *node) {	
 	if (typeid(IdentifierExp) != typeid(*node)) return;
 	
-	IdentifierExp * idExp = (IdentifierExp*)node;
+	IdentifierExp *idExp = (IdentifierExp*)node;
 	if (idExp->name.compare(SPECIALFUNC_MAIN) == 0 ||
 	    idExp->name.compare(SPECIALFUNC_INIT) == 0) 
 	{
@@ -175,15 +175,61 @@ void SymbolTableBuilder::checkAssignEquality(
 	}	
 }
 
+// throws an error if call of an init function occurs
+void SymbolTableBuilder::checkIsInitFunc(FunctionCallExp *funcCallExp) {
+	if (funcCallExp->idExp->name.compare(SPECIALFUNC_INIT) == 0) {
+		std::cerr << "Error: (line " << funcCallExp->lineno << ") "
+			  << "init function may not be called" << std::endl;
+		terminate();
+	}
+}
+
+// throws an error if number of passed parameters to a function does not equal to the number of function arguments
+void SymbolTableBuilder::checkNumberOfFuncArgs(FunctionCallExp *funcCallExp) {
+	FunctionDeclaration *funcDecl = (FunctionDeclaration*)funcCallExp->idExp->symbol->node;
+	
+	if (funcCallExp->expList->size() != funcDecl->params->size()) {
+		std::cerr << "Error: (line " << funcCallExp->lineno << ") "
+			  << "function " << funcCallExp->idExp->name
+			  << " called with incorrect number of arguments [received "
+			  << funcCallExp->expList->size() << ", expected "
+			  << funcDecl->params->size() << "]" << std::endl;
+		terminate();
+	}
+}
+
+// throws an error if function call parameter has different type than in corresponding function declaration
+void SymbolTableBuilder::checkArgTypes(FunctionCallExp *funcCallExp) {
+	FunctionDeclaration *funcDecl = (FunctionDeclaration*)funcCallExp->idExp->symbol->node;
+	
+	int paramsNum = funcCallExp->expList->size();
+
+	std::vector<FunctionParameter*>::iterator paramIter = funcDecl->params->begin();
+	std::vector<Expression*>::iterator expIter = funcCallExp->expList->begin();
+
+	while (paramIter != funcDecl->params->end() && expIter != funcCallExp->expList->end()) {
+		if ((*expIter)->type.name.compare((*paramIter)->type->name) != 0) {
+			std::cerr << "Error: (line " << funcCallExp->lineno << ") "
+				  << (*expIter)->type.name
+				  << " is not assignment compatible with "
+				  << (*paramIter)->type->name << " in function call" << std::endl;
+			terminate();
+		}
+		paramIter++;
+		expIter++;
+	}
+}
+
 // throws an error for malformed binary expressions
 void SymbolTableBuilder::binaryExpError(
 	const std::string &lhsType,
-	const std::string &rhsType,
+	const std::string &rhsType,	
 	int lineno
-) {	
+) {
+	// TODO: write more informative errors for different binary operators
 	std::cerr << "Error: (line " << lineno << ") "
-		  << "assigment lhs type is incompatible with rhs type "
-		  << "[" << lhsType << " != " << rhsType << "]" << std::endl;
+		  << "binary expression lhs type is incompatible with rhs type "
+		  << "[" << lhsType << " != " << rhsType << "]" << std::endl; 
 	terminate();	
 }
 
@@ -373,7 +419,7 @@ void SymbolTableBuilder::visit(FunctionDeclaration *funcDecl) {
 		funcDecl->idExp->name,
 		CATEGORY_FUNC,
 		funcDecl->symbolTypeToStr(),
-		funcDecl->idExp
+		funcDecl
 	);
 	
 	// terminate if id already declared
@@ -561,7 +607,7 @@ void SymbolTableBuilder::visit(BinaryOperatorExp *binOpExp) {
 	if (binOpExp == NULL) return;
 	
 	ASTTraversal::traverse(binOpExp->lhs, *this);
-	ASTTraversal::traverse(binOpExp->rhs, *this);	
+	ASTTraversal::traverse(binOpExp->rhs, *this);
 		
 	// check if a given identifier is a type name
 	// to avoid expressions with type name, i.e.: int + int
@@ -569,7 +615,7 @@ void SymbolTableBuilder::visit(BinaryOperatorExp *binOpExp) {
 	if (hasTypeName(binOpExp->lhs) || hasTypeName(binOpExp->rhs)) 
 		binaryExpError(
 			getReceivedTypeName(binOpExp->lhs),
-			getReceivedTypeName(binOpExp->rhs),
+			getReceivedTypeName(binOpExp->rhs),	
 			binOpExp->lineno
 		);
 
@@ -666,6 +712,9 @@ void SymbolTableBuilder::visit(FunctionCallExp *funcCallExp) {
 	symbolTable->ss.str(ss.str());
 	
 	ASTTraversal::traverse(funcCallExp->idExp, *this);
+		
+	// check if call of init func
+	checkIsInitFunc(funcCallExp);
 	
 	// check if parameter identifiers exist in the symbol table
 	if (funcCallExp->expList) {
@@ -673,6 +722,12 @@ void SymbolTableBuilder::visit(FunctionCallExp *funcCallExp) {
 			ASTTraversal::traverse(exp, *this);
 		}
 	}
+
+	// check number of arguments
+	checkNumberOfFuncArgs(funcCallExp);
+	
+	//arg1, arg2, . . . , argk are well-typed and have types T1, T2, . . . , Tk respectively;
+	checkArgTypes(funcCallExp);
 	
 	funcCallExp->type = funcCallExp->idExp->type; // resolve type
 }

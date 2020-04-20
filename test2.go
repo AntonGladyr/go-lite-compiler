@@ -7,12 +7,17 @@ type float float64
 type float2 float
 
 
+func init() {
+}
+
 func test_func(a string, a2 string) int {
 	return 5
 }
 
 func main() {
-	//test_func("str", 5)
+	init()
+	//var ttttt int = test_func(5, 5);
+	test_func("str")
 	type t z
 	type z bool
 
@@ -28,7 +33,7 @@ func main() {
 
 	var zzzz = 'a' + 'a'
 	
-	if 5 + "str" {
+	if zzzz + "str" {
 	}
 
 	if !test_func("s", "s") {
