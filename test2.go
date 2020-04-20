@@ -15,12 +15,17 @@ func test_func(a string, a2 string) int {
 }
 
 func main() {
-	init()
+	var qwe [5]int
+	
+	if qwe[test_func] {
+	}
+	//init()
 	//var ttttt int = test_func(5, 5);
-	test_func("str")
-	type t z
+	//test_func("str")
+	/*type t z
 	type z bool
-
+	var arrayTest [5]int
+	arrayTest[0] = test_func("s", "s")
 	var test z = z(true)
 	type test2 z
 	type test3 test2
@@ -37,7 +42,7 @@ func main() {
 	}
 
 	if !test_func("s", "s") {
-	}
+	}*/
 	
 
 	/*var test t = t(true)

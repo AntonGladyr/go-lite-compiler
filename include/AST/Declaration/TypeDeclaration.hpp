@@ -13,7 +13,7 @@ class IdentifierExp;
 class TypeDeclaration : public Declaration {
 	public:
 		IdentifierExp *idExp = NULL;
-		TypeName *type = NULL;
+		TypeName *typeName = NULL;
 		
 		virtual void accept(Visitor& v) override;
 		virtual std::string symbolToStr() override ;
@@ -22,10 +22,10 @@ class TypeDeclaration : public Declaration {
 
 		TypeDeclaration(
 			IdentifierExp *_idExp,
-			TypeName *_type,
+			TypeName *_typeName,
 			int _lineno
 		) : idExp(_idExp), 
-		    type(_type),
+		    typeName(_typeName),
 		    Declaration(_lineno) { }
 		
 		TypeDeclaration() { }

@@ -49,6 +49,8 @@ class SymbolTableBuilder : public Visitor {
 		void checkIsInitFunc(FunctionCallExp *funcCallExp);
 		void checkNumberOfFuncArgs(FunctionCallExp *funcCallExp);
 		void checkArgTypes(FunctionCallExp *funcCallExp);
+		void checkIsArray(ArrayExp *arrExp);
+		void checkIsIntExp(Expression *exp);
 		void typeCompatibilityError(
 			int lineno,
 			const std::string &expName,

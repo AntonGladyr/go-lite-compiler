@@ -14,13 +14,13 @@ void TypeDeclaration::accept(Visitor& v) {
 std::string TypeDeclaration::toString() {
 	std::stringstream ss;	
 	ss << "type " << idExp->name << " ";
-	if (type->indexes) {
-		for(auto const& index: *(type->indexes)) {
+	if (typeName->indexes) {
+		for(auto const& index: *(typeName->indexes)) {
 			ss << "[" << std::to_string(index) << "]";
 		}
 	}
 	
-	ss << type->name;
+	ss << typeName->name;
 	
 	return ss.str();
 }
@@ -35,19 +35,19 @@ std::string TypeDeclaration::symbolToStr() {
 
 std::string TypeDeclaration::symbolTypeToStr() {
 	std::stringstream ss;	
-	if (type->indexes) {
-		for(auto const& index: *(type->indexes)) {
+	if (typeName->indexes) {
+		for(auto const& index: *(typeName->indexes)) {
 			ss << "[" << std::to_string(index) << "]";
 		}
 	}
-	ss << type->name;
+	ss << typeName->name;
 	return ss.str();
 }
 
 TypeDeclaration::~TypeDeclaration() {
 	delete idExp;	
 	
-	delete type;
+	delete typeName;
 	
 	// for testing purposes
 	// std::cout << "TypeDeclaration destroyed" << std::endl;

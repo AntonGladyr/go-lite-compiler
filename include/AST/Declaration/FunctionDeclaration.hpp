@@ -21,10 +21,10 @@ class FunctionDeclaration : public Declaration {
 	public:
 		IdentifierExp *idExp = NULL;
 		std::vector<FunctionParameter*> *params = NULL;
-		TypeName *type = NULL;
+		TypeName *typeName = NULL;
 		BlockStatement *blockStmt = NULL;
 		
-		TypeName getType() { return *type; }
+		TypeName getType() { return *typeName; }
 		std::string symbolSignatureToStr();
 		virtual void accept(Visitor& v) override;
 		virtual std::string symbolToStr() override ;
@@ -44,12 +44,12 @@ class FunctionDeclaration : public Declaration {
 		FunctionDeclaration(
 			IdentifierExp *_idExp,
 			std::vector<FunctionParameter*> *_params,
-			TypeName *_type,
+			TypeName *_typeName,
 			BlockStatement *_blockStmt,
 			int _lineno
 		) : idExp(_idExp), 
 		    params{_params},
-		    type(_type),
+		    typeName(_typeName),
 		    blockStmt{_blockStmt},
 		    Declaration(_lineno) { };
 		

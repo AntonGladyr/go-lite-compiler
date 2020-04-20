@@ -312,11 +312,11 @@ stmt_list : stmt { $$ = new std::vector<Statement*>(); $$->push_back($1); }
    
 type : tIDENTIFIER { $$ = new TypeName(*$1, NULL, yylineno); delete $1; } 
     | tLBRACKET tINTVAL tRBRACKET type {
-	$$ = new TypeName(); $$->name = $4->name; $$->indexes = new std::vector<int>();	
+	$$ = new TypeName($4->name, new std::vector<int>(), yylineno); 
 	$$->indexes->push_back($2);	
 	if ($4->indexes) { $$->indexes->insert($$->indexes->end(), $4->indexes->begin(), $4->indexes->end()); }	
     }
-    | tLPAREN type tRPAREN { $$ = new TypeName(); $$ = $2; /*TODO: fix*/ }
+    | tLPAREN type tRPAREN { $$ = $2; }
     ;
 
 id_listne : id_exp { $$ = new std::vector<IdentifierExp*>(); $$->push_back($1); }

@@ -5,7 +5,7 @@
 
 FunctionParameter::~FunctionParameter() {
 	delete idExp;
-	delete type;
+	delete typeName;
 }
 
 #endif

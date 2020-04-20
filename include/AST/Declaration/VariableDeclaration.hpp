@@ -15,7 +15,7 @@ class VariableDeclaration : public Declaration {
 	public:		
 		std::vector<IdentifierExp*> *idList = NULL;
 		std::vector<Expression*> *expList = NULL;
-		TypeName *type = NULL;
+		TypeName *typeName = NULL;
 		
 		virtual void accept(Visitor& v) override;
 		virtual std::string symbolToStr() override ;
@@ -24,9 +24,9 @@ class VariableDeclaration : public Declaration {
 		
 		VariableDeclaration(
 			std::vector<IdentifierExp*> *_idList,
-			TypeName *_type,
+			TypeName *_typeName,
 			int _lineno
-		) : idList(_idList), type(_type), Declaration(_lineno) { }
+		) : idList(_idList), typeName(_typeName), Declaration(_lineno) { }
 
 		VariableDeclaration(
 			std::vector<IdentifierExp*> *_idList,
@@ -36,7 +36,7 @@ class VariableDeclaration : public Declaration {
 		
 		VariableDeclaration(
 			std::vector<IdentifierExp*> *_idList,
-			TypeName *_type,
+			TypeName *_typeName,
 			std::vector<Expression*> *_expList,
 			int _lineno
 		); 

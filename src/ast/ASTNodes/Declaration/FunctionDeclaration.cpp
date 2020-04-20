@@ -23,14 +23,14 @@ std::string FunctionDeclaration::toString() {
 		for(auto const& param : *params) {
 			ss << param->idExp->name << " ";
 			
-			if (param->type) {
-				if (param->type->indexes) {
-					for(auto const& index : *(param->type->indexes)) {
+			if (param->typeName) {
+				if (param->typeName->indexes) {
+					for(auto const& index : *(param->typeName->indexes)) {
 						ss << "[" << std::to_string(index) << "]";
 					}
 				}
 				
-				ss << param->type->name;
+				ss << param->typeName->name;
 				if (&param != &params->back())
 					ss << ", ";
 			}
@@ -42,14 +42,14 @@ std::string FunctionDeclaration::toString() {
 	
 	//function type
 	//indexes	
-	if (type) {
-		if (type->indexes) {
-			for(auto const& index : *(type->indexes)) {
+	if (typeName) {
+		if (typeName->indexes) {
+			for(auto const& index : *(typeName->indexes)) {
 				ss << "[" << std::to_string(index) << "]";
 			}	
 		}	
 		//type name
-		ss << type->name << " ";
+		ss << typeName->name << " ";
 	}
 
 	return ss.str();
@@ -65,15 +65,15 @@ std::string FunctionDeclaration::symbolToStr() {
 std::string FunctionDeclaration::symbolTypeToStr() {
 	std::stringstream ss;
 	
-	if (type) {
+	if (typeName) {
 		// array indexes
-		if (type->indexes) {	
-			for(auto const& index : *(type->indexes)) {
+		if (typeName->indexes) {	
+			for(auto const& index : *(typeName->indexes)) {
 				ss << "[" << std::to_string(index) << "]";
 			}	
 		}	
 		// type id
-		ss << type->name;
+		ss << typeName->name;
 	} else {
 		ss << "void";
 	}
@@ -89,13 +89,13 @@ std::string FunctionDeclaration::symbolSignatureToStr() {
 	if (params) {
 		for(auto const& param : *params) {
 			// for each id print type
-			if (param->type->indexes) {
-				for(auto const& index : *(param->type->indexes)) {
+			if (param->typeName->indexes) {
+				for(auto const& index : *(param->typeName->indexes)) {
 					ss << "[" << std::to_string(index) << "]";
 				}	
 			}
 			
-			ss << param->type->name;
+			ss << param->typeName->name;
 			if (&param != &params->back())
 				ss << ", ";
 		}
@@ -120,7 +120,7 @@ FunctionDeclaration::~FunctionDeclaration() {
 		delete params;
 	}
 
-	if (type) delete type;
+	if (typeName) delete typeName;
 	
 	delete blockStmt;
 	

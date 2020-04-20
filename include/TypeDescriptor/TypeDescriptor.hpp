@@ -32,7 +32,7 @@ class TypeDescriptor {
 	public:
 		std::string name;	 // type name (base and derived types)
 		std::string category;	 // there are 4 basic categories: type, constant, variable, function		
-		std::string baseType; // there are 5 base types: bool, int, float64, rune, string
+		std::string baseType;    // there are 5 base types: bool, int, float64, rune, string
 		Node *node = NULL;	 // pointer to node in the AST
 
 		// there are 6 type groups: bool, comparable, ordered, numeric, string, integer

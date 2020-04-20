@@ -68,16 +68,16 @@ void SymbolTableBuilder::insertFuncParams(Node *node) {
 				//clear string stream
 				paramType.str(std::string());
 				
-				if (param->type == NULL) terminate();
+				if (param->typeName == NULL) terminate();
 
 				// array indexes
-                       		if (param->type->indexes) {
-					for(auto const& index : *(param->type->indexes)) {
+                       		if (param->typeName->indexes) {
+					for(auto const& index : *(param->typeName->indexes)) {
 						paramType << "[" << std::to_string(index) << "]";
 					}
 				}
                           	// type
-				paramType << param->type->name;
+				paramType << param->typeName->name;
 				
 				//save pointer to the parent node in idExp
 				funcDecl->idExp->parentNode = funcDecl;	
@@ -109,7 +109,7 @@ void SymbolTableBuilder::checkSpecialFunctions(Node *node) {
 		if ((funcDecl->idExp->name.compare(SPECIALFUNC_MAIN) != 0) &&
 			(funcDecl->idExp->name.compare(SPECIALFUNC_INIT) != 0)) return;
 
-		if(funcDecl->type || funcDecl->params) {
+		if(funcDecl->typeName || funcDecl->params) {
 			std::cerr << ss.str();
 			std::cerr << "Error: (line " << funcDecl->idExp->lineno << ") " << funcDecl->idExp->name 
 				  << " must have no parameters and no return value" << std::endl;
@@ -208,11 +208,11 @@ void SymbolTableBuilder::checkArgTypes(FunctionCallExp *funcCallExp) {
 	std::vector<Expression*>::iterator expIter = funcCallExp->expList->begin();
 
 	while (paramIter != funcDecl->params->end() && expIter != funcCallExp->expList->end()) {
-		if ((*expIter)->type.name.compare((*paramIter)->type->name) != 0) {
+		if ((*expIter)->type.name.compare((*paramIter)->typeName->name) != 0) {
 			std::cerr << "Error: (line " << funcCallExp->lineno << ") "
 				  << (*expIter)->type.name
 				  << " is not assignment compatible with "
-				  << (*paramIter)->type->name << " in function call" << std::endl;
+				  << (*paramIter)->typeName->name << " in function call" << std::endl;
 			terminate();
 		}
 		paramIter++;
@@ -230,7 +230,52 @@ void SymbolTableBuilder::binaryExpError(
 	std::cerr << "Error: (line " << lineno << ") "
 		  << "binary expression lhs type is incompatible with rhs type "
 		  << "[" << lhsType << " != " << rhsType << "]" << std::endl; 
-	terminate();	
+	terminate();
+}
+
+// throws an error if the given expression is not an array
+void SymbolTableBuilder::checkIsArray(ArrayExp *arrExp) {
+	IdentifierExp *idExp = NULL;
+	VariableDeclaration *varDecl;
+	
+	Symbol *s = symbolTable->getSymbol(symbolTable, arrExp->idExp->name);	
+
+	if (typeid(IdentifierExp) != typeid(*(s->node))) {
+		std::cerr << "Error: (line " << arrExp->lineno << ") "
+			  << "indexing target expects list target (slice, array) "
+			  << "[received " << getReceivedTypeName(arrExp->idExp)
+			  << "]" << std::endl;
+		terminate();
+	}
+	
+	idExp = (IdentifierExp*)s->node;
+	
+	if (typeid(VariableDeclaration) != typeid(*(idExp->parentNode))) {
+		std::cerr << "Error: (line " << arrExp->lineno << ") "
+			  << "indexing target expects list target (slice, array) "
+			  << "[received " << getReceivedTypeName(arrExp->idExp)
+			  << "]" << std::endl;
+		terminate();
+	}
+	
+	varDecl = (VariableDeclaration*)idExp->parentNode;
+
+	if (varDecl->typeName->indexes == NULL) {
+		std::cerr << "Error: (line " << arrExp->lineno << ") "
+			  << "indexing target expects list target (slice, array) "
+			  << "[received " << getReceivedTypeName(arrExp->idExp)
+			  << "]" << std::endl;
+		terminate();
+	}
+}
+
+void SymbolTableBuilder::checkIsIntExp(Expression *exp) {	
+	if (exp->type.baseType.compare(BASETYPE_INT) != 0) {
+		std::cerr << "Error: (line " << exp->lineno << ") "
+			  << "index must be an int "
+			  << "[received " << exp->type.name << "]" << std::endl;
+		terminate();
+	}
 }
 
 // return type name of an expression
@@ -302,7 +347,7 @@ void SymbolTableBuilder::visit(VariableDeclaration *varDecl) {
 			ASTTraversal::traverse(exp, *this);
 		}
 	}
-	
+
 	//check if number of ids equals to the number of the expressions
 	if (varDecl->expList)
 		checkAssignEquality(varDecl->idList->size(), varDecl->expList->size(), varDecl);
@@ -313,25 +358,25 @@ void SymbolTableBuilder::visit(VariableDeclaration *varDecl) {
 		// check if a variable name is not 'main' nor 'init'
 		// (parent->parent scope => basetypes)
 		if (symbolTable->parent->parent == NULL) checkIdName(*var);
-		
+			
 		//check type name
-		if (varDecl->type) {
+		if (varDecl->typeName) {
 			//check if type exists
-			checkTypeName(varDecl->type);	
-			if (varDecl->type->indexes) {	
-				for(auto const& index : *(varDecl->type->indexes)) {
+			checkTypeName(varDecl->typeName);
+			if (varDecl->typeName->indexes) {	
+				for(auto const& index : *(varDecl->typeName->indexes)) {
 					type << "[" << std::to_string(index) << "]";
 				}	
 			}
 			
-			type << varDecl->type->name;
+			type << varDecl->typeName->name;
 		} else {
 			type << BASETYPE_UNDEFINED;
 		}
 		
 		ss << getTabs() << (*var)->name << " [" << CATEGORY_VAR << "]" << " = ";
-		ss << type.str() << std::endl;
-		
+		ss << type.str() << std::endl;	
+
 		//save pointer to the parent node in idExp
 		(*var)->parentNode = varDecl;	
 		Symbol *symbol = symbolTable->putSymbol(
@@ -339,7 +384,7 @@ void SymbolTableBuilder::visit(VariableDeclaration *varDecl) {
 			CATEGORY_VAR,
 			type.str(),
 			*var
-		);
+		);	
 		
 		// terminate if id already declared
 		if (symbol == NULL) terminate();
@@ -361,10 +406,10 @@ void SymbolTableBuilder::visit(TypeDeclaration *typeDecl) {
 	// check if type name is not 'main' nor 'init'
 	//parent->parent => basetypes
 	if (symbolTable->parent->parent == NULL) checkIdName(typeDecl->idExp);
-
+	
 	//check if type exists
-	if (typeDecl->type)
-		checkTypeName(typeDecl->type);
+	if (typeDecl->typeName)
+		checkTypeName(typeDecl->typeName);
 	
 	//check for recursive type declarations
 	if(typeDecl->idExp->name.compare(typeDecl->symbolTypeToStr()) == 0) {
@@ -373,7 +418,7 @@ void SymbolTableBuilder::visit(TypeDeclaration *typeDecl) {
 			  << ") invalid recursive type " << typeDecl->symbolTypeToStr() << std::endl;
 		terminate();
 	}
-	
+		
 	//save pointer to the parent node in idExp
 	typeDecl->idExp->parentNode = typeDecl;
 	Symbol *symbol = symbolTable->putSymbol(
@@ -401,13 +446,13 @@ void SymbolTableBuilder::visit(FunctionDeclaration *funcDecl) {
 	checkSpecialFunctions(funcDecl);
 	
 	// check if return type exists
-	if (funcDecl->type)
-		checkTypeName(funcDecl->type);
+	if (funcDecl->typeName)
+		checkTypeName(funcDecl->typeName);
 
 	// check if parameter types exist
 	if (funcDecl->params) {
 		for (auto const& param : *(funcDecl->params)) {
-			checkTypeName(param->type);
+			checkTypeName(param->typeName);
 		}
 	}
 	
@@ -596,14 +641,23 @@ void SymbolTableBuilder::visit(EmptyStatement *emptyStmt) { }
 
 void SymbolTableBuilder::visit(ArrayExp *arrExp) {
 	if (arrExp == NULL) return;
+
 	ASTTraversal::traverse(arrExp->idExp, *this);
 	
-	for(auto const& exp : *arrExp->expList) {
+	// expr is well-typed and resolves to []T or [N]T
+	checkIsArray(arrExp);
+		
+	// index is well-typed and resolves to int
+	for(auto const& exp : *arrExp->expList) {	
 		ASTTraversal::traverse(exp, *this);
+		checkIsIntExp(exp);
 	}
+
+	// the result of the indexing expression is T
+	arrExp->type = arrExp->idExp->type;
 }
 
-void SymbolTableBuilder::visit(BinaryOperatorExp *binOpExp) {	
+void SymbolTableBuilder::visit(BinaryOperatorExp *binOpExp) {
 	if (binOpExp == NULL) return;
 	
 	ASTTraversal::traverse(binOpExp->lhs, *this);

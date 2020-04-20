@@ -7,14 +7,14 @@
 class FunctionParameter { 
 	public:
 		IdentifierExp *idExp = NULL;
-		TypeName *type = NULL;
+		TypeName *typeName = NULL;
 		int lineno;
 			
 		FunctionParameter(
 			IdentifierExp *_idExp,
-			TypeName *_type,	
+			TypeName *_typeName,	
 			int _lineno
-		) : idExp(_idExp), type{_type}, lineno(_lineno) { }
+		) : idExp(_idExp), typeName{_typeName}, lineno(_lineno) { }
 	
 		FunctionParameter() { }
 		~FunctionParameter();
