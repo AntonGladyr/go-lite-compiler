@@ -74,8 +74,8 @@ void ASTTraversal::traverse(Node *node, Visitor& visitor) {
 		BlockStatement *blockStmt = (BlockStatement*)node;
 		visitor.openScope();
 		blockStmt->accept(visitor);
-		if (blockStmt->stmtList) {	
-			for(auto const& stmt : *(blockStmt->stmtList)) {	
+		if (blockStmt->stmtList) {
+			for(auto const& stmt : *(blockStmt->stmtList)) {
 				traverse(stmt, visitor);
 			}
 		}

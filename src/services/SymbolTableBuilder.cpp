@@ -566,6 +566,13 @@ void SymbolTableBuilder::visit(BlockStatement *blockStmt) {
 		numTabs--;
 		ss << getTabs() << "}" << std::endl;
 	}
+
+	// save pointer to the block in each statement
+	if (blockStmt->stmtList) {
+		for(auto const& stmt : *(blockStmt->stmtList)) {
+			stmt->parentBlockNode = blockStmt;
+		}
+	}
 }
 
 void SymbolTableBuilder::visit(DeclarationStatement *declStmt) {	
@@ -704,6 +711,40 @@ void SymbolTableBuilder::visit(IncDecStatement *incDecStmt) {
 void SymbolTableBuilder::visit(ReturnStatement *returnStmt) {
 	if (returnStmt == NULL) return;
 	ASTTraversal::traverse(returnStmt->exp, *this);
+
+	//TODO: weeding pass
+
+	if ( returnStmt->parentBlockNode == NULL ) {
+		std::cerr << "Error: (line " << returnStmt->lineno << ") " << std::endl; //TODO: write error
+		terminate();
+	}	
+
+	BlockStatement *blockStmt = (BlockStatement*)returnStmt->parentBlockNode;
+		
+	FunctionDeclaration *funcDecl = (FunctionDeclaration*)blockStmt->parentNode;
+
+	bool funcHasType = funcDecl->typeName != NULL;
+
+	if ( returnStmt->exp == NULL && funcHasType ) {
+		std::cerr << "Error: (line " << returnStmt->lineno << ") "
+			  << "invalid return [function has non-void return type]" << std::endl;
+		terminate();
+	}
+	
+	if ( returnStmt->exp && !funcHasType ) {
+		std::cerr << "Error: (line " << returnStmt->lineno << ") "
+			  << "invalid return [function has void return type]" << std::endl;
+		terminate();
+	}	
+
+	if ( funcHasType && // if a function has a type
+	     returnStmt->exp && // and return statement has an expression
+	     returnStmt->exp->type.name.compare(funcDecl->symbolTypeToStr()) != 0 ) { // compare both types
+	     std::cerr << "Error: (line " << returnStmt->exp->lineno << ") "
+			  << funcDecl->symbolTypeToStr() << " is not assignment compatible with "
+			  << returnStmt->exp->type.name << " in return statement" << std::endl;
+		terminate();
+	}
 }
 
 void SymbolTableBuilder::visit(EmptyStatement *emptyStmt) { }
