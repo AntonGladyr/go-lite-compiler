@@ -16,8 +16,12 @@ func test_func(a string, a2 string) [5]int {
 }
 
 func main() {
-	var x [5]int
-	var ttt int = len(test_func("str", "str"))
+	var x, y int
+	var f z = bool(true)
+	var h t = bool(false)
+	f = h
+	//var x [5]int
+	//var ttt int = len(test_func("str", "str"))
 //	var qwe [5]int
 	
 	//if test_func[5] {

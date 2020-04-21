@@ -601,6 +601,22 @@ void SymbolTableBuilder::visit(AssignStatement *assignStmt) {
 	}
 
 	checkAssignEquality(assignStmt->lhs->size(), assignStmt->rhs->size(), assignStmt);
+
+	std::vector<Expression*>::iterator lhsIter = assignStmt->lhs->begin();
+	std::vector<Expression*>::iterator rhsIter = assignStmt->rhs->begin();
+
+	while ( lhsIter != assignStmt->lhs->end() && rhsIter != assignStmt->rhs->end() ) {
+		
+		if ( (*lhsIter)->type.name.compare((*rhsIter)->type.name) != 0 ) {
+			std::cerr << "Error: (line " << (*lhsIter)->lineno << ") "
+			  	  << (*rhsIter)->type.name << " is not assignment compatible with "
+				  << (*lhsIter)->type.name << " in assign statement" << std::endl;
+			terminate();
+		}
+		
+		lhsIter++;
+		rhsIter++;
+	}
 }
 
 void SymbolTableBuilder::visit(ExpressionStatement *expStmt) {
