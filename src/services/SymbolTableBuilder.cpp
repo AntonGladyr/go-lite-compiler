@@ -11,12 +11,12 @@
 SymbolTable *SymbolTableBuilder::build(Program *prg) {
 	//copy program pointer for deallocation
 	program = prg;
-	
+
 	ss << "{" << std::endl;
 	numTabs++;
 	symbolTable = new SymbolTable();	
 	Symbol *symb = NULL;
-	
+
 	// pre-declared mappings
 	symb = symbolTable->putSymbol(BASETYPE_INT, CATEGORY_TYPE, BASETYPE_INT, NULL);
 	ss << getTabs() << BASETYPE_INT << " [" << CATEGORY_TYPE << "]" << " = " << BASETYPE_INT << std::endl;
@@ -32,10 +32,10 @@ SymbolTable *SymbolTableBuilder::build(Program *prg) {
 	ss << getTabs() << CONSTANT_TRUE << " [" << CATEGORY_CONST << "]" << " = " << BASETYPE_BOOL << std::endl;
 	symb = symbolTable->putSymbol(CONSTANT_FALSE, CATEGORY_CONST, BASETYPE_BOOL, NULL);
 	ss << getTabs() << CONSTANT_FALSE << " [" << CATEGORY_CONST << "]" << " = " << BASETYPE_BOOL << std::endl;
-	
+
 	//traverse the AST
 	ASTTraversal::traverse(prg, *this);
-	
+
 	numTabs--;
 	ss << "}" << std::endl;	
 	symbolTable->ss << ss.str();
@@ -67,33 +67,33 @@ void SymbolTableBuilder::insertFuncParams(Node *node) {
 			for (auto const& param : *(funcDecl->params)) {
 				//clear string stream
 				paramType.str(std::string());
-				
+
 				if (param->typeName == NULL) terminate();
 
 				// array indexes
-                       		if (param->typeName->indexes) {
+				if (param->typeName->indexes) {
 					for(auto const& index : *(param->typeName->indexes)) {
 						paramType << "[" << std::to_string(index) << "]";
 					}
 				}
-                          	// type
+				// type
 				paramType << param->typeName->name;
-				
+
 				//save pointer to the parent node in idExp
 				funcDecl->idExp->parentNode = funcDecl;	
 				Symbol *symbol = symbolTable->putSymbol(
-					param->idExp->name,
-					CATEGORY_VAR,
-					paramType.str(),
-					funcDecl->idExp 
-				);
-	
+						param->idExp->name,
+						CATEGORY_VAR,
+						paramType.str(),
+						funcDecl->idExp 
+						);
+
 				// terminate if id already declared
 				if (symbol == NULL) terminate();
-				
+
 				// pass to stream for printing
 				ss << getTabs() << param->idExp->name << " [" << CATEGORY_VAR << "]"
-				   << " = " << paramType.str() << std::endl;
+					<< " = " << paramType.str() << std::endl;
 			}
 		}
 	}
@@ -104,15 +104,15 @@ void SymbolTableBuilder::checkSpecialFunctions(Node *node) {
 	//TODO: change default type of init func to <unmapped>
 	if (typeid(FunctionDeclaration) == typeid(*node)) {
 		FunctionDeclaration *funcDecl = (FunctionDeclaration*)node;
-		
+
 		// return if not "main" nor "init"
 		if ((funcDecl->idExp->name.compare(SPECIALFUNC_MAIN) != 0) &&
-			(funcDecl->idExp->name.compare(SPECIALFUNC_INIT) != 0)) return;
+				(funcDecl->idExp->name.compare(SPECIALFUNC_INIT) != 0)) return;
 
 		if(funcDecl->typeName || funcDecl->params) {
 			std::cerr << ss.str();
 			std::cerr << "Error: (line " << funcDecl->idExp->lineno << ") " << funcDecl->idExp->name 
-				  << " must have no parameters and no return value" << std::endl;
+				<< " must have no parameters and no return value" << std::endl;
 			terminate();
 		}
 	}
@@ -121,12 +121,12 @@ void SymbolTableBuilder::checkSpecialFunctions(Node *node) {
 // check if type is declared
 void SymbolTableBuilder::checkTypeName(TypeName *type) {
 	Symbol *s = symbolTable->getSymbol(symbolTable, type->name);
-	
+
 	// check if identifier exists in the symbol table
 	if (s == NULL) {
 		std::cerr << ss.str();
 		std::cerr << "Error: (line " << type->lineno << ") type \""
-			  << type->name << "\" is not declared" << std::endl;	
+			<< type->name << "\" is not declared" << std::endl;	
 		terminate();
 	}
 
@@ -134,7 +134,7 @@ void SymbolTableBuilder::checkTypeName(TypeName *type) {
 	if (s->category.compare(CATEGORY_TYPE) != 0) {
 		std::cerr << ss.str();
 		std::cerr << "Error: (line " << type->lineno << ") \""
-			  << type->name << "\" is not a type" << std::endl;
+			<< type->name << "\" is not a type" << std::endl;
 		terminate();
 	}
 }
@@ -142,26 +142,26 @@ void SymbolTableBuilder::checkTypeName(TypeName *type) {
 // check identifier name ('main' and 'init' must be a function)
 void SymbolTableBuilder::checkIdName(Node *node) {	
 	if (typeid(IdentifierExp) != typeid(*node)) return;
-	
+
 	IdentifierExp *idExp = (IdentifierExp*)node;
 	if (idExp->name.compare(SPECIALFUNC_MAIN) == 0 ||
-	    idExp->name.compare(SPECIALFUNC_INIT) == 0) 
+			idExp->name.compare(SPECIALFUNC_INIT) == 0) 
 	{
 		std::cerr << ss.str();
 		std::cerr << "Error: (line " << idExp->lineno << ") "
-			  << idExp->name << " must be a function" << std::endl;
-		 terminate();
+			<< idExp->name << " must be a function" << std::endl;
+		terminate();
 	}
 }
 
 // check if the number of ids is equal to the number of expressions
 void SymbolTableBuilder::checkAssignEquality(
-	int lhsSize,
-	int rhsSize,
-	Node *node
-) {
+		int lhsSize,
+		int rhsSize,
+		Node *node
+		) {
 	if (rhsSize == 0) return;
-	
+
 	if (lhsSize != rhsSize) {
 		std::cerr << ss.str();
 		std::cerr << "Error: (line " << node->lineno << ") ";
@@ -170,7 +170,7 @@ void SymbolTableBuilder::checkAssignEquality(
 		if (typeid(AssignStatement) == typeid(*node))
 			std::cerr << "assignment ";
 		std::cerr << "lhs(" << lhsSize << ")"
-			  << " != rhs(" << rhsSize << ")" << std::endl;
+			<< " != rhs(" << rhsSize << ")" << std::endl;
 		terminate();
 	}	
 }
@@ -179,7 +179,7 @@ void SymbolTableBuilder::checkAssignEquality(
 void SymbolTableBuilder::checkIsInitFunc(FunctionCallExp *funcCallExp) {
 	if (funcCallExp->idExp->name.compare(SPECIALFUNC_INIT) == 0) {
 		std::cerr << "Error: (line " << funcCallExp->lineno << ") "
-			  << "init function may not be called" << std::endl;
+			<< "init function may not be called" << std::endl;
 		terminate();
 	}
 }
@@ -187,13 +187,13 @@ void SymbolTableBuilder::checkIsInitFunc(FunctionCallExp *funcCallExp) {
 // throws an error if number of passed parameters to a function does not equal to the number of function arguments
 void SymbolTableBuilder::checkNumberOfFuncArgs(FunctionCallExp *funcCallExp) {
 	FunctionDeclaration *funcDecl = (FunctionDeclaration*)funcCallExp->idExp->symbol->node;
-	
+
 	if (funcCallExp->expList->size() != funcDecl->params->size()) {
 		std::cerr << "Error: (line " << funcCallExp->lineno << ") "
-			  << "function " << funcCallExp->idExp->name
-			  << " called with incorrect number of arguments [received "
-			  << funcCallExp->expList->size() << ", expected "
-			  << funcDecl->params->size() << "]" << std::endl;
+			<< "function " << funcCallExp->idExp->name
+			<< " called with incorrect number of arguments [received "
+			<< funcCallExp->expList->size() << ", expected "
+			<< funcDecl->params->size() << "]" << std::endl;
 		terminate();
 	}
 }
@@ -201,7 +201,7 @@ void SymbolTableBuilder::checkNumberOfFuncArgs(FunctionCallExp *funcCallExp) {
 // throws an error if function call parameter has different type than in corresponding function declaration
 void SymbolTableBuilder::checkArgTypes(FunctionCallExp *funcCallExp) {
 	FunctionDeclaration *funcDecl = (FunctionDeclaration*)funcCallExp->idExp->symbol->node;
-	
+
 	int paramsNum = funcCallExp->expList->size();
 
 	std::vector<FunctionParameter*>::iterator paramIter = funcDecl->params->begin();
@@ -210,9 +210,9 @@ void SymbolTableBuilder::checkArgTypes(FunctionCallExp *funcCallExp) {
 	while (paramIter != funcDecl->params->end() && expIter != funcCallExp->expList->end()) {
 		if ((*expIter)->type.name.compare((*paramIter)->typeName->name) != 0) {
 			std::cerr << "Error: (line " << funcCallExp->lineno << ") "
-				  << (*expIter)->type.name
-				  << " is not assignment compatible with "
-				  << (*paramIter)->typeName->name << " in function call" << std::endl;
+				<< (*expIter)->type.name
+				<< " is not assignment compatible with "
+				<< (*paramIter)->typeName->name << " in function call" << std::endl;
 			terminate();
 		}
 		paramIter++;
@@ -222,46 +222,67 @@ void SymbolTableBuilder::checkArgTypes(FunctionCallExp *funcCallExp) {
 
 // throws an error for malformed binary expressions
 void SymbolTableBuilder::binaryExpError(
-	const std::string &lhsType,
-	const std::string &rhsType,	
-	int lineno
-) {
+		const std::string &lhsType,
+		const std::string &rhsType,	
+		int lineno
+		) {
 	// TODO: write more informative errors for different binary operators
 	std::cerr << "Error: (line " << lineno << ") "
-		  << "binary expression lhs type is incompatible with rhs type "
-		  << "[" << lhsType << " != " << rhsType << "]" << std::endl; 
+		<< "binary expression lhs type is incompatible with rhs type "
+		<< "[" << lhsType << " != " << rhsType << "]" << std::endl; 
 	terminate();
 }
 
 void SymbolTableBuilder::checkIsIntExp(Expression *exp) {
 	IdentifierExp *idExp = NULL;
-	
+
 	if (typeid(IdentifierExp) == typeid(*exp)) {
 		idExp = (IdentifierExp*)exp;
-		
+
 		// if id name is "int"
 		if (idExp->name.compare(BASETYPE_INT) == 0) {
 			std::cerr << "Error: (line " << exp->lineno << ") "
-			  	  << "index must be an int "
-			  	  << "[received " << getReceivedTypeName(exp) << "]" << std::endl;
+				<< "index must be an int "
+				<< "[received " << getReceivedTypeName(exp) << "]" << std::endl;
 			terminate();
 		}
 	}
-	
+
 	if (exp->type.baseType.compare(BASETYPE_INT) != 0) {
 		std::cerr << "Error: (line " << exp->lineno << ") "
-			  << "index must be an int "
-			  << "[received " << getReceivedTypeName(exp) << "]" << std::endl;
+			<< "index must be an int "
+			<< "[received " << getReceivedTypeName(exp) << "]" << std::endl;
 		terminate();
 	}
+}
+
+// A cap expression is well-typed if expr is well-typed, has type S and S resolves to [N]T
+void SymbolTableBuilder::checkBuiltinCap(BuiltinsExp *builtinsExp) {	
+	/*if ( !builtinsExp->exp->type.isArray ) {
+	  std::cerr << "Error: (line " << builtinsExp->exp->lineno << ") "
+	  << "capacity builtin expects slice or array type as argument "
+	  << "[received " << builtinsExp->exp->type.name << "]" << std::endl;
+	  terminate();
+	  }*/
+}
+
+// A len expression is well-typed if expr is well-typed, has type S and S resolves to string or [N]T
+void checkBuiltinLen(BuiltinsExp *builtinsExp) {
+	/*if ( !builtinsExp->exp->type.isArray ||
+	  builtinsExp->exp->type.baseType.compare(BASETYPE_STRING) != 0
+	  ) {
+	  std::cerr << "Error: (line " << builtinsExp->exp->lineno << ") "
+	  << "length builtin expects slice, array or string type as argument "
+	  << "[received " << builtinsExp->exp->type.name << "]" std::endl;
+	  }*/
 }
 
 // throws an error if the given expression is not an array
 void SymbolTableBuilder::arrayIndexingError(ArrayExp *arrExp) {	
 	std::cerr << "Error: (line " << arrExp->lineno << ") "
-		  << "indexing target expects list target (slice, array) "
-		  << "[received " << getReceivedTypeName(arrExp->idExp)
-		  << "]" << std::endl;
+		<< "indexing target expects list target (slice, array) "
+		<< "[received " << getReceivedTypeName(arrExp->idExp)
+		<< "]" << std::endl;
 	terminate();
 }
 
@@ -270,38 +291,38 @@ TypeDescriptor SymbolTableBuilder::resolveArrayExpType(ArrayExp *arrExp) {
 	IdentifierExp *idExp = NULL;
 	VariableDeclaration *varDecl = NULL;
 	FunctionDeclaration *funcDecl = NULL;
-	
+
 	Symbol *s = symbolTable->getSymbol(symbolTable, arrExp->idExp->name);	
 
 	// if the given node is not an identifier thow an error
 	if (typeid(IdentifierExp) != typeid(*(s->node)))
 		arrayIndexingError(arrExp);
-	
+
 	idExp = (IdentifierExp*)s->node;
-	
+
 	// if parent node of the given identifier is not a VariableDeclaration node, throw an error
 	if (typeid(VariableDeclaration) != typeid(*(idExp->parentNode)))
 		arrayIndexingError(arrExp);
-	
+
 	varDecl = (VariableDeclaration*)idExp->parentNode;
 
 	// if a variable declaration does not have any indexes in the type, throw an error
 	if (varDecl->typeName->indexes == NULL)
 		arrayIndexingError(arrExp);
-	
+
 	return TypeDescriptor(
 			varDecl->typeName->name,
 			symbolTable->findBaseType(symbolTable, varDecl->typeName->name),
 			CATEGORY_VAR,
 			varDecl
-		);
+			);
 }
 
 // return type name of an expression
 std::string SymbolTableBuilder::getReceivedTypeName(Expression *exp) {
 	std::stringstream receivedType;
-	bool isTypeName = hasTypeName(exp);
-	
+	bool isTypeName = hasTypeName(exp);	
+
 	if (typeid(IdentifierExp) == typeid(*exp) && isTypeName) {
 		IdentifierExp * idExp = (IdentifierExp*)exp;
 		receivedType << "{" << idExp->name << "}";
@@ -314,7 +335,7 @@ std::string SymbolTableBuilder::getReceivedTypeName(Expression *exp) {
 // check if an identifier has the same name as a type
 bool SymbolTableBuilder::hasTypeName(Expression *exp) {
 	if (typeid(IdentifierExp) != typeid(*exp)) return false;
-	
+
 	IdentifierExp * idExp = (IdentifierExp*)exp;
 	Symbol *s = symbolTable->getSymbol(symbolTable, idExp->name);
 	return s->category.compare(CATEGORY_TYPE) == 0;
@@ -322,13 +343,13 @@ bool SymbolTableBuilder::hasTypeName(Expression *exp) {
 
 // prints an error for incompatible types
 void SymbolTableBuilder::typeCompatibilityError(
-	int lineno,
-	const std::string &expName,
-	const std::string &receivedType,
-	const std::string &expectedType
-) {
+		int lineno,
+		const std::string &expName,
+		const std::string &receivedType,
+		const std::string &expectedType
+		) {
 	std::cerr << "Error: (line " << lineno << ") incompatible type in " << expName
-		  << " [received " << receivedType << ", expected " << expectedType << "]" << std::endl;
+		<< " [received " << receivedType << ", expected " << expectedType << "]" << std::endl;
 	terminate();
 }
 
@@ -342,7 +363,7 @@ void SymbolTableBuilder::typeCompatibilityError(
 
 void SymbolTableBuilder::visit(Program *prg) {
 	if (prg == NULL) return;
-	
+
 	if (isScopeOpened) {
 		symbolTable = symbolTable->scopeSymbolTable();
 		ss << getTabs() << "{" << std::endl;	
@@ -359,25 +380,31 @@ void SymbolTableBuilder::visit(VariableDeclaration *varDecl) {
 
 	//copy string stream for printing errors
 	symbolTable->ss.str(ss.str());
-	
+
 	// check if expression identifiers exist in the symbol table
 	if (varDecl->expList) {
 		for(auto const& exp : *(varDecl->expList)) {
-			ASTTraversal::traverse(exp, *this);
-		}
+			ASTTraversal::traverse(exp, *this);	
+		}	
 	}
 
 	//check if number of ids equals to the number of the expressions
 	if (varDecl->expList)
 		checkAssignEquality(varDecl->idList->size(), varDecl->expList->size(), varDecl);
 	
+	std::vector<IdentifierExp*>::reverse_iterator varIter = varDecl->idList->rbegin();
+	std::vector<Expression*>::reverse_iterator expIter; 
+	if (varDecl->expList)
+		expIter = varDecl->expList->rbegin();
+	
 	// reverse iteration for identifiers
-	for (auto var = varDecl->idList->rbegin(); var != varDecl->idList->rend(); var++) {
+	//for (auto var = varDecl->idList->rbegin(); var != varDecl->idList->rend(); var++) {
+	while (varIter != varDecl->idList->rend()) {
 		std::stringstream type;	
 		// check if a variable name is not 'main' nor 'init'
 		// (parent->parent scope => basetypes)
-		if (symbolTable->parent->parent == NULL) checkIdName(*var);
-			
+		if (symbolTable->parent->parent == NULL) checkIdName(*varIter);
+		
 		//check type name
 		if (varDecl->typeName) {
 			//check if type exists
@@ -389,30 +416,53 @@ void SymbolTableBuilder::visit(VariableDeclaration *varDecl) {
 			}
 			
 			type << varDecl->typeName->name;
+			
+			// if type is specified, save it to each identifier
+			//TODO: modify find base type for arrays
+			(*varIter)->type = TypeDescriptor(
+				type.str(),
+				type.str(),
+				CATEGORY_VAR,
+				varDecl->typeName->indexes,
+				*varIter
+			);	
 		} else {
 			type << BASETYPE_UNDEFINED;
 		}
 		
-		ss << getTabs() << (*var)->name << " [" << CATEGORY_VAR << "]" << " = ";
+		ss << getTabs() << (*varIter)->name << " [" << CATEGORY_VAR << "]" << " = ";
 		ss << type.str() << std::endl;	
-
+		
 		//save pointer to the parent node in idExp
-		(*var)->parentNode = varDecl;	
+		(*varIter)->parentNode = varDecl;	
 		Symbol *symbol = symbolTable->putSymbol(
-			(*var)->name,
+			(*varIter)->name,
 			CATEGORY_VAR,
 			type.str(),
-			*var
+			*varIter
 		);	
 		
 		// terminate if id already declared
 		if (symbol == NULL) terminate();
 		
 		// save to the node
-		(*var)->symbol = symbol;
+		(*varIter)->symbol = symbol;	
 		
-		//TODO: resolve type if it's not defined
-		//TODO: typecheck corresponding variables and expressions	
+		// resolve type if it's not defined
+		if ( varDecl->typeName == NULL )
+			(*varIter)->type = (*expIter)->type;
+		// typecheck corresponding variables and expressions; check if an expression is a type name
+		else if ( (varDecl->expList && (*varIter)->type.baseType.compare((*expIter)->type.baseType) != 0) ||
+			  (varDecl->expList && hasTypeName(*expIter) )
+		) {
+			std::cerr << "Error: (line " << (*expIter)->lineno << ") "
+				  << getReceivedTypeName(*expIter) << " is not assignment compatible with "
+				  << (*varIter)->type.name << " in variable declaration" << std::endl;
+			terminate();
+		}
+		
+		varIter++;
+		if (varDecl->expList) expIter++;
 	}
 }
 
@@ -774,6 +824,30 @@ void SymbolTableBuilder::visit(BinaryOperatorExp *binOpExp) {
 
 void SymbolTableBuilder::visit(BuiltinsExp *builtinsExp) {
 	if (builtinsExp == NULL) return;
+	
+	ASTTraversal::traverse(builtinsExp->exp, *this);	
+
+	/*if (builtinsExp->name.compare(BUILTIN_CAP) == 0) {
+		checkBuiltinCap(builtinsExp);
+		builtinsExp->type = TypeDescriptor(
+					BASETYPE_INT,
+					BASETYPE_INT,
+					CATEGORY_FUNC,
+					builtinsExp
+				);
+		return;
+	}
+	
+	if ((builtinsExp->name.compare(BUILTIN_LEN) == 0) {
+		checkBuiltinLen(builtinsExp);
+		builtinsExp->type = TypeDescriptor(
+					BASETYPE_STRING,
+					BASETYPE_STRING,
+					CATEGORY_FUNC,
+					builtinsExp
+				);
+		return;
+	}*/
 }
 
 void SymbolTableBuilder::visit(FunctionCallExp *funcCallExp) {
@@ -836,14 +910,14 @@ void SymbolTableBuilder::visit(IdentifierExp *idExp) {
 }
 
 void SymbolTableBuilder::visit(IntegerExp *intExp) {	
-	if (intExp == NULL) return;
+	if (intExp == NULL) return;	
 	//set type
 	intExp->type = TypeDescriptor(
 				BASETYPE_INT,
 				BASETYPE_INT,
 				CATEGORY_TYPE,
 				intExp
-			);
+			);	
 }
 
 void SymbolTableBuilder::visit(FloatExp *floatExp) {

@@ -50,6 +50,8 @@ class SymbolTableBuilder : public Visitor {
 		void checkNumberOfFuncArgs(FunctionCallExp *funcCallExp);
 		void checkArgTypes(FunctionCallExp *funcCallExp);	
 		void checkIsIntExp(Expression *exp);
+		void checkBuiltinCap(BuiltinsExp *builtinsExp);
+		void checkBuiltinLen(BuiltinsExp *builtinsExp);
 		void typeCompatibilityError(
 			int lineno,
 			const std::string &expName,

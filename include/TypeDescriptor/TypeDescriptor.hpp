@@ -3,6 +3,7 @@
 
 #include <set>
 #include <string>
+#include <vector>
 #include "AST/Node.hpp"
 
 const std::string BASETYPE_UNDEFINED = "<infer>";
@@ -33,6 +34,7 @@ class TypeDescriptor {
 		std::string name;	 // type name (base and derived types)
 		std::string category;	 // there are 4 basic categories: type, constant, variable, function		
 		std::string baseType;    // there are 5 base types: bool, int, float64, rune, string
+		std::vector<int> *indexes = NULL; // array indexes
 		Node *node = NULL;	 // pointer to node in the AST
 
 		// there are 6 type groups: bool, comparable, ordered, numeric, string, integer
@@ -47,13 +49,22 @@ class TypeDescriptor {
 			const std::string &rhsType
 		);
 
-		TypeDescriptor() { }
+		TypeDescriptor(
+			const std::string &_name,
+			const std::string &_baseType,
+			const std::string &_category,
+			std::vector<int> *_indexes,
+			Node *_node	
+		) : name(_name), baseType(_baseType), category(_category), indexes(_indexes), node(_node) { }
+
 		TypeDescriptor(
 			const std::string &_name,
 			const std::string &_baseType,
 			const std::string &_category,
 			Node *_node	
 		) : name(_name), baseType(_baseType), category(_category), node(_node) { }
+
+		TypeDescriptor() { }
 };
 
 #endif

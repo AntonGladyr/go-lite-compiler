@@ -16,10 +16,12 @@ func test_func(a string, a2 string) [5]int {
 }
 
 func main() {
-	var qwe [5]int
+	var x [5]int = 5
+//	var ttt int = len(test_func("str", "str"))
+//	var qwe [5]int
 	
-	if test_func[5] {
-	}
+	//if test_func[5] {
+	//}
 	//init()
 	//var ttttt int = test_func(5, 5);
 	//test_func("str")
