@@ -10,14 +10,15 @@ type float2 float
 func init() {
 }
 
-func test_func(a string, a2 string) int {
-	return 5
+func test_func(a string, a2 string) [5]int {
+	var d [5]int
+	return d
 }
 
 func main() {
 	var qwe [5]int
 	
-	if qwe[test_func] {
+	if test_func[5] {
 	}
 	//init()
 	//var ttttt int = test_func(5, 5);

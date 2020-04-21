@@ -13,8 +13,7 @@
 class SymbolTable {
 	private:
 		bool isInitFunc(Node *node);
-		bool isEqual(const std::string &id, const std::string &newId, Symbol *s, Node *node);
-		std::string findBaseType(SymbolTable *t, std::string type);
+		bool isEqual(const std::string &id, const std::string &newId, Symbol *s, Node *node);	
 	public:
 		Symbol *table[HashSize] = {};
 		SymbolTable *parent = NULL;	
@@ -31,6 +30,7 @@ class SymbolTable {
 			Node *node
 		);	
 		Symbol *getSymbol(SymbolTable *t, const std::string &name);
+		std::string findBaseType(SymbolTable *t, std::string type);
 		void build(Program *prg); // build symbol table
 		void deallocate(); //for memory deallocation
 		

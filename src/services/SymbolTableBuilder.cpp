@@ -233,49 +233,68 @@ void SymbolTableBuilder::binaryExpError(
 	terminate();
 }
 
-// throws an error if the given expression is not an array
-void SymbolTableBuilder::checkIsArray(ArrayExp *arrExp) {
+void SymbolTableBuilder::checkIsIntExp(Expression *exp) {
 	IdentifierExp *idExp = NULL;
-	VariableDeclaration *varDecl;
 	
-	Symbol *s = symbolTable->getSymbol(symbolTable, arrExp->idExp->name);	
-
-	if (typeid(IdentifierExp) != typeid(*(s->node))) {
-		std::cerr << "Error: (line " << arrExp->lineno << ") "
-			  << "indexing target expects list target (slice, array) "
-			  << "[received " << getReceivedTypeName(arrExp->idExp)
-			  << "]" << std::endl;
-		terminate();
+	if (typeid(IdentifierExp) == typeid(*exp)) {
+		idExp = (IdentifierExp*)exp;
+		
+		// if id name is "int"
+		if (idExp->name.compare(BASETYPE_INT) == 0) {
+			std::cerr << "Error: (line " << exp->lineno << ") "
+			  	  << "index must be an int "
+			  	  << "[received " << getReceivedTypeName(exp) << "]" << std::endl;
+			terminate();
+		}
 	}
 	
-	idExp = (IdentifierExp*)s->node;
-	
-	if (typeid(VariableDeclaration) != typeid(*(idExp->parentNode))) {
-		std::cerr << "Error: (line " << arrExp->lineno << ") "
-			  << "indexing target expects list target (slice, array) "
-			  << "[received " << getReceivedTypeName(arrExp->idExp)
-			  << "]" << std::endl;
-		terminate();
-	}
-	
-	varDecl = (VariableDeclaration*)idExp->parentNode;
-
-	if (varDecl->typeName->indexes == NULL) {
-		std::cerr << "Error: (line " << arrExp->lineno << ") "
-			  << "indexing target expects list target (slice, array) "
-			  << "[received " << getReceivedTypeName(arrExp->idExp)
-			  << "]" << std::endl;
+	if (exp->type.baseType.compare(BASETYPE_INT) != 0) {
+		std::cerr << "Error: (line " << exp->lineno << ") "
+			  << "index must be an int "
+			  << "[received " << getReceivedTypeName(exp) << "]" << std::endl;
 		terminate();
 	}
 }
 
-void SymbolTableBuilder::checkIsIntExp(Expression *exp) {	
-	if (exp->type.baseType.compare(BASETYPE_INT) != 0) {
-		std::cerr << "Error: (line " << exp->lineno << ") "
-			  << "index must be an int "
-			  << "[received " << exp->type.name << "]" << std::endl;
-		terminate();
-	}
+// throws an error if the given expression is not an array
+void SymbolTableBuilder::arrayIndexingError(ArrayExp *arrExp) {	
+	std::cerr << "Error: (line " << arrExp->lineno << ") "
+		  << "indexing target expects list target (slice, array) "
+		  << "[received " << getReceivedTypeName(arrExp->idExp)
+		  << "]" << std::endl;
+	terminate();
+}
+
+// resolves array expression type
+TypeDescriptor SymbolTableBuilder::resolveArrayExpType(ArrayExp *arrExp) {
+	IdentifierExp *idExp = NULL;
+	VariableDeclaration *varDecl = NULL;
+	FunctionDeclaration *funcDecl = NULL;
+	
+	Symbol *s = symbolTable->getSymbol(symbolTable, arrExp->idExp->name);	
+
+	// if the given node is not an identifier thow an error
+	if (typeid(IdentifierExp) != typeid(*(s->node)))
+		arrayIndexingError(arrExp);
+	
+	idExp = (IdentifierExp*)s->node;
+	
+	// if parent node of the given identifier is not a VariableDeclaration node, throw an error
+	if (typeid(VariableDeclaration) != typeid(*(idExp->parentNode)))
+		arrayIndexingError(arrExp);
+	
+	varDecl = (VariableDeclaration*)idExp->parentNode;
+
+	// if a variable declaration does not have any indexes in the type, throw an error
+	if (varDecl->typeName->indexes == NULL)
+		arrayIndexingError(arrExp);
+	
+	return TypeDescriptor(
+			varDecl->typeName->name,
+			symbolTable->findBaseType(symbolTable, varDecl->typeName->name),
+			CATEGORY_VAR,
+			varDecl
+		);
 }
 
 // return type name of an expression
@@ -642,19 +661,17 @@ void SymbolTableBuilder::visit(EmptyStatement *emptyStmt) { }
 void SymbolTableBuilder::visit(ArrayExp *arrExp) {
 	if (arrExp == NULL) return;
 
-	ASTTraversal::traverse(arrExp->idExp, *this);
-	
-	// expr is well-typed and resolves to []T or [N]T
-	checkIsArray(arrExp);
+	ASTTraversal::traverse(arrExp->idExp, *this);	
 		
 	// index is well-typed and resolves to int
 	for(auto const& exp : *arrExp->expList) {	
 		ASTTraversal::traverse(exp, *this);
 		checkIsIntExp(exp);
 	}
-
-	// the result of the indexing expression is T
-	arrExp->type = arrExp->idExp->type;
+	
+	// expr is well-typed and resolves to []T or [N]T
+	// the result of the indexing expression is T	
+	arrExp->type = resolveArrayExpType(arrExp);
 }
 
 void SymbolTableBuilder::visit(BinaryOperatorExp *binOpExp) {

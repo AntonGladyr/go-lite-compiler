@@ -48,8 +48,7 @@ class SymbolTableBuilder : public Visitor {
 		);
 		void checkIsInitFunc(FunctionCallExp *funcCallExp);
 		void checkNumberOfFuncArgs(FunctionCallExp *funcCallExp);
-		void checkArgTypes(FunctionCallExp *funcCallExp);
-		void checkIsArray(ArrayExp *arrExp);
+		void checkArgTypes(FunctionCallExp *funcCallExp);	
 		void checkIsIntExp(Expression *exp);
 		void typeCompatibilityError(
 			int lineno,
@@ -57,11 +56,13 @@ class SymbolTableBuilder : public Visitor {
 			const std::string &receivedType,
 			const std::string &expectedType
 		);
+		void arrayIndexingError(ArrayExp *arrExp);
 		void binaryExpError(
 			const std::string &lhsType,
 			const std::string &rhsType,
 			int lineno
 		);
+		TypeDescriptor resolveArrayExpType(ArrayExp *arrExp);
 		bool hasTypeName(Expression *exp);
 		std::string getReceivedTypeName(Expression *exp);
 		
