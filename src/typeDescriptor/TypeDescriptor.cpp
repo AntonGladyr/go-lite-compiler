@@ -1,6 +1,7 @@
 #ifndef TYPE_DESCRIPTOR_CPP
 #define TYPE_DESCRIPTOR_CPP
 
+#include <iostream>
 #include "TypeDescriptor/TypeDescriptor.hpp"
 
 std::string TypeDescriptor::resolveNumericType(
@@ -36,6 +37,12 @@ bool TypeDescriptor::isBoolType() {
 
 bool TypeDescriptor::isBaseType() {	
 	return baseTypesList.find(baseType) != baseTypesList.end();
+}
+
+bool TypeDescriptor::isArray() {
+	std::cout << "lol" << std::endl;
+	std::cout << indexes->size() << std::endl;
+	return indexes != NULL && indexes->size() != 0;
 }
 
 #endif

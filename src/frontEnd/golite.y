@@ -415,8 +415,8 @@ default_clause : tDEFAULT tCOLON switch_stmts
 	/*$$ = new case_clause(); $$->first = NULL; $$->second = new BlockStatement($3, yylineno);*/ }
     ;
 
-incdecstmt : exp tINC { $$ = new IncDecStatement($1, IncDecOp::INC, yylineno); } 
-    | exp tDEC { $$ = new IncDecStatement($1, IncDecOp::DEC, yylineno); }
+incdecstmt : exp tINC { $$ = new IncDecStatement($1, INC_DEC_OP::INC, yylineno); } 
+    | exp tDEC { $$ = new IncDecStatement($1, INC_DEC_OP::DEC, yylineno); }
     ;
 
 printstmt : tPRINT tLPAREN exp_listpe tRPAREN { $$ = new PrintStatement($3, yylineno); }

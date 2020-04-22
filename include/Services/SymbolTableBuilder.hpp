@@ -52,6 +52,7 @@ class SymbolTableBuilder : public Visitor {
 		void checkIsIntExp(Expression *exp);
 		void checkBuiltinCap(BuiltinsExp *builtinsExp);
 		void checkBuiltinLen(BuiltinsExp *builtinsExp);
+		void checkClauseExp(Expression *clauseExp, Expression *switchExp);
 		void typeCompatibilityError(
 			int lineno,
 			const std::string &expName,

@@ -48,6 +48,7 @@ class TypeDescriptor {
 		bool isStringType();
 		bool isBoolType();
 		bool isBaseType();
+		bool isArray();
 		static std::string resolveNumericType(
 			const std::string &lhsType, 
 			const std::string &rhsType

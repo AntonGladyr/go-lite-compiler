@@ -12,9 +12,6 @@
 
 class CaseClause;
 
-//typedef std::pair<std::vector<Expression*>*, BlockStatement*> case_clause;
-//typedef std::vector<std::pair<case_clause*, SWITCH_CLAUSE>*> clause_list;
-
 class SwitchStatement : public Statement {
 	public:
 		Expression *exp = NULL;		

@@ -46,6 +46,7 @@ SymbolTable *SymbolTableBuilder::build(Program *prg) {
 //=====================HELPER FUNCTIONS===========================
 //=================================================================
 
+//TODO: possibly move all helper functions to a separate class
 
 // termination after errors
 void SymbolTableBuilder::terminate() {
@@ -186,9 +187,10 @@ void SymbolTableBuilder::checkIsInitFunc(FunctionCallExp *funcCallExp) {
 
 // throws an error if number of passed parameters to a function does not equal to the number of function arguments
 void SymbolTableBuilder::checkNumberOfFuncArgs(FunctionCallExp *funcCallExp) {
+	if (funcCallExp->expList == NULL || funcCallExp->expList->size() == 0) return;
+	
 	FunctionDeclaration *funcDecl = (FunctionDeclaration*)funcCallExp->idExp->symbol->node;
-
-	if (funcCallExp->expList->size() != funcDecl->params->size()) {
+	if (funcCallExp->expList->size() != funcDecl->params->size()) {	
 		std::cerr << "Error: (line " << funcCallExp->lineno << ") "
 			<< "function " << funcCallExp->idExp->name
 			<< " called with incorrect number of arguments [received "
@@ -201,6 +203,8 @@ void SymbolTableBuilder::checkNumberOfFuncArgs(FunctionCallExp *funcCallExp) {
 // throws an error if function call parameter has different type than in corresponding function declaration
 void SymbolTableBuilder::checkArgTypes(FunctionCallExp *funcCallExp) {
 	FunctionDeclaration *funcDecl = (FunctionDeclaration*)funcCallExp->idExp->symbol->node;
+	
+	if (funcCallExp->expList == NULL || funcCallExp->expList->size() == 0) return;
 
 	int paramsNum = funcCallExp->expList->size();
 
@@ -258,23 +262,49 @@ void SymbolTableBuilder::checkIsIntExp(Expression *exp) {
 
 // A cap expression is well-typed if expr is well-typed, has type S and S resolves to [N]T
 void SymbolTableBuilder::checkBuiltinCap(BuiltinsExp *builtinsExp) {	
-	/*if ( !builtinsExp->exp->type.isArray ) {
-	  std::cerr << "Error: (line " << builtinsExp->exp->lineno << ") "
-	  << "capacity builtin expects slice or array type as argument "
-	  << "[received " << builtinsExp->exp->type.name << "]" << std::endl;
-	  terminate();
-	  }*/
+	if ( !builtinsExp->exp->type.isArray() ) {
+	  	std::cerr << "Error: (line " << builtinsExp->exp->lineno << ") "
+	  		  << "capacity builtin expects slice or array type as argument "
+	  		  << "[received " << builtinsExp->exp->type.name << "]" << std::endl;
+	  	terminate();
+	  }
 }
 
 // A len expression is well-typed if expr is well-typed, has type S and S resolves to string or [N]T
-void checkBuiltinLen(BuiltinsExp *builtinsExp) {
-	/*if ( !builtinsExp->exp->type.isArray ||
-	  builtinsExp->exp->type.baseType.compare(BASETYPE_STRING) != 0
+void SymbolTableBuilder::checkBuiltinLen(BuiltinsExp *builtinsExp) {	
+	if ( !builtinsExp->exp->type.isArray() ||
+	  	builtinsExp->exp->type.baseType.compare(BASETYPE_STRING) != 0
 	  ) {
-	  std::cerr << "Error: (line " << builtinsExp->exp->lineno << ") "
-	  << "length builtin expects slice, array or string type as argument "
-	  << "[received " << builtinsExp->exp->type.name << "]" std::endl;
-	  }*/
+	  	std::cerr << "Error: (line " << builtinsExp->exp->lineno << ") "
+	  	    	  << "length builtin expects slice, array or string type as argument "
+	  	    	  << "[received " << builtinsExp->exp->type.name << "]" << std::endl;
+		terminate();
+	  }
+}
+
+void SymbolTableBuilder::checkClauseExp(Expression *clauseExp, Expression *switchExp) {
+	// a switch statement without an expression
+	if ( switchExp == NULL &&
+	     !hasTypeName(clauseExp) && 
+	     clauseExp->type.name.compare(BASETYPE_BOOL) == 0
+	) return;
+	// a switch statement with an expression
+	else if ( switchExp && 
+		  !hasTypeName(switchExp) &&
+		  !hasTypeName(clauseExp) &&
+		  switchExp->type.name.compare(clauseExp->type.name) == 0
+	) return;
+	else {
+		std::stringstream switchExpType;
+		if (switchExp) switchExpType << switchExp->type.name;
+		else switchExpType << BASETYPE_BOOL;
+		
+		std::cerr << "Error: (line " << clauseExp->lineno << ") "
+			  << "switch statement expresion type is incompatible with case type "
+			  << "[" << getReceivedTypeName(clauseExp) << " != "
+			  << switchExpType.str() << "]" << std::endl;
+		terminate();
+	}
 }
 
 // throws an error if the given expression is not an array
@@ -377,6 +407,13 @@ void SymbolTableBuilder::visit(Program *prg) {
 
 void SymbolTableBuilder::visit(VariableDeclaration *varDecl) {
 	if (varDecl == NULL) return;
+	
+	/* 
+	   var x T        => Adds the mapping x:T to the symbol table.
+	   var x T = expr => If expr is well-typed and its type is T1, and T1=T, the mapping x:T is added to the symbol
+			     table.
+	   var x = expr   => If expr is well-typed and its type is T, the mapping x:T is added to the symbol table.
+	*/
 
 	//copy string stream for printing errors
 	symbolTable->ss.str(ss.str());
@@ -425,7 +462,7 @@ void SymbolTableBuilder::visit(VariableDeclaration *varDecl) {
 				CATEGORY_VAR,
 				varDecl->typeName->indexes,
 				*varIter
-			);	
+			);
 		} else {
 			type << BASETYPE_UNDEFINED;
 		}
@@ -468,7 +505,14 @@ void SymbolTableBuilder::visit(VariableDeclaration *varDecl) {
 
 void SymbolTableBuilder::visit(TypeDeclaration *typeDecl) {
 	if (typeDecl == NULL) return;
-
+	
+	/*
+	  type T1 T2
+	  Adds the type mapping T1 -> def(T2) to the type symbol table (i.e., T1 is a defined type inheriting from T2)
+	  If T1 is already declared in the current scope, an error is raised. If T1 is already declared, but in an outer
+	  scope, the new T1 -> def(T2) type mapping will shadow the previous mapping
+	*/
+	
 	//copy string stream for printing errors
 	symbolTable->ss.str(ss.str());
 	
@@ -507,6 +551,16 @@ void SymbolTableBuilder::visit(TypeDeclaration *typeDecl) {
 
 void SymbolTableBuilder::visit(FunctionDeclaration *funcDecl) {
 	if (funcDecl == NULL) return;
+	
+	/*
+	  func f(p1 T1, p2 T2, ..., pn Tn) Tr {
+		// statements
+	  }
+
+	  Given the declaration for f above, the mapping f:(T1 * T2 * ... * Tn -> Tr) is added to the symbol table. 
+	  If f is already declared in the current scope (i.e. the global scope since we don’t have nested functions),
+	  an error is raised.
+	*/
 
 	// copy string stream for printing errors
 	symbolTable->ss.str(ss.str());
@@ -514,10 +568,6 @@ void SymbolTableBuilder::visit(FunctionDeclaration *funcDecl) {
 	// check special functions: init and main
 	checkSpecialFunctions(funcDecl);
 	
-	// check if return type exists
-	if (funcDecl->typeName)
-		checkTypeName(funcDecl->typeName);
-
 	// check if parameter types exist
 	if (funcDecl->params) {
 		for (auto const& param : *(funcDecl->params)) {
@@ -525,6 +575,24 @@ void SymbolTableBuilder::visit(FunctionDeclaration *funcDecl) {
 		}
 	}
 	
+	std::vector<int> *indexes = NULL;
+
+	// check if return type exists
+	if (funcDecl->typeName) {
+		checkTypeName(funcDecl->typeName);
+		
+		indexes = funcDecl->typeName->indexes;
+	}
+	
+	// save type
+	funcDecl->idExp->type = TypeDescriptor(
+					funcDecl->symbolTypeToStr(),
+					funcDecl->symbolTypeToStr(),	
+					CATEGORY_FUNC,
+					indexes,
+					funcDecl
+				);
+
 	// save pointer to the parent node (func declaration) in the block statement,
 	// so func parameters can be added to the child scope
 	funcDecl->blockStmt->parentNode = funcDecl;
@@ -541,12 +609,17 @@ void SymbolTableBuilder::visit(FunctionDeclaration *funcDecl) {
 
 	// save to the node
 	funcDecl->symbol = symbol;
+
 	ss << getTabs() << funcDecl->symbolToStr() << std::endl;
 }
 
 void SymbolTableBuilder::visit(BlockStatement *blockStmt) {
 	if (blockStmt == NULL) return;
-		
+	
+	/*
+	   A block type checks if its statements type check. A block opens a new scope in the symbol table.
+	*/
+	
 	if (isScopeOpened) {
 		// open new scope
 		symbolTable = symbolTable->scopeSymbolTable();
@@ -575,7 +648,7 @@ void SymbolTableBuilder::visit(BlockStatement *blockStmt) {
 	}
 }
 
-void SymbolTableBuilder::visit(DeclarationStatement *declStmt) {	
+void SymbolTableBuilder::visit(DeclarationStatement *declStmt) {
 	if (declStmt == NULL) return;
 	ASTTraversal::traverse(declStmt->decl, *this);
 }
@@ -587,6 +660,14 @@ void SymbolTableBuilder::visit(TypeDeclarationStatement *typeDeclStmt) {
 
 void SymbolTableBuilder::visit(AssignStatement *assignStmt) {
 	if (assignStmt == NULL) return;
+
+	/*
+	   v1, v2, ..., vk = e1, e2, ..., en
+	   An assignment statement type checks if:
+	   - All the expressions on the left-hand side are well-typed;
+	   - All the expressions on the right-hand side are well-typed;
+	   - For every pair of lvalue/expression, typeof(vi) = typeof(ei) (no resolving).
+	*/
 	
 	if (assignStmt->lhs) {
 		for(auto const& exp : *(assignStmt->lhs)) {
@@ -619,6 +700,12 @@ void SymbolTableBuilder::visit(AssignStatement *assignStmt) {
 
 void SymbolTableBuilder::visit(ExpressionStatement *expStmt) {
 	if (expStmt == NULL) return;
+
+	/*
+	   expr
+	   An expression statement is well-typed if its expression child is well-typed. In GoLite, only function call
+	   expressions are allowed to be used as statements, i.e. foo(x, y) can be used as a statement, but x-1 cannot.
+	*/
 	
 	// if a given expression is not a function call, throw an error
 	if(dynamic_cast<FunctionCallExp*>(expStmt->exp) == nullptr) {
@@ -633,6 +720,29 @@ void SymbolTableBuilder::visit(ExpressionStatement *expStmt) {
 
 void SymbolTableBuilder::visit(ForStatement *forStmt) {
 	if (forStmt == NULL) return;
+
+	/*
+	   for {
+		// statements
+	   }
+	   An infinite for loop type checks if its body type checks. The body opens a new scope in the symbol table.
+
+	   for expr {
+		// statements
+	   }
+	   A "while" loop type checks if:
+		- Its expression is well-typed and resolves to type bool;
+		- The statements type check.
+
+	   for init; expr; post {
+		// statements
+	   }
+	   three-part for loop type checks if:
+		- init type check;
+		- expr is well-typed and resolves to type bool;
+		- post type checks;
+		- the statements type check.
+	*/
 	
 	if (isScopeOpened) {
 		// open new scope
@@ -643,9 +753,20 @@ void SymbolTableBuilder::visit(ForStatement *forStmt) {
 		// check init stmt
 		if (forStmt->initStmt)
 			ASTTraversal::traverse(forStmt->initStmt, *this);
+	
 		// check loop expression
-		if (forStmt->exp)
-			ASTTraversal::traverse(forStmt->exp, *this);	
+		if (forStmt->exp) {	
+			ASTTraversal::traverse(forStmt->exp, *this);
+			if ( !forStmt->exp->type.isBoolType() ||
+			     hasTypeName(forStmt->exp)
+			) {
+				std::cerr << "Error: (line " << forStmt->exp->lineno << ") "
+					  << "incompatible type in loop condition "
+					  << "[received " << getReceivedTypeName(forStmt->exp) << ", expected "
+					  << BASETYPE_BOOL << "]" << std::endl;
+				terminate();
+			}
+		}
 		// check loop post statement
 		if (forStmt->postStmt)
 			ASTTraversal::traverse(forStmt->postStmt, *this);	
@@ -660,9 +781,33 @@ void SymbolTableBuilder::visit(ForStatement *forStmt) {
 void SymbolTableBuilder::visit(IfElseStatement *ifElseStmt) {	
 	if (ifElseStmt == NULL) return;
 
+	/*
+	   if expr {
+	   	// then statements
+	   } else {
+	   	// else statements
+	   }
+
+	   An if statement type checks if:
+		- expr is well-typed and resolves to type bool;
+		- The statements in the first block type check;
+		- The statements in the second block type check.
+	*/
+
 	// check if expression
-	if (ifElseStmt->exp)
+	if (ifElseStmt->exp) {
 		ASTTraversal::traverse(ifElseStmt->exp, *this);
+		
+		if ( !ifElseStmt->exp->type.isBoolType() ||
+		     hasTypeName(ifElseStmt->exp)
+		) {
+			std::cerr << "Error: (line " << ifElseStmt->exp->lineno << ") "
+				  << "incompatible type in if condition "
+				  << "[received " << getReceivedTypeName(ifElseStmt->exp)
+				  << ", expected " << BASETYPE_BOOL << "]" << std::endl;
+			terminate();
+		}
+	}
 	
 	// traverse all blocks
 	ASTTraversal::traverse(ifElseStmt->blockStmt, *this);
@@ -678,6 +823,31 @@ void SymbolTableBuilder::visit(IfElseStatement *ifElseStmt) {
 
 void SymbolTableBuilder::visit(SwitchStatement *switchStmt) {
 	if (switchStmt == NULL) return;
+
+	/*
+	   switch expr {
+	   case e1, e2, ..., en:
+	   	// statements
+	   default:
+	   	// statements
+	   }
+
+	   A switch statement with an expression type checks if:
+		- expr is well-typed and is a comparable type;
+		- The expressions e1, e2, . . . , en are well-typed and have the same type as expr;
+		- The statements under the different alternatives type check.
+
+	   switch {
+	   case e1, e2, ..., en:
+		// statements
+	   default:
+		// statements
+	   }
+	   
+	   A switch statement without an expression type checks if:
+		- The expressions e1, e2, . . . , en are well-typed and have type bool;
+		- The statements under the different alternatives type check.
+	*/
 	
 	symbolTable = symbolTable->scopeSymbolTable();
 	ss << getTabs() << "{" << std::endl;
@@ -686,13 +856,31 @@ void SymbolTableBuilder::visit(SwitchStatement *switchStmt) {
 	// check switch expression
 	if (switchStmt->exp) {
 		ASTTraversal::traverse(switchStmt->exp, *this);
-	}
+
+		// for comparable operators
+		bool isFunc = false;	
+
+		//check is func
+		if (switchStmt->exp->symbol) 
+			isFunc = switchStmt->exp->symbol->category.compare(CATEGORY_FUNC) == 0;
+
+		if ( isFunc ||
+		     hasTypeName(switchStmt->exp)
+		) {
+			std::cerr << "Error: (line " << switchStmt->exp->lineno << ") "
+				  << "slice, map, and function values are not comparable" << std::endl
+				  << "[received " << getReceivedTypeName(switchStmt->exp)
+				  << ", expected comparable type" << "]" << std::endl;
+			terminate();
+		}
+	}	
 
 	if (switchStmt->clauseList) {
 		for(auto const& clause : *(switchStmt->clauseList)) {
 			if (clause->expList) {
 				for(auto const& exp : *(clause->expList)) {
 					ASTTraversal::traverse(exp, *this);
+					checkClauseExp(exp, switchStmt->exp);
 				}
 			}
 			
@@ -709,6 +897,14 @@ void SymbolTableBuilder::visit(SwitchStatement *switchStmt) {
 
 void SymbolTableBuilder::visit(PrintStatement *printStmt) {
 	if (printStmt == NULL) return;
+	
+	/*
+	   print(e1, ..., ek)
+	   println(e1, ..., ek)
+	   
+	   A print statement type checks if all its expressions are well-typed and resolve to a base type
+	   (int, float64, bool, string, rune).
+	*/
 	
 	if (printStmt->expList) {
 		for(auto const& exp : *printStmt->expList) {
@@ -729,11 +925,44 @@ void SymbolTableBuilder::visit(PrintStatement *printStmt) {
 
 void SymbolTableBuilder::visit(IncDecStatement *incDecStmt) {
 	if (incDecStmt == NULL) return;
+	
+	/*
+	   expr++
+	   expr--
+
+	   An increment/decrement statement type checks if its expression is well-typed and resolves to a numeric
+	   base type (int, float64, rune).
+	*/
+
 	ASTTraversal::traverse(incDecStmt->exp, *this);
+
+	if ( !incDecStmt->exp->type.isNumericType() ||
+	     hasTypeName(incDecStmt->exp)
+	) {
+		std::stringstream opName;
+		if (incDecStmt->op == INC_DEC_OP::INC) opName << "increment";
+		else if (incDecStmt->op == INC_DEC_OP::DEC) opName << "decrement";
+		
+		std::cerr << "Error: (line " << incDecStmt->exp->lineno << ") "
+			  << " incompatible type in " << opName.str()
+			  << " [received " << getReceivedTypeName(incDecStmt->exp)
+			  << ", expected numeric (int, rune, float64)]" << std::endl;
+		terminate();
+	}
 }
 
 void SymbolTableBuilder::visit(ReturnStatement *returnStmt) {
 	if (returnStmt == NULL) return;
+
+	/*
+	   return
+	   A return statement with no expression is well-typed if the enclosing function has no return type.
+	
+	   return expr
+	   A return statement with an expression is well-typed if its expression is well-typed and the type
+	   of this expression is the same as the return type of the enclosing function.
+	*/
+
 	ASTTraversal::traverse(returnStmt->exp, *this);
 
 	//TODO: weeding pass
@@ -838,7 +1067,7 @@ void SymbolTableBuilder::visit(BinaryOperatorExp *binOpExp) {
 	
 	else if ( !isFuncLhs && // anything except func type
 		  binOpExp->isComparableOperator() && // { ==, != }
-		  isFuncRhs && // anything except func type
+		  !isFuncRhs && // anything except func type
 		  binOpExp->lhs->type.baseType.compare(binOpExp->rhs->type.baseType) == 0 // lhs type equals to the rhs type
 	) binOpExp->type = TypeDescriptor(
 				BASETYPE_BOOL,
@@ -892,7 +1121,7 @@ void SymbolTableBuilder::visit(BuiltinsExp *builtinsExp) {
 	
 	ASTTraversal::traverse(builtinsExp->exp, *this);	
 
-	/*if (builtinsExp->name.compare(BUILTIN_CAP) == 0) {
+	if (builtinsExp->name.compare(BUILTIN_CAP) == 0) {
 		checkBuiltinCap(builtinsExp);
 		builtinsExp->type = TypeDescriptor(
 					BASETYPE_INT,
@@ -903,7 +1132,7 @@ void SymbolTableBuilder::visit(BuiltinsExp *builtinsExp) {
 		return;
 	}
 	
-	if ((builtinsExp->name.compare(BUILTIN_LEN) == 0) {
+	if (builtinsExp->name.compare(BUILTIN_LEN) == 0) {
 		checkBuiltinLen(builtinsExp);
 		builtinsExp->type = TypeDescriptor(
 					BASETYPE_STRING,
@@ -912,7 +1141,7 @@ void SymbolTableBuilder::visit(BuiltinsExp *builtinsExp) {
 					builtinsExp
 				);
 		return;
-	}*/
+	}
 
 	//TODO: typecasting
 }
@@ -922,8 +1151,8 @@ void SymbolTableBuilder::visit(FunctionCallExp *funcCallExp) {
 		
 	// copy string stream for printing errors
 	symbolTable->ss.str(ss.str());
-	
-	ASTTraversal::traverse(funcCallExp->idExp, *this);
+		
+	ASTTraversal::traverse(funcCallExp->idExp, *this);	
 		
 	// check if call of init func
 	checkIsInitFunc(funcCallExp);
@@ -934,10 +1163,10 @@ void SymbolTableBuilder::visit(FunctionCallExp *funcCallExp) {
 			ASTTraversal::traverse(exp, *this);
 		}
 	}
-
+		
 	// check number of arguments
 	checkNumberOfFuncArgs(funcCallExp);
-	
+		
 	//arg1, arg2, . . . , argk are well-typed and have types T1, T2, . . . , Tk respectively;
 	checkArgTypes(funcCallExp);
 	

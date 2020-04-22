@@ -11,7 +11,7 @@ void IncDecStatement::accept(Visitor& v) {
 
 std::string IncDecStatement::toString() {
 	std::stringstream ss;
-	ss << exp->toString() << (op == IncDecOp::INC ? "++" : "--");	
+	ss << exp->toString() << (op == INC_DEC_OP::INC ? "++" : "--");	
 	return ss.str();
 }
 
