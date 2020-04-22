@@ -35,6 +35,7 @@ class SymbolTableBuilder : public Visitor {
 		SymbolTable *symbolTable = NULL;
 		int numTabs = 0;
 		std::stringstream ss; // for printing symbol table
+		bool isSymbolMode;
 		
 		void terminate();	
 		void checkTypeName(TypeName *type);
@@ -71,7 +72,7 @@ class SymbolTableBuilder : public Visitor {
 		std::string getReceivedTypeName(Expression *exp);
 		
 	public:	
-		SymbolTable *build(Program *prg);
+		SymbolTable *build(Program *prg, bool _isSymbolMode);
 		virtual void visit(Program *prg) override;
 		virtual void visit(VariableDeclaration *varDecl) override;
 		virtual void visit(TypeDeclaration *typeDecl) override;

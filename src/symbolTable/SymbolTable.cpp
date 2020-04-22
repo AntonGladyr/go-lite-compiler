@@ -12,16 +12,21 @@
 
 SymbolTable::SymbolTable(Program *prg) {
 	SymbolTableBuilder builder;
-	SymbolTable *sbPtr = builder.build(prg);
+	SymbolTable *sbPtr = builder.build(prg, isSymbolMode);
 	std::copy(std::begin(sbPtr->table), std::end(sbPtr->table), std::begin(table));
 	childList = sbPtr->childList;
 	parent = sbPtr->parent;
 	ss << sbPtr->ss.str();
 }
 
+SymbolTable::SymbolTable(Program *prg, bool _isSymbolMode) {
+	isSymbolMode = _isSymbolMode;
+	build(prg);
+}
+
 void SymbolTable::build(Program *prg) {
 	SymbolTableBuilder builder;
-	SymbolTable *sbPtr = builder.build(prg);
+	SymbolTable *sbPtr = builder.build(prg, isSymbolMode);
 	std::copy(std::begin(sbPtr->table), std::end(sbPtr->table), std::begin(table));	
 	childList = sbPtr->childList;
 	parent = sbPtr->parent;
@@ -99,7 +104,7 @@ bool SymbolTable::isEqual(
 	Node *node
 ) {
 	if (id.compare(newId) == 0) {
-		std::cerr << ss.str();
+		if (isSymbolMode) std::cerr << ss.str();
 		std::cerr << "Error:";
 		if (node) std::cerr << " (line " <<  node->lineno << ")";
 		std::cerr << " identifier " << id << " already declared on line "

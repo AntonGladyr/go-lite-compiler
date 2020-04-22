@@ -50,7 +50,7 @@ int main(int argc, char *argv[]){
     	}
 	else if(!strcmp(argv[1], "symbol")) {
 		yyparse();	
-		SymbolTable *symbolTable = new SymbolTable(program);	
+		SymbolTable *symbolTable = new SymbolTable(program, true);	
 		std::cout << symbolTable->toString();
 		
 		//TODO: invoke deallocate() behind the scenes
@@ -64,9 +64,7 @@ int main(int argc, char *argv[]){
 	else if(!strcmp(argv[1], "typecheck")) {
 		yyparse();	
 		SymbolTable *symbolTable = new SymbolTable(program);
-		TypeChecker checker;
-		checker.typecheck(program, symbolTable);		
-			
+		
 		std::cout << "OK" << std::endl;
 			
 		//TODO: invoke deallocate() behind the scenes

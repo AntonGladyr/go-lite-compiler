@@ -13,7 +13,8 @@
 class SymbolTable {
 	private:
 		bool isInitFunc(Node *node);
-		bool isEqual(const std::string &id, const std::string &newId, Symbol *s, Node *node);	
+		bool isEqual(const std::string &id, const std::string &newId, Symbol *s, Node *node);
+		bool isSymbolMode = false;
 	public:
 		Symbol *table[HashSize] = {};
 		SymbolTable *parent = NULL;	
@@ -36,8 +37,9 @@ class SymbolTable {
 		
 		std::string toString();
 		
-		SymbolTable(Program *prg);	
-		SymbolTable() { }; 
+		SymbolTable(Program *prg);
+		SymbolTable(Program *prg, bool _isSymbolMode); // for symbol table mode
+		SymbolTable() { };
 		~SymbolTable();
 };
 

@@ -8,9 +8,10 @@
 #include "AST/ASTTraversal.hpp"
 
 // initializes a symbol table
-SymbolTable *SymbolTableBuilder::build(Program *prg) {
+SymbolTable *SymbolTableBuilder::build(Program *prg, bool _isSymbolMode) {
 	//copy program pointer for deallocation
 	program = prg;
+	isSymbolMode = _isSymbolMode;
 
 	ss << "{" << std::endl;
 	numTabs++;
@@ -111,7 +112,7 @@ void SymbolTableBuilder::checkSpecialFunctions(Node *node) {
 				(funcDecl->idExp->name.compare(SPECIALFUNC_INIT) != 0)) return;
 
 		if(funcDecl->typeName || funcDecl->params) {
-			std::cerr << ss.str();
+			if (isSymbolMode) std::cerr << ss.str();
 			std::cerr << "Error: (line " << funcDecl->idExp->lineno << ") " << funcDecl->idExp->name 
 				<< " must have no parameters and no return value" << std::endl;
 			terminate();
@@ -125,7 +126,7 @@ void SymbolTableBuilder::checkTypeName(TypeName *type) {
 
 	// check if identifier exists in the symbol table
 	if (s == NULL) {
-		std::cerr << ss.str();
+		if (isSymbolMode) std::cerr << ss.str();
 		std::cerr << "Error: (line " << type->lineno << ") type \""
 			<< type->name << "\" is not declared" << std::endl;	
 		terminate();
@@ -133,7 +134,7 @@ void SymbolTableBuilder::checkTypeName(TypeName *type) {
 
 	// check if identifier has "type" category
 	if (s->category.compare(CATEGORY_TYPE) != 0) {
-		std::cerr << ss.str();
+		if (isSymbolMode) std::cerr << ss.str();
 		std::cerr << "Error: (line " << type->lineno << ") \""
 			<< type->name << "\" is not a type" << std::endl;
 		terminate();
@@ -148,7 +149,7 @@ void SymbolTableBuilder::checkIdName(Node *node) {
 	if (idExp->name.compare(SPECIALFUNC_MAIN) == 0 ||
 			idExp->name.compare(SPECIALFUNC_INIT) == 0) 
 	{
-		std::cerr << ss.str();
+		if (isSymbolMode) std::cerr << ss.str();
 		std::cerr << "Error: (line " << idExp->lineno << ") "
 			<< idExp->name << " must be a function" << std::endl;
 		terminate();
@@ -164,7 +165,7 @@ void SymbolTableBuilder::checkAssignEquality(
 	if (rhsSize == 0) return;
 
 	if (lhsSize != rhsSize) {
-		std::cerr << ss.str();
+		if (isSymbolMode) std::cerr << ss.str();
 		std::cerr << "Error: (line " << node->lineno << ") ";
 		if (typeid(VariableDeclaration) == typeid(*node))
 			std::cerr << "variable declaration ";
@@ -520,14 +521,14 @@ void SymbolTableBuilder::visit(VariableDeclaration *varDecl) {
 			CATEGORY_VAR,
 			type.str(),
 			*varIter
-		);	
+		);
 		
 		// terminate if id already declared
 		if (symbol == NULL) terminate();
 		
 		// save to the node
 		(*varIter)->symbol = symbol;	
-		
+			
 		// resolve type if it's not defined
 		if ( varDecl->typeName == NULL )
 			(*varIter)->type = (*expIter)->type;
@@ -569,7 +570,7 @@ void SymbolTableBuilder::visit(TypeDeclaration *typeDecl) {
 	
 	//check for recursive type declarations
 	if(typeDecl->idExp->name.compare(typeDecl->symbolTypeToStr()) == 0) {
-		std::cerr << ss.str();
+		if (isSymbolMode) std::cerr << ss.str();
 		std::cerr << "Error: (line " << typeDecl->idExp->lineno
 			  << ") invalid recursive type " << typeDecl->symbolTypeToStr() << std::endl;
 		terminate();
@@ -752,7 +753,7 @@ void SymbolTableBuilder::visit(ExpressionStatement *expStmt) {
 	
 	// if a given expression is not a function call, throw an error
 	if(dynamic_cast<FunctionCallExp*>(expStmt->exp) == nullptr) {
-		std::cerr << ss.str();
+		if (isSymbolMode) std::cerr << ss.str();
 		std::cerr << "Error: (line " << expStmt->exp->lineno << ") "
 			  << "expression statements must be function calls" << std::endl;
 		terminate();
@@ -1217,9 +1218,10 @@ void SymbolTableBuilder::visit(FunctionCallExp *funcCallExp) {
 		checkTypeConversion(funcCallExp);
 		
 		// resolve type
+		//TODO: fix base type
 		funcCallExp->type = TypeDescriptor(
 					funcCallExp->idExp->name,
-					symbolTable->findBaseType(symbolTable, funcCallExp->idExp->name),
+					funcCallExp->idExp->name,
 					CATEGORY_VAR,
 					funcCallExp
 				);
@@ -1247,7 +1249,7 @@ void SymbolTableBuilder::visit(IdentifierExp *idExp) {
 	Symbol *symbol = symbolTable->getSymbol(symbolTable, idExp->name);
 	// check if identifier exists
 	if(symbol == NULL) {
-		std::cerr << ss.str();
+		if (isSymbolMode) std::cerr << ss.str();
 		std::cerr << "Error: (line " << idExp->lineno << ") \""
 		  << idExp->name << "\" is not declared" << std::endl;
 		terminate();
