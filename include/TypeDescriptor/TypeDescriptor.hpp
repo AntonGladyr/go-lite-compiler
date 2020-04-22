@@ -28,6 +28,9 @@ const std::set<std::string> numericTypesList = { BASETYPE_INT, BASETYPE_FLOAT, B
 
 const std::set<std::string> integerTypesList = { BASETYPE_INT, BASETYPE_RUNE };
 
+const std::set<std::string> 
+baseTypesList = { BASETYPE_INT, BASETYPE_FLOAT, BASETYPE_BOOL, BASETYPE_STRING, BASETYPE_RUNE };
+
 
 class TypeDescriptor {
 	public:
@@ -44,6 +47,7 @@ class TypeDescriptor {
 		bool isIntegerType();
 		bool isStringType();
 		bool isBoolType();
+		bool isBaseType();
 		static std::string resolveNumericType(
 			const std::string &lhsType, 
 			const std::string &rhsType

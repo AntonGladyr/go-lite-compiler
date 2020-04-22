@@ -6,6 +6,7 @@ type str string
 type float float64
 type float2 float
 
+var qqqqq float2
 
 func init() {
 }
@@ -16,10 +17,12 @@ func test_func(a string, a2 string) [5]int {
 }
 
 func main() {
-	var x, y int
-	var f z = bool(true)
-	var h t = bool(false)
-	f = h
+	println(qqqqq)
+	//print(main())
+	//var x, y int
+	//var f z = bool(true)
+	//var h t = bool(false)
+	//f = h
 	//var x [5]int
 	//var ttt int = len(test_func("str", "str"))
 //	var qwe [5]int

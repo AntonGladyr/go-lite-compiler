@@ -34,4 +34,8 @@ bool TypeDescriptor::isBoolType() {
 	return baseType.compare(BASETYPE_BOOL) == 0;
 }
 
+bool TypeDescriptor::isBaseType() {	
+	return baseTypesList.find(baseType) != baseTypesList.end();
+}
+
 #endif
