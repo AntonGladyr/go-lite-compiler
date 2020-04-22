@@ -6,22 +6,34 @@ type str string
 type float float64
 type float2 float
 
+type intint int
+
 var qqqqq float2
 var b t
 
 func init() {
 }
 
-func test_func(a string, a2 string) [5]int {
+func test_func2() [5]int {
 	var d [5]int
 	return d
 }
 
+func test_func(a string, a2 string) [5]int {
+	var d [5]int
+	return test_func2()
+}
+
 func main() {
-	var ttt int = len(test_func("str", "str"))
-	//println(qqqqq)	
+	var ii intint = intint(5)
+	//var i int = intint(i)
+	//i++
+	//println(i[5])
+	//var ttt int = len(test_func("str", "str"))
+	//println(qqqqq)
+	//var tttt int = cap(test_func("s", "s"))
 	//print(main())
-	//var x, y int
+	var x, y int
 	//var f z = bool(true)
 	//var h t = bool(false)
 	//f = h

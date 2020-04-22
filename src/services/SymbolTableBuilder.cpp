@@ -187,9 +187,12 @@ void SymbolTableBuilder::checkIsInitFunc(FunctionCallExp *funcCallExp) {
 
 // throws an error if number of passed parameters to a function does not equal to the number of function arguments
 void SymbolTableBuilder::checkNumberOfFuncArgs(FunctionCallExp *funcCallExp) {
-	if (funcCallExp->expList == NULL || funcCallExp->expList->size() == 0) return;
-	
 	FunctionDeclaration *funcDecl = (FunctionDeclaration*)funcCallExp->idExp->symbol->node;
+
+	if ( (funcCallExp->expList == NULL || funcCallExp->expList->size() == 0) &&
+	     (funcDecl->params == NULL || funcDecl->params->size() == 0)	
+	) return;
+		
 	if (funcCallExp->expList->size() != funcDecl->params->size()) {	
 		std::cerr << "Error: (line " << funcCallExp->lineno << ") "
 			<< "function " << funcCallExp->idExp->name
@@ -261,7 +264,7 @@ void SymbolTableBuilder::checkIsIntExp(Expression *exp) {
 }
 
 // A cap expression is well-typed if expr is well-typed, has type S and S resolves to [N]T
-void SymbolTableBuilder::checkBuiltinCap(BuiltinsExp *builtinsExp) {	
+void SymbolTableBuilder::checkBuiltinCap(BuiltinsExp *builtinsExp) {
 	if ( !builtinsExp->exp->type.isArray() ) {
 	  	std::cerr << "Error: (line " << builtinsExp->exp->lineno << ") "
 	  		  << "capacity builtin expects slice or array type as argument "
@@ -271,8 +274,8 @@ void SymbolTableBuilder::checkBuiltinCap(BuiltinsExp *builtinsExp) {
 }
 
 // A len expression is well-typed if expr is well-typed, has type S and S resolves to string or [N]T
-void SymbolTableBuilder::checkBuiltinLen(BuiltinsExp *builtinsExp) {	
-	if ( !builtinsExp->exp->type.isArray() ||
+void SymbolTableBuilder::checkBuiltinLen(BuiltinsExp *builtinsExp) {
+	if ( !builtinsExp->exp->type.isArray() &&
 	  	builtinsExp->exp->type.baseType.compare(BASETYPE_STRING) != 0
 	  ) {
 	  	std::cerr << "Error: (line " << builtinsExp->exp->lineno << ") "
@@ -303,6 +306,46 @@ void SymbolTableBuilder::checkClauseExp(Expression *clauseExp, Expression *switc
 			  << "switch statement expresion type is incompatible with case type "
 			  << "[" << getReceivedTypeName(clauseExp) << " != "
 			  << switchExpType.str() << "]" << std::endl;
+		terminate();
+	}
+}
+
+// throws an error if an expression cannot be cast
+void SymbolTableBuilder::checkTypeConversion(FunctionCallExp *funcCallExp) {
+	if ( funcCallExp->expList == NULL ||
+	     funcCallExp->expList->size() == 0 ||
+	     funcCallExp->expList->size() > 1
+	) {
+		std::cerr << "Error: (line " << funcCallExp->idExp->lineno << ") "
+			  << "conversion expects 1 argument" << std::endl;
+		terminate();
+	}
+
+	bool isTypeName = hasTypeName(funcCallExp->expList->front());
+	
+	// type and expr resolve to identical underlying types;
+	bool isIdenticalBaseTypes = 
+		(funcCallExp->idExp->type.baseType.compare(funcCallExp->expList->front()->type.baseType) == 0);
+
+	// type and expr both resolve to numeric types;
+	bool isBothNumericTypes = 
+		(funcCallExp->idExp->type.isNumericType() && funcCallExp->expList->front()->type.isNumericType());
+
+	// type resolves to a string type and expr resolves to an integer type (rune or int)
+	bool isStringAndInt = 
+		(funcCallExp->idExp->type.isStringType() && funcCallExp->expList->front()->type.isIntegerType());
+
+	if ( !isTypeName &&
+	     ( isIdenticalBaseTypes || 
+	       isBothNumericTypes ||
+	       isStringAndInt
+	     )
+	) return;
+	else {
+		std::cerr << "Error: (line " << funcCallExp->idExp->lineno << ") "
+			  << "conversion between incompatible types "
+			  << "[" << funcCallExp->idExp->name << "<-" 
+			  << getReceivedTypeName(funcCallExp->expList->front()) << "]" << std::endl;
 		terminate();
 	}
 }
@@ -1135,27 +1178,22 @@ void SymbolTableBuilder::visit(BuiltinsExp *builtinsExp) {
 	if (builtinsExp->name.compare(BUILTIN_LEN) == 0) {
 		checkBuiltinLen(builtinsExp);
 		builtinsExp->type = TypeDescriptor(
-					BASETYPE_STRING,
-					BASETYPE_STRING,
+					BASETYPE_INT,
+					BASETYPE_INT,
 					CATEGORY_FUNC,
 					builtinsExp
 				);
 		return;
-	}
-
-	//TODO: typecasting
+	}	
 }
 
 void SymbolTableBuilder::visit(FunctionCallExp *funcCallExp) {
 	if (funcCallExp == NULL) return;
-		
+	
 	// copy string stream for printing errors
 	symbolTable->ss.str(ss.str());
 		
-	ASTTraversal::traverse(funcCallExp->idExp, *this);	
-		
-	// check if call of init func
-	checkIsInitFunc(funcCallExp);
+	ASTTraversal::traverse(funcCallExp->idExp, *this);
 	
 	// check if parameter identifiers exist in the symbol table
 	if (funcCallExp->expList) {
@@ -1163,6 +1201,34 @@ void SymbolTableBuilder::visit(FunctionCallExp *funcCallExp) {
 			ASTTraversal::traverse(exp, *this);
 		}
 	}
+
+	// if typecasting call
+	// 'type' resolves to a base type int, float64, bool, rune or string;
+	if (baseTypesList.find(funcCallExp->idExp->type.baseType) != baseTypesList.end()) {
+		/*
+		   expr is well-typed and has a type that can be be cast to type:
+			- type and expr resolve to identical underlying types;
+			- type and expr both resolve to numeric types;
+			- type resolves to a string type and expr resolves to an integer type (rune or int)
+
+		   The type of a type cast expression is 'type'
+		*/
+
+		checkTypeConversion(funcCallExp);
+		
+		// resolve type
+		funcCallExp->type = TypeDescriptor(
+					funcCallExp->idExp->name,
+					symbolTable->findBaseType(symbolTable, funcCallExp->idExp->name),
+					CATEGORY_VAR,
+					funcCallExp
+				);
+
+		return;
+	}
+		
+	// check if call of init func
+	checkIsInitFunc(funcCallExp);
 		
 	// check number of arguments
 	checkNumberOfFuncArgs(funcCallExp);
@@ -1170,7 +1236,9 @@ void SymbolTableBuilder::visit(FunctionCallExp *funcCallExp) {
 	//arg1, arg2, . . . , argk are well-typed and have types T1, T2, . . . , Tk respectively;
 	checkArgTypes(funcCallExp);
 	
-	funcCallExp->type = funcCallExp->idExp->type; // resolve type
+	// resolve type
+	FunctionDeclaration *funcDecl = (FunctionDeclaration*)funcCallExp->idExp->symbol->node;
+	funcCallExp->type = funcDecl->idExp->type;
 }
 
 void SymbolTableBuilder::visit(IdentifierExp *idExp) {
@@ -1192,12 +1260,15 @@ void SymbolTableBuilder::visit(IdentifierExp *idExp) {
 		type << "{" << symbol->type << "}";
 	else
 		type << symbol->type;
-		
+	
+	std::vector<int> *indexes = NULL;
+	
 	// save type of the id to the node
 	idExp->type = TypeDescriptor(
 				symbol->type,
 				symbol->baseType,
 				symbol->category,
+				indexes,
 				symbol->node
 			);
 
