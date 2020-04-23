@@ -25,7 +25,7 @@ func test_func(a string, a2 string) [5]int {
 }
 
 func main() {
-	var ii intint = intint(intint)
+	//var ii intint = intint(intint)
 	//var i int = intint(i)
 	//i++
 	//println(i[5])

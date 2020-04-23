@@ -6,7 +6,7 @@
 #include "Services/Visitor.hpp"
 #include "AST/ASTTraversal.hpp"
 #include "Services/PrettyPrinter.hpp"
-#include "Services/TypeChecker.hpp"
+#include "Services/CodeGenerator.hpp"
 #include "SymbolTable/SymbolTable.hpp"
 
 void yyparse();

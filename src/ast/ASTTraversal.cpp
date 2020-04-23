@@ -38,7 +38,7 @@
 void ASTTraversal::traverse(Node *node, Visitor& visitor) {
 	if (node == NULL) return;
 	
-	if (typeid(Program) == typeid(*node)) {
+	if (typeid(Program) == typeid(*node)) {	
 		Program *prg = (Program*)node;
 		visitor.openScope();
 		prg->accept(visitor);

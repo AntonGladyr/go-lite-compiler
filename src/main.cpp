@@ -20,18 +20,18 @@ int main(int argc, char *argv[]){
 	}
 
 
-	if(!strcmp(argv[1], "scan")) {
+	if (!strcmp(argv[1], "scan")) {
         	g_tokens = 0;
-        	while(yylex());	
+        	while (yylex());	
         	std::cout << "OK" << std::endl;
         	return 0;
     	}
-    	else if(!strcmp(argv[1], "tokens")) {
+    	else if (!strcmp(argv[1], "tokens")) {
 		g_tokens = 1;
-        	while(yylex());
+        	while (yylex());
         	return 0;
     	}
-    	else if(!strcmp(argv[1], "parse")) {
+    	else if (!strcmp(argv[1], "parse")) {
         	yyparse();
         	std::cout << "OK" << std::endl;
 		
@@ -39,7 +39,7 @@ int main(int argc, char *argv[]){
 		program = NULL;
         	return 0;
     	}
-    	else if(!strcmp(argv[1], "pretty")) {		
+    	else if (!strcmp(argv[1], "pretty")) {		
         	yyparse();
 		PrettyPrinter printer;	
 		ASTTraversal::traverse(program, printer);	
@@ -48,7 +48,7 @@ int main(int argc, char *argv[]){
 		program = NULL;
         	return 0;
     	}
-	else if(!strcmp(argv[1], "symbol")) {
+	else if (!strcmp(argv[1], "symbol")) {
 		yyparse();	
 		SymbolTable *symbolTable = new SymbolTable(program, true);	
 		std::cout << symbolTable->toString();
@@ -61,12 +61,29 @@ int main(int argc, char *argv[]){
 		program = NULL;
 		return 0;
 	}
-	else if(!strcmp(argv[1], "typecheck")) {
+	else if (!strcmp(argv[1], "typecheck")) {
 		yyparse();	
 		SymbolTable *symbolTable = new SymbolTable(program);
 		
 		std::cout << "OK" << std::endl;
 			
+		//TODO: invoke deallocate() behind the scenes
+		symbolTable->deallocate();
+		delete symbolTable;	
+		delete program;
+		program = NULL;
+		symbolTable = NULL;
+		return 0;
+	}
+	else if (!strcmp(argv[1], "codegen")) {
+		yyparse();
+		SymbolTable *symbolTable = new SymbolTable(program);
+		CodeGenerator codeGen;
+			
+		codeGen.emit(program, symbolTable);
+		
+		std::cout << "OK" << std::endl;
+		
 		//TODO: invoke deallocate() behind the scenes
 		symbolTable->deallocate();
 		delete symbolTable;	

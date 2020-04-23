@@ -1,5 +1,5 @@
-#ifndef TYPECHECKER_HPP
-#define TYPECHECKER_HPP
+#ifndef CODE_GENERATOR_HPP
+#define CODE_GENERATOR_HPP
 
 #include <iostream>
 #include <utility>
@@ -25,11 +25,11 @@
 #include "SymbolTable/SymbolTable.hpp"
 #include "AST/Expression/IdentifierExp.hpp"
 
-class TypeChecker : public Visitor {
-	private:
+class CodeGenerator : public Visitor {
+	private:	
 		SymbolTable *symbolTable = NULL;
 	public:
-		void typecheck(Program *prg, SymbolTable *symbolTable);
+		void emit(Program *prg, SymbolTable *st);
 		virtual void visit(Program *prg) override;
 		virtual void visit(VariableDeclaration *varDecl) override;
 		virtual void visit(TypeDeclaration *typeDecl) override;
@@ -63,8 +63,8 @@ class TypeChecker : public Visitor {
 		virtual void openScope() override { isScopeOpened = true; }
 		virtual void closeScope() override { isScopeOpened = false; }	
 
-		TypeChecker() { }
-		~TypeChecker() { }
+		CodeGenerator() { }
+		~CodeGenerator() { }
 };
 
 #endif
