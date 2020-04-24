@@ -33,14 +33,14 @@ class SymbolTableBuilder : public Visitor {
 	private:
 		Program *program = NULL;
 		SymbolTable *symbolTable = NULL;
-		int numTabs = 0;
+		unsigned int numTabs = 0;
 		std::stringstream ss; // for printing symbol table
 		bool isSymbolMode;
 		
-		void terminate();	
+		void terminate();
 		void checkTypeName(TypeName *type);
 		void insertFuncParams(Node *node);
-		void checkSpecialFunctions(Node *node);
+		bool isSpecialFunction(Node *node);
 		void checkIdName(Node *node); // check identifier name ('main' and 'init' must be a function)	
 		void checkAssignEquality(
 			int lhsSize,

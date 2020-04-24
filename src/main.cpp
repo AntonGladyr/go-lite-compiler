@@ -81,9 +81,7 @@ int main(int argc, char *argv[]){
 		CodeGenerator codeGen;
 			
 		codeGen.emit(program, symbolTable);
-		
-		std::cout << "OK" << std::endl;
-		
+			
 		//TODO: invoke deallocate() behind the scenes
 		symbolTable->deallocate();
 		delete symbolTable;	

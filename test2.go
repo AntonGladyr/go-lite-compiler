@@ -1,3 +1,5 @@
+//~2 3
+
 package test
 
 type t bool
@@ -14,6 +16,9 @@ var b t
 func init() {
 }
 
+func init() {
+}
+
 func test_func2() [5]int {
 	var d [5]int
 	return d
@@ -25,6 +30,10 @@ func test_func(a string, a2 string) [5]int {
 }
 
 func main() {
+	
+	//for {
+		println(2, 3)
+	//}
 	//var ii intint = intint(intint)
 	//var i int = intint(i)
 	//i++

@@ -2,6 +2,7 @@
 #define PROGRAM_HPP
 
 #include <string>
+#include <sstream>
 #include <vector>
 #include "Services/Visitor.hpp"
 #include "AST/Declaration/Declaration.hpp"
@@ -21,7 +22,12 @@ class Program : public Node {
 		
 		void accept(Visitor& v);
 		virtual std::string toString();
-	
+		std::string preambleToCcode();
+		std::string mainToCcode(
+			const std::string &mainFuncCall,
+			const std::string &initFuncCalls
+		);
+		
 		Program(
 			IdentifierExp *_package,
 			std::vector<Declaration*> *_declList,

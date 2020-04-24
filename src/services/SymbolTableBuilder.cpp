@@ -102,14 +102,14 @@ void SymbolTableBuilder::insertFuncParams(Node *node) {
 }
 
 // check init and main functions
-void SymbolTableBuilder::checkSpecialFunctions(Node *node) {
+bool SymbolTableBuilder::isSpecialFunction(Node *node) {
 	//TODO: change default type of init func to <unmapped>
 	if (typeid(FunctionDeclaration) == typeid(*node)) {
 		FunctionDeclaration *funcDecl = (FunctionDeclaration*)node;
 
-		// return if not "main" nor "init"
+		// return false if not "main" nor "init"
 		if ((funcDecl->idExp->name.compare(SPECIALFUNC_MAIN) != 0) &&
-				(funcDecl->idExp->name.compare(SPECIALFUNC_INIT) != 0)) return;
+				(funcDecl->idExp->name.compare(SPECIALFUNC_INIT) != 0)) return false;
 
 		if(funcDecl->typeName || funcDecl->params) {
 			if (isSymbolMode) std::cerr << ss.str();
@@ -117,7 +117,11 @@ void SymbolTableBuilder::checkSpecialFunctions(Node *node) {
 				<< " must have no parameters and no return value" << std::endl;
 			terminate();
 		}
+
+		return true;
 	}
+
+	return false;
 }
 
 // check if type is declared
@@ -428,6 +432,15 @@ void SymbolTableBuilder::typeCompatibilityError(
 }
 
 
+std::string SymbolTableBuilder::getTabs() {
+	std::stringstream ss;
+	for(int i = 0; i < numTabs; i++) {
+		ss << "\t";
+	}
+	return ss.str();
+}
+
+
 //=====================END OF HELPER FUNCTIONS=====================
 //=================================================================
 
@@ -610,7 +623,9 @@ void SymbolTableBuilder::visit(FunctionDeclaration *funcDecl) {
 	symbolTable->ss.str(ss.str());
 
 	// check special functions: init and main
-	checkSpecialFunctions(funcDecl);
+	bool isSpecialFunc = isSpecialFunction(funcDecl);
+
+	if (isSpecialFunc) return;
 	
 	// check if parameter types exist
 	if (funcDecl->params) {
@@ -731,10 +746,13 @@ void SymbolTableBuilder::visit(AssignStatement *assignStmt) {
 	std::vector<Expression*>::iterator rhsIter = assignStmt->rhs->begin();
 		
 	while ( lhsIter != assignStmt->lhs->end() && rhsIter != assignStmt->rhs->end() ) {	
-		if ( (*lhsIter)->type.name.compare((*rhsIter)->type.name) != 0 ) {
+		if ( hasTypeName(*lhsIter) ||
+		     hasTypeName(*rhsIter) ||
+		     (*lhsIter)->type.name.compare((*rhsIter)->type.name) != 0
+		) {
 			std::cerr << "Error: (line " << (*lhsIter)->lineno << ") "
-			  	  << (*rhsIter)->type.name << " is not assignment compatible with "
-				  << (*lhsIter)->type.name << " in assign statement" << std::endl;
+			  	  << getReceivedTypeName(*rhsIter) << " is not assignment compatible with "
+				  << getReceivedTypeName(*lhsIter) << " in assign statement" << std::endl;
 			terminate();
 		}	
 		lhsIter++;
@@ -1389,14 +1407,5 @@ void SymbolTableBuilder::visit(UnaryExp *unaryExp) {
 void SymbolTableBuilder::visit(BreakStatement *breakStmt) { }
 
 void SymbolTableBuilder::visit(ContinueStatement *continueStmt) { }
-
-
-std::string SymbolTableBuilder::getTabs() {
-	std::stringstream ss;
-	for(int i = 0; i < numTabs; i++) {
-		ss << "\t";
-	}
-	return ss.str();
-}
 
 #endif

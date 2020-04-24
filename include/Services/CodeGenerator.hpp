@@ -26,8 +26,22 @@
 #include "AST/Expression/IdentifierExp.hpp"
 
 class CodeGenerator : public Visitor {
-	private:	
+	private:
 		SymbolTable *symbolTable = NULL;
+		unsigned int numTabs = 0;
+		unsigned int initFuncNum = 0;
+		bool isInversedBool = false;
+		std::stringstream mainFuncCall;
+		std::stringstream initFuncCalls;
+		std::stringstream outCode; // for storing generated code
+		
+		void terminate();
+		void saveToFile(
+			const std::string &path,
+			const std::string &name,
+			const std::string &ext	// extension
+		);
+	
 	public:
 		void emit(Program *prg, SymbolTable *st);
 		virtual void visit(Program *prg) override;
@@ -61,7 +75,8 @@ class CodeGenerator : public Visitor {
 		virtual void visit(UnaryExp *unaryExp) override;
 
 		virtual void openScope() override { isScopeOpened = true; }
-		virtual void closeScope() override { isScopeOpened = false; }	
+		virtual void closeScope() override { isScopeOpened = false; }
+		std::string getTabs();
 
 		CodeGenerator() { }
 		~CodeGenerator() { }

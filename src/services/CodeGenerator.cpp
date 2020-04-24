@@ -3,22 +3,64 @@
 
 #include <sstream>
 #include <iostream>
+#include <fstream>
 #include "Services/CodeGenerator.hpp"
 #include "AST/ASTTraversal.hpp"
 
+const std::string FILE_PATH = "./";
+const std::string FILE_NAME = "__golite_target_code";
+const std::string EXTENSION = ".c";
+
 void CodeGenerator::emit(Program *prg, SymbolTable *st) {
-	symbolTable = st;
+	symbolTable = st;	
 	ASTTraversal::traverse(prg, *this);
 }
 
+//========================HELPER FUNCTIONS=========================
+//=================================================================
+
+void CodeGenerator::terminate() {
+}
+
+void CodeGenerator::saveToFile(
+	const std::string &path,
+	const std::string &name,
+	const std::string &ext	// extension
+) {
+	std::stringstream ss;
+	ss << path << name << ext;
+	std::ofstream file;
+	file.open(ss.str());
+	file << outCode.str();
+	file.close();
+}
+
+//=====================END OF HELPER FUNCTIONS=====================
+//=================================================================
+
+
+//=========================VISITOR PATTERN=========================
+//=================================================================
+
 void CodeGenerator::visit(Program *prg) {
 	if (prg == NULL) return;
-	std::cout << "hello" << std::endl;
-	//TODO: collect all init functions
+	
+	if (isScopeOpened) {
+		// initialization
+		outCode << prg->preambleToCcode();
+	} else {
+		// generate main function	
+		outCode << prg->mainToCcode(
+					mainFuncCall.str(), 
+					initFuncCalls.str()
+		);
+		std::cout << outCode.str() << std::endl;
+		saveToFile(FILE_PATH, FILE_NAME, EXTENSION);
+	} 
 }
 
 void CodeGenerator::visit(VariableDeclaration *varDecl) {
-	if (varDecl == NULL) return;	
+	if (varDecl == NULL) return;
 }
 
 void CodeGenerator::visit(TypeDeclaration *typeDecl) {
@@ -159,6 +201,14 @@ void CodeGenerator::visit(StringExp *strExp) {
 
 void CodeGenerator::visit(UnaryExp *unaryExp) {
 	if (unaryExp == NULL) return;
+}
+
+std::string CodeGenerator::getTabs() {
+	std::stringstream ss;
+	for(int i = 0; i < numTabs; i++) {
+		ss << "\t";
+	}
+	return ss.str();
 }
 
 #endif

@@ -26,7 +26,7 @@
 
 class PrettyPrinter : public Visitor {
 	private:
-		int numTabs = 0;
+		unsigned int numTabs = 0;
 	public:	
 		virtual void visit(Program *prg) override;
 		virtual void visit(VariableDeclaration *varDecl) override;

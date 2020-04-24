@@ -1,53 +1,40 @@
 package test
 
-//var test1 int = "str"
-
-func main() {
-	//var main [5][5]int = 0
-	if !'t' {
-		println("ok")
-	}
-	//switch {
-		//case 1: main()
-		//case "string" : main()
-	//}
-	//t(5) = main()
-}
-
-func test(f int) {
+/*func test(f int) {
 	var f1 float64
 	return
 	return f1[int]
-}
+}*/
 
-var str int = "string"
 
 type qq int
 var qwe int
 
 var s qq = qq(3)
 
-func true() qq {
-	qq = qq
-	for ; qq < 0; qq++{
+//func true() qq {
+	//qq = qq
+	/*for ; qq < 0; qq++{
 
-	}
+	}*/
 
 	/*{
 	} else {
 		var variable = 100
 	}*/
-	/*for i := 0; i < 0; i++ {
+/*	for i := 0; i < 0; i++ {
 		var t int = 0
-		return
-	}*/
-}
+		return qq(5)
+	}
+}*/
 
 func qwerty(s string) string {
 	return "test"
 }
 
 func init() {
+	var d int
+	d = 5
 }
 
 func init() {
@@ -57,8 +44,19 @@ func init() {
 }
 
 
-//func main() {
-//}
+func main() {
+	println("hello")
+}
+
+func init() {
+}
+
+func init() {
+}
+
+func test2() {
+	print("test")
+}
 /*
 func main() {
 	

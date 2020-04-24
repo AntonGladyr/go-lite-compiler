@@ -2,7 +2,6 @@
 #define PROGRAM_CPP
 
 #include <iostream>
-#include <sstream>
 #include "AST/Program/Program.hpp"
 #include "AST/Node.hpp"
 
@@ -16,6 +15,27 @@ std::string Program::toString() {
 	ss << "package " << package->name;
 	return ss.str();
 }
+
+std::string Program::preambleToCcode() {
+	std::stringstream ss;
+	ss << "#include <stdio.h>" << std::endl
+	   << "#include <string.h>" << std::endl << std::endl;
+	
+	return ss.str();
+}
+std::string Program::mainToCcode(
+	const std::string &mainFuncCall,
+	const std::string &initFuncCalls
+) {
+	std::stringstream ss;
+	ss << "main() {" << std::endl
+	   << initFuncCalls << std::endl
+	   << mainFuncCall << std::endl
+	   << "}" << std::endl;
+	
+	return ss.str();
+}
+
 
 Program::~Program() {
 	delete package;
