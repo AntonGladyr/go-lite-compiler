@@ -28,9 +28,10 @@ std::string Program::mainToCcode(
 	const std::string &initFuncCalls
 ) {
 	std::stringstream ss;
-	ss << "main() {" << std::endl
+	ss << "\nint main() {" << std::endl
 	   << initFuncCalls << std::endl
 	   << mainFuncCall << std::endl
+	   << "\treturn 0;" << std::endl
 	   << "}" << std::endl;
 	
 	return ss.str();

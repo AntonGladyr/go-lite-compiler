@@ -1,6 +1,6 @@
 package main
 
-func switch_stmt() {
+func switch_stmts() {
 	var x int
 
 	// no expression
@@ -12,8 +12,8 @@ func switch_stmt() {
 
 	// expression, no default
 	switch x {
-		case 0:	
-		case 1, 3, 5, 7, 9: 
+		case 0:
+		case 1, 3, 5, 7, 9:
 	}
 
 	// empty

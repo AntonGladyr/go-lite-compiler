@@ -30,7 +30,7 @@ func test_func(a string, a2 string) [5]int {
 }
 
 func main() {
-	
+	var d = (test_func)("str", "str")
 	//for {
 		println(2, 3)
 	//}

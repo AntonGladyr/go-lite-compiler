@@ -22,7 +22,7 @@ const std::string SPECIALFUNC_MAIN   = "main";
 const std::string SPECIALFUNC_INIT   = "init";
 
 
-const std::set<std::string> orderedTypesList = { BASETYPE_INT, BASETYPE_FLOAT, BASETYPE_STRING };
+const std::set<std::string> orderedTypesList = { BASETYPE_INT, BASETYPE_FLOAT, BASETYPE_STRING, BASETYPE_RUNE };
 
 const std::set<std::string> numericTypesList = { BASETYPE_INT, BASETYPE_FLOAT, BASETYPE_RUNE };
 

@@ -102,26 +102,21 @@ void SymbolTableBuilder::insertFuncParams(Node *node) {
 }
 
 // check init and main functions
-bool SymbolTableBuilder::isSpecialFunction(Node *node) {
-	//TODO: change default type of init func to <unmapped>
+void SymbolTableBuilder::checkSpecialFunctions(Node *node) {	
 	if (typeid(FunctionDeclaration) == typeid(*node)) {
 		FunctionDeclaration *funcDecl = (FunctionDeclaration*)node;
 
 		// return false if not "main" nor "init"
 		if ((funcDecl->idExp->name.compare(SPECIALFUNC_MAIN) != 0) &&
-				(funcDecl->idExp->name.compare(SPECIALFUNC_INIT) != 0)) return false;
+				(funcDecl->idExp->name.compare(SPECIALFUNC_INIT) != 0)) return;
 
 		if(funcDecl->typeName || funcDecl->params) {
 			if (isSymbolMode) std::cerr << ss.str();
 			std::cerr << "Error: (line " << funcDecl->idExp->lineno << ") " << funcDecl->idExp->name 
 				<< " must have no parameters and no return value" << std::endl;
 			terminate();
-		}
-
-		return true;
-	}
-
-	return false;
+		}	
+	}	
 }
 
 // check if type is declared
@@ -191,8 +186,8 @@ void SymbolTableBuilder::checkIsInitFunc(FunctionCallExp *funcCallExp) {
 }
 
 // throws an error if number of passed parameters to a function does not equal to the number of function arguments
-void SymbolTableBuilder::checkNumberOfFuncArgs(FunctionCallExp *funcCallExp) {
-	FunctionDeclaration *funcDecl = (FunctionDeclaration*)funcCallExp->idExp->symbol->node;
+void SymbolTableBuilder::checkNumberOfFuncArgs(FunctionCallExp *funcCallExp) {	
+	FunctionDeclaration *funcDecl = (FunctionDeclaration*)funcCallExp->idExp->symbol->node;	
 
 	if ( (funcCallExp->expList == NULL || funcCallExp->expList->size() == 0) &&
 	     (funcDecl->params == NULL || funcDecl->params->size() == 0)	
@@ -230,6 +225,29 @@ void SymbolTableBuilder::checkArgTypes(FunctionCallExp *funcCallExp) {
 		paramIter++;
 		expIter++;
 	}
+}
+
+// if function call id is not a CATEGORY_FUNC, throw an error
+void SymbolTableBuilder::checkIfFuncExist(Expression *exp) {	
+	if ( exp == NULL ||
+	     typeid(FunctionCallExp) != typeid(*exp)
+	) return;	
+	
+	FunctionCallExp *funcCall = (FunctionCallExp*)exp;
+	Symbol *s = symbolTable->getSymbol(symbolTable, funcCall->idExp->name);
+
+	if (s == NULL) {
+		std::cerr << "Error: (line " << funcCall->idExp->lineno << ") "
+			  << funcCall->idExp->name << "is not declared" << std::endl;
+		terminate();
+	}
+
+	if (s->category.compare(CATEGORY_FUNC) != 0) {
+		std::cerr << "Error: (line " << funcCall->idExp->lineno << ") "
+			  << "cannot call non-function " << funcCall->idExp->name << std::endl;
+		terminate();
+	}
+
 }
 
 // throws an error for malformed binary expressions
@@ -325,20 +343,20 @@ void SymbolTableBuilder::checkTypeConversion(FunctionCallExp *funcCallExp) {
 			  << "conversion expects 1 argument" << std::endl;
 		terminate();
 	}
-
-	bool isTypeName = hasTypeName(funcCallExp->expList->front());
 	
+	bool isTypeName = hasTypeName(funcCallExp->expList->front());
+
 	// type and expr resolve to identical underlying types;
 	bool isIdenticalBaseTypes = 
 		(funcCallExp->idExp->type.baseType.compare(funcCallExp->expList->front()->type.baseType) == 0);
 
 	// type and expr both resolve to numeric types;
 	bool isBothNumericTypes = 
-		(funcCallExp->idExp->type.isNumericType() && funcCallExp->expList->front()->type.isNumericType());
+		(funcCallExp->idExp->type.isNumericType() && funcCallExp->expList->front()->type.isNumericType());	
 
 	// type resolves to a string type and expr resolves to an integer type (rune or int)
 	bool isStringAndInt = 
-		(funcCallExp->idExp->type.isStringType() && funcCallExp->expList->front()->type.isIntegerType());
+		(funcCallExp->idExp->type.isStringType() && funcCallExp->expList->front()->type.isIntegerType());	
 
 	if ( !isTypeName &&
 	     ( isIdenticalBaseTypes || 
@@ -352,6 +370,50 @@ void SymbolTableBuilder::checkTypeConversion(FunctionCallExp *funcCallExp) {
 			  << "[" << funcCallExp->idExp->name << "<-" 
 			  << getReceivedTypeName(funcCallExp->expList->front()) << "]" << std::endl;
 		terminate();
+	}
+}
+
+// check if a variable assigns to main() function call
+void SymbolTableBuilder::checkVoidFunc(Expression *exp) {
+	if (exp == NULL) return;
+	
+	if (typeid(FunctionCallExp) != typeid(*exp)) return;
+
+	FunctionCallExp *funcCall = (FunctionCallExp*)exp;
+	if ( funcCall->idExp->name.compare(SPECIALFUNC_MAIN) == 0 ||
+	     funcCall->idExp->type.name.compare("void") == 0
+	) {
+		std::cerr << "Error: (line " << funcCall->idExp->lineno << ") "
+		  	  << "void cannot be used as a value in variable declaration" << std::endl;
+		terminate();
+	}
+}
+
+// check if a variable uses a function name
+void SymbolTableBuilder::checkIfFuncName(Expression *lhs, Expression *rhs) {
+	if (lhs == NULL && rhs == NULL) return;
+		
+	if (lhs != NULL && typeid(IdentifierExp) == typeid(*lhs)) {
+		IdentifierExp *idLhs = (IdentifierExp*)lhs;
+		if (idLhs->name.empty()) return;
+		Symbol *s = symbolTable->getSymbol(symbolTable, idLhs->name);	
+		
+		if (s->category.compare(CATEGORY_FUNC) == 0) {	
+			std::cerr << "Error: (line " << idLhs->lineno << ") "
+			  	  << getReceivedTypeName(lhs) << " is not assignment compatible" << std::endl;
+			terminate();
+		}
+	}
+	     
+	if (rhs != NULL && typeid(IdentifierExp) != typeid(*rhs)) {
+		IdentifierExp *idRhs = (IdentifierExp*)rhs;
+		if (idRhs->name.empty()) return;
+		Symbol *s = symbolTable->getSymbol(symbolTable, idRhs->name);
+		if (s->category.compare(CATEGORY_FUNC) == 0) {
+			std::cerr << "Error: (line " << idRhs->lineno << ") "
+			  	  << getReceivedTypeName(rhs) << " is not assignment compatible" << std::endl; 
+			terminate();
+		}
 	}
 }
 
@@ -415,7 +477,7 @@ bool SymbolTableBuilder::hasTypeName(Expression *exp) {
 	if (typeid(IdentifierExp) != typeid(*exp)) return false;
 
 	IdentifierExp * idExp = (IdentifierExp*)exp;
-	Symbol *s = symbolTable->getSymbol(symbolTable, idExp->name);
+	Symbol *s = symbolTable->getSymbol(symbolTable, idExp->name);	
 	return s->category.compare(CATEGORY_TYPE) == 0;
 }
 
@@ -494,7 +556,13 @@ void SymbolTableBuilder::visit(VariableDeclaration *varDecl) {
 	// reverse iteration for identifiers
 	//for (auto var = varDecl->idList->rbegin(); var != varDecl->idList->rend(); var++) {
 	while (varIter != varDecl->idList->rend()) {
-		std::stringstream type;	
+		std::stringstream type;
+			
+		if (varDecl->expList) {
+			// check if a variable assigns to main() function call throw an error
+			checkVoidFunc(*expIter);
+		}
+		
 		// check if a variable name is not 'main' nor 'init'
 		// (parent->parent scope => basetypes)
 		if (symbolTable->parent->parent == NULL) checkIdName(*varIter);
@@ -520,7 +588,12 @@ void SymbolTableBuilder::visit(VariableDeclaration *varDecl) {
 				varDecl->typeName->indexes,
 				*varIter
 			);
-		} else {
+		}
+		// if type of a var declaration is not specified, use expression type
+		else if (!varDecl->typeName && *expIter) {
+			type << (*expIter)->type.name;
+		}
+		else {
 			type << BASETYPE_UNDEFINED;
 		}
 		
@@ -545,8 +618,9 @@ void SymbolTableBuilder::visit(VariableDeclaration *varDecl) {
 		// resolve type if it's not defined
 		if ( varDecl->typeName == NULL )
 			(*varIter)->type = (*expIter)->type;
+		
 		// typecheck corresponding variables and expressions; check if an expression is a type name
-		else if ( (varDecl->expList && (*varIter)->type.baseType.compare((*expIter)->type.baseType) != 0) ||
+		if ( (varDecl->expList && (*varIter)->type.baseType.compare((*expIter)->type.baseType) != 0) ||
 			  (varDecl->expList && hasTypeName(*expIter) )
 		) {
 			std::cerr << "Error: (line " << (*expIter)->lineno << ") "
@@ -623,35 +697,14 @@ void SymbolTableBuilder::visit(FunctionDeclaration *funcDecl) {
 	symbolTable->ss.str(ss.str());
 
 	// check special functions: init and main
-	bool isSpecialFunc = isSpecialFunction(funcDecl);
-
-	if (isSpecialFunc) return;
+	checkSpecialFunctions(funcDecl);
 	
-	// check if parameter types exist
-	if (funcDecl->params) {
-		for (auto const& param : *(funcDecl->params)) {
-			checkTypeName(param->typeName);
-		}
+	// return if init function
+	if (funcDecl->idExp->name.compare(SPECIALFUNC_INIT) == 0) {	
+		ss << getTabs() << funcDecl->symbolToStr() << std::endl;
+		return;
 	}
-	
-	std::vector<int> *indexes = NULL;
-
-	// check if return type exists
-	if (funcDecl->typeName) {
-		checkTypeName(funcDecl->typeName);
 		
-		indexes = funcDecl->typeName->indexes;
-	}
-	
-	// save type
-	funcDecl->idExp->type = TypeDescriptor(
-					funcDecl->symbolTypeToStr(),
-					funcDecl->symbolTypeToStr(),	
-					CATEGORY_FUNC,
-					indexes,
-					funcDecl
-				);
-
 	// save pointer to the parent node (func declaration) in the block statement,
 	// so func parameters can be added to the child scope
 	funcDecl->blockStmt->parentNode = funcDecl;
@@ -662,6 +715,31 @@ void SymbolTableBuilder::visit(FunctionDeclaration *funcDecl) {
 		funcDecl->symbolTypeToStr(),
 		funcDecl
 	);
+
+	// check if parameter types exist
+	if (funcDecl->params) {
+		for (auto const& param : *(funcDecl->params)) {
+			checkTypeName(param->typeName);
+		}
+	}
+		
+	std::vector<int> *indexes = NULL;
+
+	// check if return type exists
+	if (funcDecl->typeName) {
+		checkTypeName(funcDecl->typeName);
+		
+		indexes = funcDecl->typeName->indexes;
+	}
+		
+	// save type
+	funcDecl->idExp->type = TypeDescriptor(
+					funcDecl->symbolTypeToStr(),
+					funcDecl->symbolTypeToStr(),	
+					CATEGORY_FUNC,
+					indexes,
+					funcDecl
+				);
 	
 	// terminate if id already declared
 	if (symbol == NULL) terminate();
@@ -687,23 +765,28 @@ void SymbolTableBuilder::visit(BlockStatement *blockStmt) {
 		numTabs++;
 		
 		// if parent node is FuncDecl, put func parameters to the symbol table
-		if (blockStmt->parentNode) {
-			if (typeid(FunctionDeclaration) == typeid(*(blockStmt->parentNode)))
-				insertFuncParams(blockStmt->parentNode);
+		if ( blockStmt->parentNode &&
+		     typeid(FunctionDeclaration) == typeid(*(blockStmt->parentNode))
+		) {	
+			insertFuncParams(blockStmt->parentNode);
+			FunctionDeclaration *funcDecl = (FunctionDeclaration*)blockStmt->parentNode;
+			blockStmt->functionNode = funcDecl;
 		}
+		
+		// save pointer to the base (function) block in each statement
+		if (blockStmt->stmtList) {	
+			for(auto &stmt : *(blockStmt->stmtList)) {	
+				stmt->functionNode = blockStmt->functionNode;
+			}	
+		}
+
+		// save pointer to the function in block and return statements
 		
 	} else {
 		// close scope
 		symbolTable = symbolTable->unscopeSymbolTable();
 		numTabs--;
 		ss << getTabs() << "}" << std::endl;
-	}
-
-	// save pointer to the block in each statement
-	if (blockStmt->stmtList) {
-		for(auto const& stmt : *(blockStmt->stmtList)) {
-			stmt->parentBlockNode = blockStmt;
-		}
 	}
 }
 
@@ -737,9 +820,12 @@ void SymbolTableBuilder::visit(AssignStatement *assignStmt) {
 	if (assignStmt->rhs) {
 		for(auto const& exp : *(assignStmt->rhs)) {
 			ASTTraversal::traverse(exp, *this);
+
+			// check if a variable assigns to main() function call throw an error
+			checkVoidFunc(exp);
 		}
 	}
-
+	
 	checkAssignEquality(assignStmt->lhs->size(), assignStmt->rhs->size(), assignStmt);
 
 	std::vector<Expression*>::iterator lhsIter = assignStmt->lhs->begin();
@@ -754,7 +840,11 @@ void SymbolTableBuilder::visit(AssignStatement *assignStmt) {
 			  	  << getReceivedTypeName(*rhsIter) << " is not assignment compatible with "
 				  << getReceivedTypeName(*lhsIter) << " in assign statement" << std::endl;
 			terminate();
-		}	
+		}
+	
+		// check if function name used as an identifier
+		//checkIfFuncName(*lhsIter, *rhsIter);
+		
 		lhsIter++;
 		rhsIter++;
 	}
@@ -762,19 +852,35 @@ void SymbolTableBuilder::visit(AssignStatement *assignStmt) {
 
 void SymbolTableBuilder::visit(ExpressionStatement *expStmt) {
 	if (expStmt == NULL) return;
-
+	
 	/*
 	   expr
 	   An expression statement is well-typed if its expression child is well-typed. In GoLite, only function call
 	   expressions are allowed to be used as statements, i.e. foo(x, y) can be used as a statement, but x-1 cannot.
 	*/
 	
-	// if a given expression is not a function call, throw an error
-	if(dynamic_cast<FunctionCallExp*>(expStmt->exp) == nullptr) {
+	// if a given expression is not a function call, throw an error	
+	if (typeid(FunctionCallExp) != typeid(*(expStmt->exp))) {
 		if (isSymbolMode) std::cerr << ss.str();
 		std::cerr << "Error: (line " << expStmt->exp->lineno << ") "
-			  << "expression statements must be function calls" << std::endl;
+			  << "expression statement must be a function call" << std::endl;
 		terminate();
+	} else {	
+		FunctionCallExp *funcCall = (FunctionCallExp*)expStmt->exp;
+		Symbol *s = symbolTable->getSymbol(symbolTable, funcCall->idExp->name);
+		
+		if (s == NULL) {
+			std::cerr << "Error: (line " << funcCall->idExp->lineno << ") "
+				  << "function " << funcCall->idExp->name << " is not declared" << std::endl;
+			terminate();
+		}
+		
+		if (hasTypeName(funcCall->idExp)) {
+			if (isSymbolMode) std::cerr << ss.str();
+			std::cerr << "Error: (line " << expStmt->exp->lineno << ") "
+			  	  << "expression statement must be a function call" << std::endl;
+			terminate();
+		}
 	}
 	
 	ASTTraversal::traverse(expStmt->exp, *this);
@@ -859,6 +965,8 @@ void SymbolTableBuilder::visit(IfElseStatement *ifElseStmt) {
 	// check if expression
 	if (ifElseStmt->exp) {
 		ASTTraversal::traverse(ifElseStmt->exp, *this);
+
+		checkVoidFunc(ifElseStmt->exp);
 		
 		if ( !ifElseStmt->exp->type.isBoolType() ||
 		     hasTypeName(ifElseStmt->exp)
@@ -872,13 +980,16 @@ void SymbolTableBuilder::visit(IfElseStatement *ifElseStmt) {
 	}
 	
 	// traverse all blocks
+	ifElseStmt->blockStmt->functionNode = ifElseStmt->functionNode;
 	ASTTraversal::traverse(ifElseStmt->blockStmt, *this);
 	
-	if (ifElseStmt->ifStmt) {	
+	if (ifElseStmt->ifStmt) {
+		ifElseStmt->ifStmt->functionNode = ifElseStmt->functionNode;
 		ASTTraversal::traverse(ifElseStmt->ifStmt, *this);
 	}
 	
-	if (ifElseStmt->elseBlockStmt ) {	
+	if (ifElseStmt->elseBlockStmt) {
+		ifElseStmt->elseBlockStmt->functionNode = ifElseStmt->functionNode;
 		ASTTraversal::traverse(ifElseStmt->elseBlockStmt, *this);
 	}
 }
@@ -919,13 +1030,15 @@ void SymbolTableBuilder::visit(SwitchStatement *switchStmt) {
 	if (switchStmt->exp) {
 		ASTTraversal::traverse(switchStmt->exp, *this);
 
+		checkVoidFunc(switchStmt->exp);
+
 		// for comparable operators
 		bool isFunc = false;	
 
 		//check is func
 		if (switchStmt->exp->symbol) 
 			isFunc = switchStmt->exp->symbol->category.compare(CATEGORY_FUNC) == 0;
-
+		
 		if ( isFunc ||
 		     hasTypeName(switchStmt->exp)
 		) {
@@ -947,6 +1060,7 @@ void SymbolTableBuilder::visit(SwitchStatement *switchStmt) {
 			}
 			
 			if (clause->blockStmt) {
+				clause->blockStmt->functionNode = switchStmt->functionNode;
 				ASTTraversal::traverse(clause->blockStmt, *this);
 			}
 		}
@@ -999,6 +1113,7 @@ void SymbolTableBuilder::visit(IncDecStatement *incDecStmt) {
 	ASTTraversal::traverse(incDecStmt->exp, *this);
 
 	if ( !incDecStmt->exp->type.isNumericType() ||
+	     typeid(IdentifierExp) != typeid(*(incDecStmt->exp)) || 
 	     hasTypeName(incDecStmt->exp)
 	) {
 		std::stringstream opName;
@@ -1015,7 +1130,7 @@ void SymbolTableBuilder::visit(IncDecStatement *incDecStmt) {
 
 void SymbolTableBuilder::visit(ReturnStatement *returnStmt) {
 	if (returnStmt == NULL) return;
-
+	
 	/*
 	   return
 	   A return statement with no expression is well-typed if the enclosing function has no return type.
@@ -1025,18 +1140,16 @@ void SymbolTableBuilder::visit(ReturnStatement *returnStmt) {
 	   of this expression is the same as the return type of the enclosing function.
 	*/
 
-	ASTTraversal::traverse(returnStmt->exp, *this);
+	ASTTraversal::traverse(returnStmt->exp, *this);	
 
 	//TODO: weeding pass
 
-	if ( returnStmt->parentBlockNode == NULL ) {
+	if ( returnStmt->functionNode == NULL ) {
 		std::cerr << "Error: (line " << returnStmt->lineno << ") " << std::endl; //TODO: write error
 		terminate();
-	}	
-
-	BlockStatement *blockStmt = (BlockStatement*)returnStmt->parentBlockNode;
+	}
 		
-	FunctionDeclaration *funcDecl = (FunctionDeclaration*)blockStmt->parentNode;
+	FunctionDeclaration *funcDecl = (FunctionDeclaration*)returnStmt->functionNode;	
 
 	bool funcHasType = funcDecl->typeName != NULL;
 
@@ -1044,13 +1157,13 @@ void SymbolTableBuilder::visit(ReturnStatement *returnStmt) {
 		std::cerr << "Error: (line " << returnStmt->lineno << ") "
 			  << "invalid return [function has non-void return type]" << std::endl;
 		terminate();
-	}
-	
+	}	
+
 	if ( returnStmt->exp && !funcHasType ) {
 		std::cerr << "Error: (line " << returnStmt->lineno << ") "
 			  << "invalid return [function has void return type]" << std::endl;
 		terminate();
-	}	
+	}
 
 	if ( funcHasType && // if a function has a type
 	     returnStmt->exp && // and return statement has an expression
@@ -1059,7 +1172,8 @@ void SymbolTableBuilder::visit(ReturnStatement *returnStmt) {
 			  << funcDecl->symbolTypeToStr() << " is not assignment compatible with "
 			  << returnStmt->exp->type.name << " in return statement" << std::endl;
 		terminate();
-	}
+	}	
+
 }
 
 void SymbolTableBuilder::visit(EmptyStatement *emptyStmt) { }
@@ -1121,7 +1235,7 @@ void SymbolTableBuilder::visit(BinaryOperatorExp *binOpExp) {
                   binOpExp->isBoolOperator() &&       // { ||, && }
 		  binOpExp->rhs->type.isBoolType()    // bool
 	) binOpExp->type = TypeDescriptor(
-				BASETYPE_BOOL,
+				binOpExp->lhs->type.name,
 				BASETYPE_BOOL,
 				CATEGORY_CONST,
 				binOpExp
@@ -1152,8 +1266,7 @@ void SymbolTableBuilder::visit(BinaryOperatorExp *binOpExp) {
 		  binOpExp->isNumericOperator() &&       // { + , - , * , / }
 		  binOpExp->rhs->type.isNumericType()    // { int, float64, rune }
 	) binOpExp->type = TypeDescriptor(
-				TypeDescriptor::resolveNumericType( binOpExp->lhs->type.baseType,
-								    binOpExp->rhs->type.baseType ),
+				binOpExp->lhs->type.name,
 				TypeDescriptor::resolveNumericType( binOpExp->lhs->type.baseType,
 								    binOpExp->rhs->type.baseType ),
 				CATEGORY_CONST,
@@ -1164,7 +1277,7 @@ void SymbolTableBuilder::visit(BinaryOperatorExp *binOpExp) {
 		  binOpExp->isIntegerOperator() &&       // { % , | , & , << , >> , &^ , ^ }
 		  binOpExp->rhs->type.isIntegerType()    // { int, rune }
 	) binOpExp->type = TypeDescriptor(
-				BASETYPE_INT,
+				binOpExp->lhs->type.name,
 				BASETYPE_INT,
 				CATEGORY_CONST,
 				binOpExp
@@ -1206,7 +1319,7 @@ void SymbolTableBuilder::visit(BuiltinsExp *builtinsExp) {
 	}	
 }
 
-void SymbolTableBuilder::visit(FunctionCallExp *funcCallExp) {
+void SymbolTableBuilder::visit(FunctionCallExp *funcCallExp) {	
 	if (funcCallExp == NULL) return;
 	
 	// copy string stream for printing errors
@@ -1220,10 +1333,11 @@ void SymbolTableBuilder::visit(FunctionCallExp *funcCallExp) {
 			ASTTraversal::traverse(exp, *this);
 		}
 	}
-
+	
 	// if typecasting call
 	// 'type' resolves to a base type int, float64, bool, rune or string;
-	if (baseTypesList.find(funcCallExp->idExp->type.baseType) != baseTypesList.end()) {
+	if ( hasTypeName(funcCallExp->idExp) &&
+	     baseTypesList.find(funcCallExp->idExp->type.baseType) != baseTypesList.end()) {
 		/*
 		   expr is well-typed and has a type that can be be cast to type:
 			- type and expr resolve to identical underlying types;
@@ -1232,7 +1346,7 @@ void SymbolTableBuilder::visit(FunctionCallExp *funcCallExp) {
 
 		   The type of a type cast expression is 'type'
 		*/
-
+		
 		checkTypeConversion(funcCallExp);
 		
 		// resolve type
@@ -1246,18 +1360,22 @@ void SymbolTableBuilder::visit(FunctionCallExp *funcCallExp) {
 
 		return;
 	}
-		
+	
+	// if function call id is not a CATEGORY_FUNC, throw an error
+	checkIfFuncExist(funcCallExp);
+	
 	// check if call of init func
 	checkIsInitFunc(funcCallExp);
-		
+	
 	// check number of arguments
 	checkNumberOfFuncArgs(funcCallExp);
-		
+
 	//arg1, arg2, . . . , argk are well-typed and have types T1, T2, . . . , Tk respectively;
 	checkArgTypes(funcCallExp);
-	
+
 	// resolve type
 	FunctionDeclaration *funcDecl = (FunctionDeclaration*)funcCallExp->idExp->symbol->node;
+
 	funcCallExp->type = funcDecl->idExp->type;
 }
 

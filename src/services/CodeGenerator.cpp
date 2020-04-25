@@ -6,13 +6,20 @@
 #include <fstream>
 #include "Services/CodeGenerator.hpp"
 #include "AST/ASTTraversal.hpp"
+#include "TypeDescriptorTable/TypeDescriptorTable.hpp"
+#include "Const/Constants/Constants.hpp"
 
 const std::string FILE_PATH = "./";
 const std::string FILE_NAME = "__golite_target_code";
 const std::string EXTENSION = ".c";
 
 void CodeGenerator::emit(Program *prg, SymbolTable *st) {
-	symbolTable = st;	
+	symbolTable = st;
+	TypeDescriptorTable::getInstance().append(BASETYPE_INT, C_INT);
+	TypeDescriptorTable::getInstance().append(BASETYPE_FLOAT, C_DOUBLE);
+	TypeDescriptorTable::getInstance().append(BASETYPE_STRING, C_STRING);
+	TypeDescriptorTable::getInstance().append(BASETYPE_RUNE, C_CHAR);
+	TypeDescriptorTable::getInstance().append(BASETYPE_BOOL, C_BOOL);
 	ASTTraversal::traverse(prg, *this);
 }
 
@@ -64,11 +71,21 @@ void CodeGenerator::visit(VariableDeclaration *varDecl) {
 }
 
 void CodeGenerator::visit(TypeDeclaration *typeDecl) {
-	if (typeDecl == NULL) return;		
+	if (typeDecl == NULL) return;
 }
 
 void CodeGenerator::visit(FunctionDeclaration *funcDecl) {
-	if (funcDecl == NULL) return;	
+	if (funcDecl == NULL) return;
+
+	outCode << funcDecl->toCcode(initFuncNum);
+
+	if (funcDecl->idExp->name.compare(SPECIALFUNC_INIT) == 0) {
+		initFuncCalls << funcDecl->initCallToCcode(initFuncNum);
+		initFuncNum++;
+	}
+
+	if (funcDecl->idExp->name.compare(SPECIALFUNC_MAIN) == 0)
+		mainFuncCall << funcDecl->mainCallToCCode();
 }
 
 void CodeGenerator::visit(BlockStatement *blockStmt) {

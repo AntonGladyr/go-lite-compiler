@@ -8,6 +8,6 @@ func assign_stmts() {
 	a, b = 0, 1
 
 	// parenthesized assignment
-        (a) = 0
-        (a), (b) = 0, 1
+	(a) = 0
+	(a), (b) = 0, 1
 } 

@@ -40,7 +40,7 @@ class SymbolTableBuilder : public Visitor {
 		void terminate();
 		void checkTypeName(TypeName *type);
 		void insertFuncParams(Node *node);
-		bool isSpecialFunction(Node *node);
+		void checkSpecialFunctions(Node *node);
 		void checkIdName(Node *node); // check identifier name ('main' and 'init' must be a function)	
 		void checkAssignEquality(
 			int lhsSize,
@@ -55,6 +55,9 @@ class SymbolTableBuilder : public Visitor {
 		void checkBuiltinLen(BuiltinsExp *builtinsExp);
 		void checkClauseExp(Expression *clauseExp, Expression *switchExp);
 		void checkTypeConversion(FunctionCallExp *funcCallExp);
+		void checkVoidFunc(Expression *exp);
+		void checkIfFuncExist(Expression *exp);
+		void checkIfFuncName(Expression *lhs, Expression *rhs);
 		void typeCompatibilityError(
 			int lineno,
 			const std::string &expName,

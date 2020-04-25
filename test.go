@@ -43,8 +43,8 @@ func init() {
 func init() {
 }
 
-
 func main() {
+        var s string = qwerty("s")
 	println("hello")
 }
 

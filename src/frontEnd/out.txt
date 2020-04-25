@@ -35,8 +35,8 @@ Grammar
 
     0 $accept: program $end
 
-    1 program: tPACKAGE id_exp tSEMICOLON decl_list
-    2        | tPACKAGE id_exp tSEMICOLON
+    1 program: tPACKAGE tIDENTIFIER tSEMICOLON decl_list
+    2        | tPACKAGE tIDENTIFIER tSEMICOLON
 
     3 decl_list: decl
     4          | decl_list decl
@@ -49,10 +49,10 @@ Grammar
     9         | tVAR id_listne tASSIGN exp_list
    10         | tVAR id_listne type tASSIGN exp_list
 
-   11 type_decl: tTYPE id_exp type
+   11 type_decl: tTYPE tIDENTIFIER type
 
-   12 func_decl: tFUNC id_exp tLPAREN paramspe tRPAREN blockstmt
-   13          | tFUNC id_exp tLPAREN paramspe tRPAREN type blockstmt
+   12 func_decl: tFUNC tIDENTIFIER tLPAREN paramspe tRPAREN blockstmt
+   13          | tFUNC tIDENTIFIER tLPAREN paramspe tRPAREN type blockstmt
 
    14 stmt_list: stmt
    15          | stmt_list stmt
@@ -70,7 +70,7 @@ Grammar
    23 exp_listpe: exp_list
    24           | %empty
 
-   25 param: id_exp type
+   25 param: tIDENTIFIER type
 
    26 paramsne: param
    27         | paramsne tCOMMA param
@@ -263,7 +263,7 @@ tRPAREN (331) 12 13 18 68 69 72 78 81 82
 tRBRACKET (332) 17 73 74
 tSEMICOLON (333) 1 2 5 6 7 30 31 32 33 34 35 36 37 38 39 47
 tCOLON (334) 64 65
-tIDENTIFIER (335) 16 79
+tIDENTIFIER (335) 1 2 11 12 13 16 25 79
 tINTVAL (336) 17 102
 tFLOATVAL (337) 103
 tBOOLVAL (338) 106
@@ -349,7 +349,7 @@ index (124)
 primary_exp (125)
     on left: 75 76 77 78, on right: 80
 id_exp (126)
-    on left: 79, on right: 1 2 11 12 13 19 20 25 72 75 77
+    on left: 79, on right: 19 20 72 75 77
 exp (127)
     on left: 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97
     98 99 100 101 102 103 104 105 106 107 108 109 110, on right: 21
@@ -368,154 +368,148 @@ State 0
 
 State 1
 
-    1 program: tPACKAGE . id_exp tSEMICOLON decl_list
-    2        | tPACKAGE . id_exp tSEMICOLON
+    1 program: tPACKAGE . tIDENTIFIER tSEMICOLON decl_list
+    2        | tPACKAGE . tIDENTIFIER tSEMICOLON
 
     tIDENTIFIER  shift, and go to state 3
-
-    id_exp  go to state 4
 
 
 State 2
 
     0 $accept: program . $end
 
-    $end  shift, and go to state 5
+    $end  shift, and go to state 4
 
 
 State 3
 
-   79 id_exp: tIDENTIFIER .
+    1 program: tPACKAGE tIDENTIFIER . tSEMICOLON decl_list
+    2        | tPACKAGE tIDENTIFIER . tSEMICOLON
 
-    $default  reduce using rule 79 (id_exp)
+    tSEMICOLON  shift, and go to state 5
 
 
 State 4
-
-    1 program: tPACKAGE id_exp . tSEMICOLON decl_list
-    2        | tPACKAGE id_exp . tSEMICOLON
-
-    tSEMICOLON  shift, and go to state 6
-
-
-State 5
 
     0 $accept: program $end .
 
     $default  accept
 
 
-State 6
+State 5
 
-    1 program: tPACKAGE id_exp tSEMICOLON . decl_list
-    2        | tPACKAGE id_exp tSEMICOLON .
+    1 program: tPACKAGE tIDENTIFIER tSEMICOLON . decl_list
+    2        | tPACKAGE tIDENTIFIER tSEMICOLON .
 
-    tFUNC  shift, and go to state 7
-    tTYPE  shift, and go to state 8
-    tVAR   shift, and go to state 9
+    tFUNC  shift, and go to state 6
+    tTYPE  shift, and go to state 7
+    tVAR   shift, and go to state 8
 
     $default  reduce using rule 2 (program)
 
-    decl_list  go to state 10
-    decl       go to state 11
-    var_decl   go to state 12
-    type_decl  go to state 13
-    func_decl  go to state 14
+    decl_list  go to state 9
+    decl       go to state 10
+    var_decl   go to state 11
+    type_decl  go to state 12
+    func_decl  go to state 13
+
+
+State 6
+
+   12 func_decl: tFUNC . tIDENTIFIER tLPAREN paramspe tRPAREN blockstmt
+   13          | tFUNC . tIDENTIFIER tLPAREN paramspe tRPAREN type blockstmt
+
+    tIDENTIFIER  shift, and go to state 14
 
 
 State 7
 
-   12 func_decl: tFUNC . id_exp tLPAREN paramspe tRPAREN blockstmt
-   13          | tFUNC . id_exp tLPAREN paramspe tRPAREN type blockstmt
+   11 type_decl: tTYPE . tIDENTIFIER type
 
-    tIDENTIFIER  shift, and go to state 3
-
-    id_exp  go to state 15
+    tIDENTIFIER  shift, and go to state 15
 
 
 State 8
-
-   11 type_decl: tTYPE . id_exp type
-
-    tIDENTIFIER  shift, and go to state 3
-
-    id_exp  go to state 16
-
-
-State 9
 
     8 var_decl: tVAR . id_listne type
     9         | tVAR . id_listne tASSIGN exp_list
    10         | tVAR . id_listne type tASSIGN exp_list
 
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
 
     id_listne  go to state 17
     id_exp     go to state 18
 
 
-State 10
+State 9
 
-    1 program: tPACKAGE id_exp tSEMICOLON decl_list .
+    1 program: tPACKAGE tIDENTIFIER tSEMICOLON decl_list .
     4 decl_list: decl_list . decl
 
-    tFUNC  shift, and go to state 7
-    tTYPE  shift, and go to state 8
-    tVAR   shift, and go to state 9
+    tFUNC  shift, and go to state 6
+    tTYPE  shift, and go to state 7
+    tVAR   shift, and go to state 8
 
     $default  reduce using rule 1 (program)
 
     decl       go to state 19
-    var_decl   go to state 12
-    type_decl  go to state 13
-    func_decl  go to state 14
+    var_decl   go to state 11
+    type_decl  go to state 12
+    func_decl  go to state 13
 
 
-State 11
+State 10
 
     3 decl_list: decl .
 
     $default  reduce using rule 3 (decl_list)
 
 
-State 12
+State 11
 
     5 decl: var_decl . tSEMICOLON
 
     tSEMICOLON  shift, and go to state 20
 
 
-State 13
+State 12
 
     6 decl: type_decl . tSEMICOLON
 
     tSEMICOLON  shift, and go to state 21
 
 
-State 14
+State 13
 
     7 decl: func_decl . tSEMICOLON
 
     tSEMICOLON  shift, and go to state 22
 
 
-State 15
+State 14
 
-   12 func_decl: tFUNC id_exp . tLPAREN paramspe tRPAREN blockstmt
-   13          | tFUNC id_exp . tLPAREN paramspe tRPAREN type blockstmt
+   12 func_decl: tFUNC tIDENTIFIER . tLPAREN paramspe tRPAREN blockstmt
+   13          | tFUNC tIDENTIFIER . tLPAREN paramspe tRPAREN type blockstmt
 
     tLPAREN  shift, and go to state 23
 
 
-State 16
+State 15
 
-   11 type_decl: tTYPE id_exp . type
+   11 type_decl: tTYPE tIDENTIFIER . type
 
     tLPAREN      shift, and go to state 24
     tLBRACKET    shift, and go to state 25
     tIDENTIFIER  shift, and go to state 26
 
     type  go to state 27
+
+
+State 16
+
+   79 id_exp: tIDENTIFIER .
+
+    $default  reduce using rule 79 (id_exp)
 
 
 State 17
@@ -571,17 +565,16 @@ State 22
 
 State 23
 
-   12 func_decl: tFUNC id_exp tLPAREN . paramspe tRPAREN blockstmt
-   13          | tFUNC id_exp tLPAREN . paramspe tRPAREN type blockstmt
+   12 func_decl: tFUNC tIDENTIFIER tLPAREN . paramspe tRPAREN blockstmt
+   13          | tFUNC tIDENTIFIER tLPAREN . paramspe tRPAREN type blockstmt
 
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 31
 
     $default  reduce using rule 29 (paramspe)
 
-    param     go to state 31
-    paramsne  go to state 32
-    paramspe  go to state 33
-    id_exp    go to state 34
+    param     go to state 32
+    paramsne  go to state 33
+    paramspe  go to state 34
 
 
 State 24
@@ -611,7 +604,7 @@ State 26
 
 State 27
 
-   11 type_decl: tTYPE id_exp type .
+   11 type_decl: tTYPE tIDENTIFIER type .
 
     $default  reduce using rule 11 (type_decl)
 
@@ -627,7 +620,7 @@ State 28
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -645,7 +638,7 @@ State 29
 
    20 id_listne: id_listne tCOMMA . id_exp
 
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
 
     id_exp  go to state 54
 
@@ -662,38 +655,38 @@ State 30
 
 State 31
 
-   26 paramsne: param .
-
-    $default  reduce using rule 26 (paramsne)
-
-
-State 32
-
-   27 paramsne: paramsne . tCOMMA param
-   28 paramspe: paramsne .
-
-    tCOMMA  shift, and go to state 56
-
-    $default  reduce using rule 28 (paramspe)
-
-
-State 33
-
-   12 func_decl: tFUNC id_exp tLPAREN paramspe . tRPAREN blockstmt
-   13          | tFUNC id_exp tLPAREN paramspe . tRPAREN type blockstmt
-
-    tRPAREN  shift, and go to state 57
-
-
-State 34
-
-   25 param: id_exp . type
+   25 param: tIDENTIFIER . type
 
     tLPAREN      shift, and go to state 24
     tLBRACKET    shift, and go to state 25
     tIDENTIFIER  shift, and go to state 26
 
-    type  go to state 58
+    type  go to state 56
+
+
+State 32
+
+   26 paramsne: param .
+
+    $default  reduce using rule 26 (paramsne)
+
+
+State 33
+
+   27 paramsne: paramsne . tCOMMA param
+   28 paramspe: paramsne .
+
+    tCOMMA  shift, and go to state 57
+
+    $default  reduce using rule 28 (paramspe)
+
+
+State 34
+
+   12 func_decl: tFUNC tIDENTIFIER tLPAREN paramspe . tRPAREN blockstmt
+   13          | tFUNC tIDENTIFIER tLPAREN paramspe . tRPAREN type blockstmt
+
+    tRPAREN  shift, and go to state 58
 
 
 State 35
@@ -735,7 +728,7 @@ State 39
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -759,7 +752,7 @@ State 40
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -783,7 +776,7 @@ State 41
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -807,7 +800,7 @@ State 42
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -831,7 +824,7 @@ State 43
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -981,7 +974,7 @@ State 55
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -997,18 +990,24 @@ State 55
 
 State 56
 
-   27 paramsne: paramsne tCOMMA . param
+   25 param: tIDENTIFIER type .
 
-    tIDENTIFIER  shift, and go to state 3
-
-    param   go to state 92
-    id_exp  go to state 34
+    $default  reduce using rule 25 (param)
 
 
 State 57
 
-   12 func_decl: tFUNC id_exp tLPAREN paramspe tRPAREN . blockstmt
-   13          | tFUNC id_exp tLPAREN paramspe tRPAREN . type blockstmt
+   27 paramsne: paramsne tCOMMA . param
+
+    tIDENTIFIER  shift, and go to state 31
+
+    param  go to state 92
+
+
+State 58
+
+   12 func_decl: tFUNC tIDENTIFIER tLPAREN paramspe tRPAREN . blockstmt
+   13          | tFUNC tIDENTIFIER tLPAREN paramspe tRPAREN . type blockstmt
 
     tLBRACE      shift, and go to state 93
     tLPAREN      shift, and go to state 24
@@ -1017,13 +1016,6 @@ State 57
 
     type       go to state 94
     blockstmt  go to state 95
-
-
-State 58
-
-   25 param: id_exp type .
-
-    $default  reduce using rule 25 (param)
 
 
 State 59
@@ -1055,7 +1047,7 @@ State 61
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1079,7 +1071,7 @@ State 62
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1252,7 +1244,7 @@ State 68
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1276,7 +1268,7 @@ State 69
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1305,7 +1297,7 @@ State 70
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1336,7 +1328,7 @@ State 72
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1360,7 +1352,7 @@ State 73
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1384,7 +1376,7 @@ State 74
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1408,7 +1400,7 @@ State 75
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1432,7 +1424,7 @@ State 76
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1456,7 +1448,7 @@ State 77
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1480,7 +1472,7 @@ State 78
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1504,7 +1496,7 @@ State 79
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1528,7 +1520,7 @@ State 80
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1552,7 +1544,7 @@ State 81
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1576,7 +1568,7 @@ State 82
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1600,7 +1592,7 @@ State 83
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1624,7 +1616,7 @@ State 84
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1648,7 +1640,7 @@ State 85
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1672,7 +1664,7 @@ State 86
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1696,7 +1688,7 @@ State 87
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1720,7 +1712,7 @@ State 88
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1744,7 +1736,7 @@ State 89
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1768,7 +1760,7 @@ State 90
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1809,8 +1801,8 @@ State 93
     tIF          shift, and go to state 126
     tRETURN      shift, and go to state 127
     tSWITCH      shift, and go to state 128
-    tTYPE        shift, and go to state 8
-    tVAR         shift, and go to state 9
+    tTYPE        shift, and go to state 7
+    tVAR         shift, and go to state 8
     tPRINT       shift, and go to state 129
     tPRINTLN     shift, and go to state 130
     tLEN         shift, and go to state 37
@@ -1822,7 +1814,7 @@ State 93
     tLBRACE      shift, and go to state 93
     tLPAREN      shift, and go to state 43
     tRBRACE      shift, and go to state 131
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1855,7 +1847,7 @@ State 93
 
 State 94
 
-   13 func_decl: tFUNC id_exp tLPAREN paramspe tRPAREN type . blockstmt
+   13 func_decl: tFUNC tIDENTIFIER tLPAREN paramspe tRPAREN type . blockstmt
 
     tLBRACE  shift, and go to state 93
 
@@ -1864,7 +1856,7 @@ State 94
 
 State 95
 
-   12 func_decl: tFUNC id_exp tLPAREN paramspe tRPAREN blockstmt .
+   12 func_decl: tFUNC tIDENTIFIER tLPAREN paramspe tRPAREN blockstmt .
 
     $default  reduce using rule 12 (func_decl)
 
@@ -2749,7 +2741,7 @@ State 125
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -2784,7 +2776,7 @@ State 126
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -2809,7 +2801,7 @@ State 127
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -2837,7 +2829,7 @@ State 128
     tBANG        shift, and go to state 42
     tLBRACE      shift, and go to state 161
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -2896,8 +2888,8 @@ State 134
     tIF          shift, and go to state 126
     tRETURN      shift, and go to state 127
     tSWITCH      shift, and go to state 128
-    tTYPE        shift, and go to state 8
-    tVAR         shift, and go to state 9
+    tTYPE        shift, and go to state 7
+    tVAR         shift, and go to state 8
     tPRINT       shift, and go to state 129
     tPRINTLN     shift, and go to state 130
     tLEN         shift, and go to state 37
@@ -2909,7 +2901,7 @@ State 134
     tLBRACE      shift, and go to state 93
     tLPAREN      shift, and go to state 43
     tRBRACE      shift, and go to state 165
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -3087,7 +3079,7 @@ State 148
 
 State 149
 
-   13 func_decl: tFUNC id_exp tLPAREN paramspe tRPAREN type blockstmt .
+   13 func_decl: tFUNC tIDENTIFIER tLPAREN paramspe tRPAREN type blockstmt .
 
     $default  reduce using rule 13 (func_decl)
 
@@ -3374,7 +3366,7 @@ State 163
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -3402,7 +3394,7 @@ State 164
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -3444,7 +3436,7 @@ State 167
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -3553,7 +3545,7 @@ State 180
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -3591,7 +3583,7 @@ State 182
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -3762,8 +3754,8 @@ State 195
     tIF          shift, and go to state 126
     tRETURN      shift, and go to state 127
     tSWITCH      shift, and go to state 128
-    tTYPE        shift, and go to state 8
-    tVAR         shift, and go to state 9
+    tTYPE        shift, and go to state 7
+    tVAR         shift, and go to state 8
     tPRINT       shift, and go to state 129
     tPRINTLN     shift, and go to state 130
     tLEN         shift, and go to state 37
@@ -3774,7 +3766,7 @@ State 195
     tBANG        shift, and go to state 42
     tLBRACE      shift, and go to state 93
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -3853,7 +3845,7 @@ State 201
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -3897,8 +3889,8 @@ State 204
     tIF          shift, and go to state 126
     tRETURN      shift, and go to state 127
     tSWITCH      shift, and go to state 128
-    tTYPE        shift, and go to state 8
-    tVAR         shift, and go to state 9
+    tTYPE        shift, and go to state 7
+    tVAR         shift, and go to state 8
     tPRINT       shift, and go to state 129
     tPRINTLN     shift, and go to state 130
     tLEN         shift, and go to state 37
@@ -3909,7 +3901,7 @@ State 204
     tBANG        shift, and go to state 42
     tLBRACE      shift, and go to state 93
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -3953,8 +3945,8 @@ State 205
     tIF          shift, and go to state 126
     tRETURN      shift, and go to state 127
     tSWITCH      shift, and go to state 128
-    tTYPE        shift, and go to state 8
-    tVAR         shift, and go to state 9
+    tTYPE        shift, and go to state 7
+    tVAR         shift, and go to state 8
     tPRINT       shift, and go to state 129
     tPRINTLN     shift, and go to state 130
     tLEN         shift, and go to state 37
@@ -3965,7 +3957,7 @@ State 205
     tBANG        shift, and go to state 42
     tLBRACE      shift, and go to state 93
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 3
+    tIDENTIFIER  shift, and go to state 16
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46

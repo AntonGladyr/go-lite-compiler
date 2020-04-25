@@ -42,7 +42,7 @@ class CodeGenerator : public Visitor {
 			const std::string &ext	// extension
 		);
 	
-	public:
+	public:		
 		void emit(Program *prg, SymbolTable *st);
 		virtual void visit(Program *prg) override;
 		virtual void visit(VariableDeclaration *varDecl) override;

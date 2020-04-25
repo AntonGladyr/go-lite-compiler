@@ -26,6 +26,9 @@ class FunctionDeclaration : public Declaration {
 		
 		TypeName getType() { return *typeName; }
 		std::string symbolSignatureToStr();
+		std::string mainCallToCCode();	
+		std::string initCallToCcode(unsigned int initFuncNum);
+		std::string toCcode(unsigned int initFuncNum);
 		virtual void accept(Visitor& v) override;
 		virtual std::string symbolToStr() override ;
 		virtual std::string symbolTypeToStr() override;

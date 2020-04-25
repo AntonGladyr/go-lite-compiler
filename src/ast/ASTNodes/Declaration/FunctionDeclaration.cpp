@@ -5,6 +5,7 @@
 #include <string>
 #include <sstream>
 #include "AST/Declaration/FunctionDeclaration.hpp"
+#include "Const/Constants/Constants.hpp"
 
 
 void FunctionDeclaration::accept(Visitor& v) {
@@ -74,7 +75,8 @@ std::string FunctionDeclaration::symbolTypeToStr() {
 		}	
 		// type id
 		ss << typeName->name;
-	} else {
+	}
+	else {
 		ss << "void";
 	}
 
@@ -83,6 +85,9 @@ std::string FunctionDeclaration::symbolTypeToStr() {
 
 std::string FunctionDeclaration::symbolSignatureToStr() {
 	std::stringstream ss;
+	
+	if (idExp->name.compare(SPECIALFUNC_INIT) == 0)
+		return "<unmapped>";
 	
 	// params
 	ss << "(";
@@ -107,6 +112,29 @@ std::string FunctionDeclaration::symbolSignatureToStr() {
 
 	ss << symbolTypeToStr();
 
+	return ss.str();
+}
+
+std::string FunctionDeclaration::initCallToCcode(unsigned int initFuncNum) {
+	std::stringstream ss;
+	ss << "\t" << kPrefix << "init_" << initFuncNum << "();" << std::endl;
+	return ss.str();
+}
+
+std::string FunctionDeclaration::mainCallToCCode() {
+	std::stringstream ss;
+	ss << "\t" << kPrefix << "main();" << std::endl;
+	return ss.str();
+}
+
+std::string FunctionDeclaration::toCcode(unsigned int initFuncNum) {
+	std::stringstream ss;
+	
+	if (idExp->name.compare(SPECIALFUNC_INIT) == 0)
+		ss << "void " << kPrefix << idExp->name
+		   << "__" << initFuncNum << "() " << std::endl;
+	else ss << idExp->type.baseType << " " << kPrefix << idExp->name << "() " << std::endl;
+	
 	return ss.str();
 }
 
