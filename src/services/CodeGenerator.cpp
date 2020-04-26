@@ -4,10 +4,12 @@
 #include <sstream>
 #include <iostream>
 #include <fstream>
+#include <limits.h>
 #include "Services/CodeGenerator.hpp"
 #include "AST/ASTTraversal.hpp"
 #include "TypeDescriptorTable/TypeDescriptorTable.hpp"
 #include "Const/Constants/Constants.hpp"
+#include "../helpers/vectorExtension.cpp"
 
 const std::string FILE_PATH = "./";
 const std::string FILE_NAME = "__golite_target_code";
@@ -20,6 +22,7 @@ void CodeGenerator::emit(Program *prg, SymbolTable *st) {
 	TypeDescriptorTable::getInstance().append(BASETYPE_STRING, C_STRING);
 	TypeDescriptorTable::getInstance().append(BASETYPE_RUNE, C_CHAR);
 	TypeDescriptorTable::getInstance().append(BASETYPE_BOOL, C_BOOL);
+	TypeDescriptorTable::getInstance().append("void", C_VOID);
 	ASTTraversal::traverse(prg, *this);
 }
 
@@ -41,6 +44,7 @@ void CodeGenerator::saveToFile(
 	file << outCode.str();
 	file.close();
 }
+
 
 //=====================END OF HELPER FUNCTIONS=====================
 //=================================================================
@@ -68,6 +72,42 @@ void CodeGenerator::visit(Program *prg) {
 
 void CodeGenerator::visit(VariableDeclaration *varDecl) {
 	if (varDecl == NULL) return;
+	
+	std::vector<IdentifierExp*>::reverse_iterator varIter = varDecl->idList->rbegin();
+	std::vector<Expression*>::reverse_iterator expIter;
+	if (varDecl->expList)
+		expIter = varDecl->expList->rbegin();
+	
+	while (varIter != varDecl->idList->rend()) {
+		
+		outCode << getTabs();
+		if (varDecl->typeName) {	
+			outCode << (*varIter)->symbol->baseType; 
+			
+			if (varDecl->typeName->indexes) {
+				for(auto const& index : *(varDecl->typeName->indexes)) {
+					outCode << "[" << std::to_string(index) << "]";
+				}
+			}
+		}
+		else {
+			if ((*expIter)->symbol)
+				outCode << (*expIter)->symbol->baseType;
+			else
+				outCode << (*expIter)->type.baseType;
+		}
+		
+		outCode << " " << (*varIter)->name;
+	
+		if (varDecl->expList) {
+			outCode << " = ";
+			ASTTraversal::traverse(*expIter, *this);
+		}
+		
+		outCode << ";" << std::endl;
+		varIter++;
+		if (varDecl->expList) expIter++;
+	}	
 }
 
 void CodeGenerator::visit(TypeDeclaration *typeDecl) {
@@ -91,16 +131,18 @@ void CodeGenerator::visit(FunctionDeclaration *funcDecl) {
 void CodeGenerator::visit(BlockStatement *blockStmt) {
 	if (blockStmt == NULL) return;
 	
-	/*if (isScopeOpened) {
-		
+	if (isScopeOpened) {
+		outCode << getTabs() << "{" << std::endl;
+		numTabs++;
 	} else {
-		
-		
-	}*/
+		numTabs--;
+		outCode << getTabs() << "}" << std::endl << std::endl;
+	}
 }
 
 void CodeGenerator::visit(DeclarationStatement *declStmt) {	
-	if (declStmt == NULL) return;	
+	if (declStmt == NULL) return;
+	ASTTraversal::traverse(declStmt->decl, *this);
 }
 
 void CodeGenerator::visit(TypeDeclarationStatement *typeDeclStmt) {
@@ -121,14 +163,20 @@ void CodeGenerator::visit(ForStatement *forStmt) {
 
 void CodeGenerator::visit(IfElseStatement *ifElseStmt) {	
 	if (ifElseStmt == NULL) return;
-		
+	
+	outCode << getTabs() << "if (";
+	ASTTraversal::traverse(ifElseStmt->exp, *this);
+	outCode << ") ";
+	
 	ASTTraversal::traverse(ifElseStmt->blockStmt, *this);
 	
-	if (ifElseStmt->ifStmt) {	
+	if (ifElseStmt->ifStmt) {
+		outCode << getTabs() << "else ";
 		ASTTraversal::traverse(ifElseStmt->ifStmt, *this);
 	}
 	
-	if (ifElseStmt->elseBlockStmt ) {	
+	if (ifElseStmt->elseBlockStmt ) {
+		outCode << getTabs() << "else ";
 		ASTTraversal::traverse(ifElseStmt->elseBlockStmt, *this);
 	}
 }
@@ -153,23 +201,48 @@ void CodeGenerator::visit(SwitchStatement *switchStmt) {
 }
 
 void CodeGenerator::visit(PrintStatement *printStmt) {
-	if (printStmt == NULL) return;	
+	if (printStmt == NULL) return;
+	
+	std::string space;
+	
+	if (printStmt->isPrintln) space = " ";
+	else space = "";
+
+	//outCode << getTabs() << 
+	
 }
 
 void CodeGenerator::visit(BreakStatement *breakStmt) {
-	if (breakStmt == NULL) return;	
+	if (breakStmt == NULL) return;
+	outCode << getTabs() << "break;" << std::endl;
 }
 
 void CodeGenerator::visit(ContinueStatement *continueStmt) {
 	if (continueStmt == NULL) return;
+	outCode << getTabs() << "continue;" << std::endl;
 }
 
 void CodeGenerator::visit(IncDecStatement *incDecStmt) {
 	if (incDecStmt == NULL) return;	
+	
+	outCode << getTabs();
+	
+	ASTTraversal::traverse(incDecStmt->exp, *this);
+	
+	if (incDecStmt->op == INC_DEC_OP::INC)
+		outCode << "++;";
+
+	if (incDecStmt->op == INC_DEC_OP::DEC)
+		outCode << "--;";
+
+	outCode << ";" << std::endl;
 }
 
 void CodeGenerator::visit(ReturnStatement *returnStmt) {
 	if (returnStmt == NULL) return;
+	outCode << getTabs() << "return ";
+	ASTTraversal::traverse(returnStmt->exp, *this);
+	outCode << ";" << std::endl;
 }
 
 void CodeGenerator::visit(EmptyStatement *emptyStmt) {
@@ -178,10 +251,19 @@ void CodeGenerator::visit(EmptyStatement *emptyStmt) {
 
 void CodeGenerator::visit(ArrayExp *arrExp) {
 	if (arrExp == NULL) return;
+	outCode << arrExp->idExp->name;
+	for(auto const& exp: *(arrExp->expList)) {
+		outCode << "[" << exp->toString() << "]";
+	}
 }
 
 void CodeGenerator::visit(BinaryOperatorExp *binOpExp) {
 	if (binOpExp == NULL) return;
+	outCode << "(";
+	ASTTraversal::traverse(binOpExp->lhs, *this);
+	outCode << " " << binOpExp->op << " ";
+	ASTTraversal::traverse(binOpExp->rhs, *this);
+	outCode << ")";
 }
 
 void CodeGenerator::visit(BoolExp *boolExp) {
@@ -190,34 +272,96 @@ void CodeGenerator::visit(BoolExp *boolExp) {
 
 void CodeGenerator::visit(BuiltinsExp *builtinsExp) {
 	if (builtinsExp == NULL) return;
+
+	if (builtinsExp->name.compare(BUILTIN_CAP) == 0) {
+		//TODO: outCode << "sizeof("
+	}
+
+	if ( builtinsExp->name.compare(BUILTIN_LEN) == 0 && 
+	     typeid(IdentifierExp) == typeid(builtinsExp->exp)
+	) {
+		IdentifierExp *idExp = (IdentifierExp*)builtinsExp->exp;
+		outCode << "sizeof(" << idExp->name << ") / sizeof(*" << idExp->name << ")";
+	}
+
+	if ( builtinsExp->name.compare(BUILTIN_LEN) == 0 && 
+	     typeid(StringExp) == typeid(builtinsExp->exp)
+	) {
+		outCode << "sizeof(" << builtinsExp->exp << ") / sizeof(char)";
+	}
 }
 
 void CodeGenerator::visit(FloatExp *floatExp) {
 	if (floatExp == NULL) return;
+	outCode << floatExp->value;
 }
 
 void CodeGenerator::visit(FunctionCallExp *funcCallExp) {
 	if (funcCallExp == NULL) return;
+		
+	// if typecasting call
+	if ( funcCallExp->idExp->symbol->category.compare(CATEGORY_TYPE) == 0 ) {	
+		outCode << funcCallExp->idExp->symbol->baseType << "("
+		    << *(funcCallExp->expList) << ")";
+		return;
+	}
+	
+	outCode << funcCallExp->idExp->name << "("
+		<< *(funcCallExp->expList) << ")";
 }
 
 void CodeGenerator::visit(IdentifierExp *idExp) {
 	if (idExp == NULL) return;
+	outCode << idExp->name;
 }
 
 void CodeGenerator::visit(IntegerExp *intExp) {
 	if (intExp == NULL) return;
+	outCode << intExp->value;
 }
 
 void CodeGenerator::visit(RuneExp *runeExp) {
 	if (runeExp == NULL) return;
+	outCode << runeExp->value;
 }
 
 void CodeGenerator::visit(StringExp *strExp) {
 	if (strExp == NULL) return;
+	outCode << strExp->value;
 }
 
 void CodeGenerator::visit(UnaryExp *unaryExp) {
 	if (unaryExp == NULL) return;
+
+	// Logical negation: expr must resolve to a bool
+	if ( unaryExp->op.compare(UNARY_BANG) == 0 ) {
+		outCode << unaryExp->op;
+		ASTTraversal::traverse(unaryExp->exp, *this);
+	}
+
+	 // Unary plus: expr must resolve to a numeric type (int, float64, rune)
+	if ( unaryExp->op.compare(UNARY_PLUS) == 0 ) {
+		ASTTraversal::traverse(unaryExp->exp, *this);
+	}
+
+	// Negation: expr must resolve to a numeric type (int, float64, rune)
+	if ( unaryExp->op.compare(UNARY_MINUS) == 0 ) {
+		outCode << unaryExp->op;
+		ASTTraversal::traverse(unaryExp->exp, *this);
+	}
+
+	// Bitwise negation: expr must resolve to an integer type (int, rune)
+	if ( unaryExp->op.compare(UNARY_BWXOR) == 0 ) {
+		if (unaryExp->exp->type.baseType.compare(BASETYPE_INT)) {
+			outCode << INT_MAX << " " << unaryExp->op << " ";
+			ASTTraversal::traverse(unaryExp->exp, *this);
+		}
+
+		if (unaryExp->exp->type.baseType.compare(BASETYPE_RUNE)) {
+			outCode << CHAR_MAX << " " << unaryExp->op << " ";
+			ASTTraversal::traverse(unaryExp->exp, *this);
+		}
+	}
 }
 
 std::string CodeGenerator::getTabs() {

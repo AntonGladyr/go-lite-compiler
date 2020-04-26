@@ -554,7 +554,6 @@ void SymbolTableBuilder::visit(VariableDeclaration *varDecl) {
 		expIter = varDecl->expList->rbegin();
 	
 	// reverse iteration for identifiers
-	//for (auto var = varDecl->idList->rbegin(); var != varDecl->idList->rend(); var++) {
 	while (varIter != varDecl->idList->rend()) {
 		std::stringstream type;
 			

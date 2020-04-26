@@ -28,6 +28,15 @@ var s qq = qq(3)
 	}
 }*/
 
+var d [5]int
+var x = d[0]
+
+func qweqwe() [5]int {
+	var d [5]int
+	d[0] = 5
+	return d
+}
+
 func qwerty(s string) string {
 	return "test"
 }

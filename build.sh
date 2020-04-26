@@ -5,3 +5,4 @@
 make -C ./build
 cd build/bin
 cp golite ../
+cd ../..

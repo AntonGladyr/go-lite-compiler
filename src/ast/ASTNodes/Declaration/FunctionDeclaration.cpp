@@ -6,7 +6,7 @@
 #include <sstream>
 #include "AST/Declaration/FunctionDeclaration.hpp"
 #include "Const/Constants/Constants.hpp"
-
+#include "TypeDescriptorTable/TypeDescriptorTable.hpp"
 
 void FunctionDeclaration::accept(Visitor& v) {
 	v.visit(this);
@@ -131,10 +131,45 @@ std::string FunctionDeclaration::toCcode(unsigned int initFuncNum) {
 	std::stringstream ss;
 	
 	if (idExp->name.compare(SPECIALFUNC_INIT) == 0)
-		ss << "void " << kPrefix << idExp->name
-		   << "__" << initFuncNum << "() " << std::endl;
-	else ss << idExp->type.baseType << " " << kPrefix << idExp->name << "() " << std::endl;
+		ss << C_VOID << " " << kPrefix << idExp->name
+		   << "__" << initFuncNum;
+	else if (idExp->type.baseType.compare(BASETYPE_STRING) == 0)
+		ss << "const " << TypeDescriptorTable::getInstance().getTypeDescriptor(idExp->type.baseType)
+		   << " " << kPrefix << idExp->name; 
+	else if (idExp->type.isBaseType())
+		ss << TypeDescriptorTable::getInstance().getTypeDescriptor(idExp->type.baseType)
+	           << " " << kPrefix << idExp->name;
+	else if (idExp->type.indexes) {
+		ss << idExp->type.name << "* " << kPrefix << idExp->name; //TODO: multidemensional array
+	}
+	else	
+		ss << idExp->type.name << " " << kPrefix << idExp->name;
 	
+	ss << "(";
+	if (params) {
+		for(auto const& param : *params) {
+			// for each id print type
+			if (param->idExp->type.isBaseType())
+				ss << param->idExp->type.baseType << " "; // base type
+			//TODO: multidemensional array
+			/*else (param->idExp->type->indexes)
+				ss << */
+			else ss << param->idExp->type.name << " "; // derived type
+			
+			ss << param->idExp->name << " "; // id
+
+			if (param->typeName->indexes) {
+				for(auto const& index : *(param->typeName->indexes)) {
+					ss << "[" << std::to_string(index) << "]";
+				}	
+			}
+				
+			if (&param != &params->back())
+				ss << ", ";
+		}
+
+	}
+	ss << ") ";
 	return ss.str();
 }
 

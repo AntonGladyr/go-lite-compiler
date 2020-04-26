@@ -9,6 +9,7 @@
 #include "SymbolTable/SymbolTable.hpp"
 #include "SymbolTable/HashFunction.h"
 #include "AST/Declaration/FunctionDeclaration.hpp"
+#include "Services/SymbolTableBuilder.hpp"
 
 SymbolTable::SymbolTable(Program *prg) {
 	SymbolTableBuilder builder;
@@ -121,7 +122,7 @@ std::string SymbolTable::findBaseType(SymbolTable *t, std::string type) {
 	while (true) {
 		s = getSymbol(t, type);
 		if (s == NULL || s->name.compare(s->type) == 0) return type;
-		type = s->type;
+		type = s->baseType;
 	}
 }
 

@@ -6,6 +6,7 @@
 #include <sstream>
 #include "AST/Declaration/VariableDeclaration.hpp"
 #include "../../../helpers/vectorExtension.cpp"
+#include "SymbolTable/SymbolTable.hpp"
 
 void VariableDeclaration::accept(Visitor& v) {
 	v.visit(this);

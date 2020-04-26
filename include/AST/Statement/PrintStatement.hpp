@@ -7,11 +7,9 @@
 #include "AST/Expression/Expression.hpp"
 
 class PrintStatement : public Statement {
-	private:
-		bool isPrintln;
 	public:
 		std::vector<Expression*> *expList = NULL;
-
+		bool isPrintln;	
 		virtual void accept(Visitor& v) override;
 		virtual std::string toString();
 		

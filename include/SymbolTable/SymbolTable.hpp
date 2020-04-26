@@ -8,7 +8,6 @@
 #include "SymbolTable/HashFunction.h"
 #include "AST/Node.hpp"
 #include "AST/Program/Program.hpp"
-#include "Services/SymbolTableBuilder.hpp"
 
 class SymbolTable {
 	private:
