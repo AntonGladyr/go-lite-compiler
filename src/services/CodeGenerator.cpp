@@ -150,7 +150,8 @@ void CodeGenerator::visit(TypeDeclarationStatement *typeDeclStmt) {
 }
 
 void CodeGenerator::visit(AssignStatement *assignStmt) {
-	if (assignStmt == NULL) return;	
+	if (assignStmt == NULL) return;
+		
 }
 
 void CodeGenerator::visit(ExpressionStatement *expStmt) {
@@ -158,7 +159,33 @@ void CodeGenerator::visit(ExpressionStatement *expStmt) {
 }
 
 void CodeGenerator::visit(ForStatement *forStmt) {
-	if (forStmt == NULL) return;	
+	if (forStmt == NULL) return;
+		
+	if ( forStmt->initStmt == NULL &&
+	     forStmt->exp == NULL &&
+	     forStmt->postStmt == NULL 
+	) {
+		outCode << getTabs() << "for(;;) ";
+	}
+	else if ( forStmt->initStmt == NULL &&
+		  forStmt->exp &&
+		  forStmt->postStmt == NULL
+	) {
+		outCode << getTabs() << "while(";
+		ASTTraversal::traverse(forStmt->exp, *this);
+		outCode << ") ";
+	}
+	else if ( forStmt->initStmt &&
+		  forStmt->exp &&
+		  forStmt->postStmt
+	) {
+		//TODO: fix new line
+		outCode << getTabs() << "for (";
+		ASTTraversal::traverse(forStmt->initStmt, *this);
+		ASTTraversal::traverse(forStmt->exp, *this);
+		ASTTraversal::traverse(forStmt->postStmt, *this);
+		outCode << getTabs() << ") ";
+	}
 }
 
 void CodeGenerator::visit(IfElseStatement *ifElseStmt) {	
@@ -208,8 +235,38 @@ void CodeGenerator::visit(PrintStatement *printStmt) {
 	if (printStmt->isPrintln) space = " ";
 	else space = "";
 
-	//outCode << getTabs() << 
-	
+	outCode << getTabs() << "printf(\"";
+
+	for(auto const& exp: *(printStmt->expList)) {
+		if (exp->symbol) {
+			if (exp->symbol->baseType.compare(BASETYPE_STRING) == 0)
+				outCode << "%s" << space;
+			else if (exp->symbol->baseType.compare(BASETYPE_INT) == 0)
+				outCode << "%d" << space;
+			else if (exp->symbol->baseType.compare(BASETYPE_RUNE) == 0)
+				outCode << "%c" << space; 
+			else if (exp->symbol->baseType.compare(BASETYPE_FLOAT) == 0)
+				outCode << "%f" << space;
+			else if (exp->symbol->baseType.compare(BASETYPE_BOOL) == 0) //TODO:fix for bool
+				outCode << "%d" << space;
+		}
+		else {
+			if (exp->type.baseType.compare(BASETYPE_STRING) == 0)
+				outCode << "%s" << space;
+			else if (exp->type.baseType.compare(BASETYPE_INT) == 0)
+				outCode << "%d" << space;
+			else if (exp->type.baseType.compare(BASETYPE_RUNE) == 0)
+				outCode << "%c" << space;
+			else if (exp->type.baseType.compare(BASETYPE_FLOAT) == 0)
+				outCode << "%f" << space;
+			else if (exp->type.baseType.compare(BASETYPE_BOOL) == 0) //TODO:fix for bool
+				outCode << "%d" << space;
+		}
+	}
+
+	outCode << "\"";
+	if (printStmt->expList) outCode << ", " << *(printStmt->expList);
+	outCode << ");" << std::endl;	
 }
 
 void CodeGenerator::visit(BreakStatement *breakStmt) {
