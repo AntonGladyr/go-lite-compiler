@@ -82,7 +82,7 @@ void CodeGenerator::visit(VariableDeclaration *varDecl) {
 		
 		outCode << getTabs();
 		if (varDecl->typeName) {	
-			outCode << (*varIter)->symbol->baseType; 
+			outCode << TypeDescriptorTable::getInstance().getTypeDescriptor((*varIter)->symbol->baseType);
 			
 			if (varDecl->typeName->indexes) {
 				for(auto const& index : *(varDecl->typeName->indexes)) {
@@ -94,7 +94,7 @@ void CodeGenerator::visit(VariableDeclaration *varDecl) {
 			if ((*expIter)->symbol)
 				outCode << (*expIter)->symbol->baseType;
 			else
-				outCode << (*expIter)->type.baseType;
+				outCode << TypeDescriptorTable::getInstance().getTypeDescriptor((*expIter)->type.baseType);
 		}
 		
 		outCode << " " << (*varIter)->name;
@@ -151,11 +151,22 @@ void CodeGenerator::visit(TypeDeclarationStatement *typeDeclStmt) {
 
 void CodeGenerator::visit(AssignStatement *assignStmt) {
 	if (assignStmt == NULL) return;
-		
+	std::vector<Expression*>::iterator lhsIter = assignStmt->lhs->begin();
+	std::vector<Expression*>::iterator rhsIter = assignStmt->rhs->begin();
+	
+	while ( lhsIter != assignStmt->lhs->end() && rhsIter != assignStmt->rhs->end() ) {
+		ASTTraversal::traverse(*lhsIter, *this);
+		outCode << " = ";
+		ASTTraversal::traverse(*rhsIter, *this);
+		outCode << ";" << std::endl;
+		lhsIter++;
+		rhsIter++;
+	}	
 }
 
 void CodeGenerator::visit(ExpressionStatement *expStmt) {
-	if (expStmt == NULL) return;	
+	if (expStmt == NULL) return;
+	
 }
 
 void CodeGenerator::visit(ForStatement *forStmt) {

@@ -149,12 +149,17 @@ std::string FunctionDeclaration::toCcode(unsigned int initFuncNum) {
 	if (params) {
 		for(auto const& param : *params) {
 			// for each id print type
-			if (param->idExp->type.isBaseType())
-				ss << param->idExp->type.baseType << " "; // base type
+			if (param->idExp->symbol)
+				ss << TypeDescriptorTable::getInstance().getTypeDescriptor(
+					param->idExp->symbol->baseType) << " ";
+			else if (param->idExp->type.isBaseType())
+				ss << TypeDescriptorTable::getInstance().getTypeDescriptor(
+					param->idExp->type.baseType) << " "; // base type
 			//TODO: multidemensional array
 			/*else (param->idExp->type->indexes)
 				ss << */
-			else ss << param->idExp->type.name << " "; // derived type
+			/*else ss << TypeDescriptorTable::getInstance().getTypeDescriptor(
+					param->idExp->type.name << " "); // derived type*/
 			
 			ss << param->idExp->name << " "; // id
 
