@@ -1,8 +1,7 @@
-#ifndef SYMBOLTABLEBUILDER_HPP
-#define SYMBOLTABLEBUILDER_HPP
+#ifndef WEEDER_HPP
+#define WEEDER_HPP
 
 #include <iostream>
-#include <sstream>
 #include <utility>
 #include "Services/Visitor.hpp"
 #include "AST/Program/Program.hpp"
@@ -24,60 +23,16 @@
 #include "AST/Statement/ReturnStatement.hpp"
 #include "AST/Statement/EmptyStatement.hpp"
 #include "AST/Expression/IdentifierExp.hpp"
-#include "SymbolTable/SymbolTable.hpp"
-#include "AST/Declaration/TypeName.hpp"
 
-class SymbolTable;
-
-class SymbolTableBuilder : public Visitor {
+class Weeder : public Visitor {
 	private:
+		int numTabs = 0;
+	public:
 		Program *program = NULL;
-		SymbolTable *symbolTable = NULL;
-		unsigned int numTabs = 0;
-		std::stringstream ss; // for printing symbol table
-		bool isSymbolMode;
 		
 		void terminate();
-		void checkTypeName(TypeName *type);
-		void insertFuncParams(Node *node);
-		void checkSpecialFunctions(Node *node);
-		void checkIdName(Node *node); // check identifier name ('main' and 'init' must be a function)	
-		void checkAssignEquality(
-			int lhsSize,
-			int rhsSize,
-			Node *node
-		);
-		void checkIsInitFunc(FunctionCallExp *funcCallExp);
-		void checkNumberOfFuncArgs(FunctionCallExp *funcCallExp);
-		void checkArgTypes(FunctionCallExp *funcCallExp);	
-		void checkIsIntExp(Expression *exp);
-		void checkBuiltinCap(BuiltinsExp *builtinsExp);
-		void checkBuiltinLen(BuiltinsExp *builtinsExp);
-		void checkClauseExp(Expression *clauseExp, Expression *switchExp);
-		void checkTypeConversion(FunctionCallExp *funcCallExp);
-		void checkVoidFunc(Expression *exp);
-		void checkIfFuncExist(Expression *exp);
-		void checkIfFuncName(Expression *lhs, Expression *rhs);
-		void checkReturnAtEndOfFunc(Statement *stmt);
-		void checkIsFuncType(FunctionCallExp *funcCallExp);
-		void typeCompatibilityError(
-			int lineno,
-			const std::string &expName,
-			const std::string &receivedType,
-			const std::string &expectedType
-		);
-		void arrayIndexingError(ArrayExp *arrExp);
-		void binaryExpError(
-			const std::string &lhsType,
-			const std::string &rhsType,
-			int lineno
-		);
-		TypeDescriptor resolveArrayExpType(ArrayExp *arrExp);
-		bool hasTypeName(Expression *exp);
-		std::string getReceivedTypeName(Expression *exp);
+		void weedOut(Program *prg);
 		
-	public:	
-		SymbolTable *build(Program *prg, bool _isSymbolMode);
 		virtual void visit(Program *prg) override;
 		virtual void visit(VariableDeclaration *varDecl) override;
 		virtual void visit(TypeDeclaration *typeDecl) override;
@@ -111,9 +66,9 @@ class SymbolTableBuilder : public Visitor {
 		virtual void openScope() override { isScopeOpened = true; }
 		virtual void closeScope() override { isScopeOpened = false; }
 		std::string getTabs();
-		
-		SymbolTableBuilder() { } 
-		~SymbolTableBuilder() { }
+
+		Weeder() { }
+		~Weeder() { }
 };
 
-#endif	
+#endif

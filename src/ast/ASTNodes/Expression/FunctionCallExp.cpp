@@ -11,12 +11,12 @@ void FunctionCallExp::accept(Visitor& v) {
 
 std::string FunctionCallExp::toString() {
 	std::stringstream ss;
-	ss << idExp->name << "(" << *expList << ")";
+	ss << _identifierExp->toString() << "(" << *expList << ")";
 	return ss.str();
 }
 
-FunctionCallExp::~FunctionCallExp() {
-	delete idExp;
+FunctionCallExp::~FunctionCallExp() {	
+	if (_identifierExp) delete _identifierExp;
 	
 	for(auto const& exp : *expList) {
 		delete exp;

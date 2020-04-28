@@ -10,16 +10,17 @@
 class FunctionCallExp : public Expression {
 	public:	
 		IdentifierExp *idExp = NULL;
+		Expression *_identifierExp = NULL;  // for idExp
 		std::vector<Expression*> *expList = NULL;
 
 		virtual void accept(Visitor& v) override;
 		virtual std::string toString();
 			
 		FunctionCallExp(
-			IdentifierExp *_idExp,
+			Expression *_idExp,
 			std::vector<Expression*> *_expList,
 			int _lineno
-		) : idExp(_idExp), expList(_expList), Expression(_lineno) { }
+		) : _identifierExp(_idExp), expList(_expList), Expression(_lineno) { }
 		
 		FunctionCallExp() { }
 		~FunctionCallExp();	

@@ -65,7 +65,7 @@ void CodeGenerator::visit(Program *prg) {
 					mainFuncCall.str(), 
 					initFuncCalls.str()
 		);
-		std::cout << outCode.str() << std::endl;
+		//std::cout << outCode.str() << std::endl;
 		saveToFile(FILE_PATH, FILE_NAME, EXTENSION);
 	} 
 }

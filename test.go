@@ -1,5 +1,18 @@
 package test
 
+func t1() int {
+	return (5)(5)
+}
+
+func t2() int {
+	return 5
+}
+
+func ret_if() {
+	var d int = t2 + t2
+}
+
+
 /*func test(f int) {
 	var f1 float64
 	return
@@ -78,3 +91,9 @@ func main() {
 	//t[5], t[5] =  5, 5
 	//var test int = int
 }*/
+
+func test3() {
+	type num int
+	var x num
+	x = 5
+}

@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string.h>
+#include <string>
 #include "main.hpp"
 
 void printUsageInfo() {	
@@ -18,8 +19,7 @@ int main(int argc, char *argv[]){
 		printUsageInfo();
 		return 1;
 	}
-
-
+	
 	if (!strcmp(argv[1], "scan")) {
         	g_tokens = 0;
         	while (yylex());	
@@ -33,7 +33,10 @@ int main(int argc, char *argv[]){
     	}
     	else if (!strcmp(argv[1], "parse")) {
         	yyparse();
-        	std::cout << "OK" << std::endl;
+		
+		//TODO: Weeder; split SymbolTable class into Weeder and SymbolTable	
+		
+        	std::cout << "OK" << std::endl;	
 		
 		delete program;
 		program = NULL;
@@ -50,7 +53,7 @@ int main(int argc, char *argv[]){
     	}
 	else if (!strcmp(argv[1], "symbol")) {
 		yyparse();	
-		SymbolTable *symbolTable = new SymbolTable(program, true);	
+		SymbolTable *symbolTable = new SymbolTable(program, true);
 		std::cout << symbolTable->toString();
 		
 		//TODO: invoke deallocate() behind the scenes

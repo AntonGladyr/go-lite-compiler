@@ -55,7 +55,7 @@ void SymbolTableBuilder::terminate() {
 	delete symbolTable;
 	symbolTable = NULL;
 	delete program;
-	program = NULL;	
+	program = NULL;
 	std::exit(EXIT_FAILURE);
 }
 
@@ -177,7 +177,7 @@ void SymbolTableBuilder::checkAssignEquality(
 }
 
 // throws an error if call of an init function occurs
-void SymbolTableBuilder::checkIsInitFunc(FunctionCallExp *funcCallExp) {
+void SymbolTableBuilder::checkIsInitFunc(FunctionCallExp *funcCallExp) {	
 	if (funcCallExp->idExp->name.compare(SPECIALFUNC_INIT) == 0) {
 		std::cerr << "Error: (line " << funcCallExp->lineno << ") "
 			<< "init function may not be called" << std::endl;
@@ -405,7 +405,7 @@ void SymbolTableBuilder::checkIfFuncName(Expression *lhs, Expression *rhs) {
 		}
 	}
 	     
-	if (rhs != NULL && typeid(IdentifierExp) != typeid(*rhs)) {
+	if (rhs != NULL && typeid(IdentifierExp) == typeid(*rhs)) {
 		IdentifierExp *idRhs = (IdentifierExp*)rhs;
 		if (idRhs->name.empty()) return;
 		Symbol *s = symbolTable->getSymbol(symbolTable, idRhs->name);
@@ -414,6 +414,116 @@ void SymbolTableBuilder::checkIfFuncName(Expression *lhs, Expression *rhs) {
 			  	  << getReceivedTypeName(rhs) << " is not assignment compatible" << std::endl; 
 			terminate();
 		}
+	}
+}
+
+void SymbolTableBuilder::checkReturnAtEndOfFunc(Statement *stmt) {
+	if (stmt == NULL) {
+		std::cerr << "Error: (line " << stmt->lineno << ") "
+	                  << "missing return at end of function" << std::endl;
+		terminate();
+	}
+	
+	if ( typeid(BlockStatement) == typeid(*stmt) ) {
+		BlockStatement *blockStmt = (BlockStatement*)stmt;
+		
+		if ( blockStmt->stmtList != NULL &&
+		     blockStmt->stmtList->size() != 0
+		) {
+			checkReturnAtEndOfFunc(blockStmt->stmtList->back());
+			return;
+		}
+	}
+	
+	if ( typeid(ReturnStatement) == typeid(*stmt) ) return;
+	
+	if ( typeid(ForStatement) == typeid(*stmt) ) {
+		ForStatement *forStmt = (ForStatement*)stmt;
+		return;
+		/*if (forStmt->exp == NULL && forStmt->postStmt == NULL) {
+			bool hasBreakStmt = false;
+			
+			if ( forStmt->blockStmt->stmtList == NULL ||
+			     ( forStmt->blockStmt->stmtList != NULL && 
+			       forStmt->blockStmt->stmtList->size() == 0 )
+			) return;
+			
+			for(auto const& s : *(forStmt->blockStmt->stmtList)) {
+				if ( typeid(BreakStatement) == typeid(*s) )
+					hasBreakStmt = true;
+			}
+			
+			if (!hasBreakStmt) return;
+		}*/
+		
+		/*if (forStmt->initStmt && forStmt->exp && forStmt->postStmt) {
+			checkReturnAtEndOfFunc(forStmt->blockStmt);
+			return;
+		}*/
+	}
+	
+	if ( typeid(IfElseStatement) == typeid(*stmt) ) {	
+		IfElseStatement *ifElseStmt = (IfElseStatement*)stmt;
+		
+		// check IF block
+		if ( ifElseStmt->blockStmt != NULL) {
+			checkReturnAtEndOfFunc(ifElseStmt->blockStmt);
+		}
+
+		bool hasElseBlock = false;
+		Statement *ifStmt = ifElseStmt->ifStmt;
+		
+		// check ELSE IF blocks and nested ELSE block
+		while(ifStmt) {
+			IfElseStatement *ifBlock = (IfElseStatement*)ifStmt;
+			checkReturnAtEndOfFunc(ifBlock->blockStmt);
+			
+			if (ifBlock->elseBlockStmt) {
+				checkReturnAtEndOfFunc(ifBlock->elseBlockStmt);
+				hasElseBlock = true;
+			}
+			
+			ifStmt = ifBlock->ifStmt;
+		}
+		
+		// check ELSE block if there is no ELSE IF blocks
+		if (ifStmt == NULL && ifElseStmt->elseBlockStmt) {
+			checkReturnAtEndOfFunc(ifElseStmt->elseBlockStmt);
+			hasElseBlock = true;
+		}
+
+		if (hasElseBlock) return;
+	}
+
+	if ( typeid(SwitchStatement) == typeid(*stmt) ) {
+		SwitchStatement *switchStmt = (SwitchStatement*)stmt;
+		
+		bool hasDefaultClause = false;
+		
+		if ( switchStmt->clauseList != NULL && 
+		     switchStmt->clauseList->size() != 0
+		) {
+			for(auto const& clause : *(switchStmt->clauseList)) {
+				checkReturnAtEndOfFunc(clause->blockStmt);
+				if (clause->clauseType == SWITCH_CLAUSE::DEFAULT)
+					hasDefaultClause = true;
+			}
+		}
+		
+		if (hasDefaultClause) return;
+	}
+		
+	std::cerr << "Error: (line " << stmt->lineno << ") "
+	          << "missing return at end of function" << std::endl;
+	terminate();
+}
+
+void SymbolTableBuilder::checkIsFuncType(FunctionCallExp *funcCallExp) {
+	if ( typeid(IdentifierExp) != typeid(*(funcCallExp->_identifierExp)) ) {
+		std::cerr << "Error: (line " << funcCallExp->_identifierExp->lineno << ") "
+					     << funcCallExp->_identifierExp->toString()
+				             << " is not a function type" << std::endl;
+		terminate();
 	}
 }
 
@@ -728,13 +838,22 @@ void SymbolTableBuilder::visit(FunctionDeclaration *funcDecl) {
 	if (funcDecl->typeName) {
 		checkTypeName(funcDecl->typeName);
 		
+		// terminate if missing return at end of function
+		//if ( funcDecl->blockStmt->stmtList != NULL && 
+		   //  funcDecl->blockStmt->stmtList->size() != 0
+		//) {
+			//checkReturnAtEndOfFunc(funcDecl->blockStmt->stmtList->back());
+			checkReturnAtEndOfFunc(funcDecl->blockStmt);
+
+		//}
+		
 		indexes = funcDecl->typeName->indexes;
 	}
-		
+	
 	// save type
 	funcDecl->idExp->type = TypeDescriptor(
 					funcDecl->symbolTypeToStr(),
-					funcDecl->symbolTypeToStr(),	
+					funcDecl->symbolTypeToStr(),	//TODO:fix
 					CATEGORY_FUNC,
 					indexes,
 					funcDecl
@@ -842,7 +961,7 @@ void SymbolTableBuilder::visit(AssignStatement *assignStmt) {
 		}
 	
 		// check if function name used as an identifier
-		//checkIfFuncName(*lhsIter, *rhsIter);
+		checkIfFuncName(*lhsIter, *rhsIter);
 		
 		lhsIter++;
 		rhsIter++;
@@ -866,6 +985,13 @@ void SymbolTableBuilder::visit(ExpressionStatement *expStmt) {
 		terminate();
 	} else {	
 		FunctionCallExp *funcCall = (FunctionCallExp*)expStmt->exp;
+		
+		checkIsFuncType(funcCall);
+	
+		// save function id to idExp, so it has IdentifierExp type instead of Expression
+		funcCall->idExp = (IdentifierExp*)funcCall->_identifierExp;
+		expStmt->exp = funcCall;
+		
 		Symbol *s = symbolTable->getSymbol(symbolTable, funcCall->idExp->name);
 		
 		if (s == NULL) {
@@ -1219,6 +1345,9 @@ void SymbolTableBuilder::visit(BinaryOperatorExp *binOpExp) {
 	if (binOpExp->rhs->symbol) 
 		isFuncRhs = binOpExp->rhs->symbol->category.compare(CATEGORY_FUNC) == 0;
 	
+	// check if an expressino is a function id
+	checkIfFuncName(binOpExp->lhs, binOpExp->rhs);
+	
 	// resolve binary operation type
 	if ( binOpExp->lhs->type.isStringType() &&     // "string"
 	     binOpExp->op.compare(BINARY_PLUS) == 0 && // +
@@ -1324,7 +1453,12 @@ void SymbolTableBuilder::visit(FunctionCallExp *funcCallExp) {
 	// copy string stream for printing errors
 	symbolTable->ss.str(ss.str());
 		
-	ASTTraversal::traverse(funcCallExp->idExp, *this);
+	ASTTraversal::traverse(funcCallExp->_identifierExp, *this);	
+	
+	checkIsFuncType(funcCallExp);
+	
+	// save function id to idExp, so it has IdentifierExp type instead of Expression
+	funcCallExp->idExp = (IdentifierExp*)funcCallExp->_identifierExp;
 	
 	// check if parameter identifiers exist in the symbol table
 	if (funcCallExp->expList) {

@@ -35,8 +35,8 @@ Grammar
 
     0 $accept: program $end
 
-    1 program: tPACKAGE tIDENTIFIER tSEMICOLON decl_list
-    2        | tPACKAGE tIDENTIFIER tSEMICOLON
+    1 program: tPACKAGE id_exp tSEMICOLON decl_list
+    2        | tPACKAGE id_exp tSEMICOLON
 
     3 decl_list: decl
     4          | decl_list decl
@@ -49,10 +49,10 @@ Grammar
     9         | tVAR id_listne tASSIGN exp_list
    10         | tVAR id_listne type tASSIGN exp_list
 
-   11 type_decl: tTYPE tIDENTIFIER type
+   11 type_decl: tTYPE id_exp type
 
-   12 func_decl: tFUNC tIDENTIFIER tLPAREN paramspe tRPAREN blockstmt
-   13          | tFUNC tIDENTIFIER tLPAREN paramspe tRPAREN type blockstmt
+   12 func_decl: tFUNC id_exp tLPAREN paramspe tRPAREN blockstmt
+   13          | tFUNC id_exp tLPAREN paramspe tRPAREN type blockstmt
 
    14 stmt_list: stmt
    15          | stmt_list stmt
@@ -70,7 +70,7 @@ Grammar
    23 exp_listpe: exp_list
    24           | %empty
 
-   25 param: tIDENTIFIER type
+   25 param: id_exp type
 
    26 paramsne: param
    27         | paramsne tCOMMA param
@@ -137,19 +137,19 @@ Grammar
    70 blockstmt: tLBRACE stmt_list tRBRACE
    71          | tLBRACE tRBRACE
 
-   72 func_call: id_exp tLPAREN exp_listpe tRPAREN
+   72 func_call: primary_exp tLPAREN exp_listpe tRPAREN
 
    73 index: tLBRACKET exp tRBRACKET
    74      | tLBRACKET exp tRBRACKET index
 
-   75 primary_exp: id_exp
-   76            | func_call
-   77            | id_exp index
-   78            | tLPAREN exp tRPAREN
+   75 id_exp: tIDENTIFIER
 
-   79 id_exp: tIDENTIFIER
+   76 primary_exp: id_exp
+   77            | tLPAREN exp tRPAREN
 
-   80 exp: primary_exp
+   78 exp: primary_exp
+   79    | func_call
+   80    | id_exp index
    81    | tLEN tLPAREN exp tRPAREN
    82    | tCAP tLPAREN exp tRPAREN
    83    | exp tPLUS exp
@@ -254,16 +254,16 @@ tGREATEREQ (322) 100
 tSHORTDECLARE (323)
 tELLIPSIS (324)
 tLBRACE (325) 57 58 70 71
-tLPAREN (326) 12 13 18 68 69 72 78 81 82
+tLPAREN (326) 12 13 18 68 69 72 77 81 82
 tLBRACKET (327) 17 73 74
 tCOMMA (328) 20 22 27
 tPERIOD (329)
 tRBRACE (330) 57 58 70 71
-tRPAREN (331) 12 13 18 68 69 72 78 81 82
+tRPAREN (331) 12 13 18 68 69 72 77 81 82
 tRBRACKET (332) 17 73 74
 tSEMICOLON (333) 1 2 5 6 7 30 31 32 33 34 35 36 37 38 39 47
 tCOLON (334) 64 65
-tIDENTIFIER (335) 1 2 11 12 13 16 25 79
+tIDENTIFIER (335) 16 75
 tINTVAL (336) 17 102
 tFLOATVAL (337) 103
 tBOOLVAL (338) 106
@@ -343,18 +343,18 @@ printstmt (121)
 blockstmt (122)
     on left: 70 71, on right: 12 13 30 47 48 54 55 56
 func_call (123)
-    on left: 72, on right: 76
+    on left: 72, on right: 79
 index (124)
-    on left: 73 74, on right: 74 77
-primary_exp (125)
-    on left: 75 76 77 78, on right: 80
-id_exp (126)
-    on left: 79, on right: 19 20 72 75 77
+    on left: 73 74, on right: 74 80
+id_exp (125)
+    on left: 75, on right: 1 2 11 12 13 19 20 25 76 80
+primary_exp (126)
+    on left: 76 77, on right: 72 78
 exp (127)
-    on left: 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97
-    98 99 100 101 102 103 104 105 106 107 108 109 110, on right: 21
-    22 41 46 50 54 55 56 58 66 67 73 74 78 81 82 83 84 85 86 87 88
-    89 90 91 92 93 94 95 96 97 98 99 100 101 107 108 109 110
+    on left: 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95
+    96 97 98 99 100 101 102 103 104 105 106 107 108 109 110, on right:
+    21 22 41 46 50 54 55 56 58 66 67 73 74 77 81 82 83 84 85 86 87
+    88 89 90 91 92 93 94 95 96 97 98 99 100 101 107 108 109 110
 
 
 State 0
@@ -368,148 +368,154 @@ State 0
 
 State 1
 
-    1 program: tPACKAGE . tIDENTIFIER tSEMICOLON decl_list
-    2        | tPACKAGE . tIDENTIFIER tSEMICOLON
+    1 program: tPACKAGE . id_exp tSEMICOLON decl_list
+    2        | tPACKAGE . id_exp tSEMICOLON
 
     tIDENTIFIER  shift, and go to state 3
+
+    id_exp  go to state 4
 
 
 State 2
 
     0 $accept: program . $end
 
-    $end  shift, and go to state 4
+    $end  shift, and go to state 5
 
 
 State 3
 
-    1 program: tPACKAGE tIDENTIFIER . tSEMICOLON decl_list
-    2        | tPACKAGE tIDENTIFIER . tSEMICOLON
+   75 id_exp: tIDENTIFIER .
 
-    tSEMICOLON  shift, and go to state 5
+    $default  reduce using rule 75 (id_exp)
 
 
 State 4
+
+    1 program: tPACKAGE id_exp . tSEMICOLON decl_list
+    2        | tPACKAGE id_exp . tSEMICOLON
+
+    tSEMICOLON  shift, and go to state 6
+
+
+State 5
 
     0 $accept: program $end .
 
     $default  accept
 
 
-State 5
+State 6
 
-    1 program: tPACKAGE tIDENTIFIER tSEMICOLON . decl_list
-    2        | tPACKAGE tIDENTIFIER tSEMICOLON .
+    1 program: tPACKAGE id_exp tSEMICOLON . decl_list
+    2        | tPACKAGE id_exp tSEMICOLON .
 
-    tFUNC  shift, and go to state 6
-    tTYPE  shift, and go to state 7
-    tVAR   shift, and go to state 8
+    tFUNC  shift, and go to state 7
+    tTYPE  shift, and go to state 8
+    tVAR   shift, and go to state 9
 
     $default  reduce using rule 2 (program)
 
-    decl_list  go to state 9
-    decl       go to state 10
-    var_decl   go to state 11
-    type_decl  go to state 12
-    func_decl  go to state 13
-
-
-State 6
-
-   12 func_decl: tFUNC . tIDENTIFIER tLPAREN paramspe tRPAREN blockstmt
-   13          | tFUNC . tIDENTIFIER tLPAREN paramspe tRPAREN type blockstmt
-
-    tIDENTIFIER  shift, and go to state 14
+    decl_list  go to state 10
+    decl       go to state 11
+    var_decl   go to state 12
+    type_decl  go to state 13
+    func_decl  go to state 14
 
 
 State 7
 
-   11 type_decl: tTYPE . tIDENTIFIER type
+   12 func_decl: tFUNC . id_exp tLPAREN paramspe tRPAREN blockstmt
+   13          | tFUNC . id_exp tLPAREN paramspe tRPAREN type blockstmt
 
-    tIDENTIFIER  shift, and go to state 15
+    tIDENTIFIER  shift, and go to state 3
+
+    id_exp  go to state 15
 
 
 State 8
+
+   11 type_decl: tTYPE . id_exp type
+
+    tIDENTIFIER  shift, and go to state 3
+
+    id_exp  go to state 16
+
+
+State 9
 
     8 var_decl: tVAR . id_listne type
     9         | tVAR . id_listne tASSIGN exp_list
    10         | tVAR . id_listne type tASSIGN exp_list
 
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
 
     id_listne  go to state 17
     id_exp     go to state 18
 
 
-State 9
+State 10
 
-    1 program: tPACKAGE tIDENTIFIER tSEMICOLON decl_list .
+    1 program: tPACKAGE id_exp tSEMICOLON decl_list .
     4 decl_list: decl_list . decl
 
-    tFUNC  shift, and go to state 6
-    tTYPE  shift, and go to state 7
-    tVAR   shift, and go to state 8
+    tFUNC  shift, and go to state 7
+    tTYPE  shift, and go to state 8
+    tVAR   shift, and go to state 9
 
     $default  reduce using rule 1 (program)
 
     decl       go to state 19
-    var_decl   go to state 11
-    type_decl  go to state 12
-    func_decl  go to state 13
+    var_decl   go to state 12
+    type_decl  go to state 13
+    func_decl  go to state 14
 
 
-State 10
+State 11
 
     3 decl_list: decl .
 
     $default  reduce using rule 3 (decl_list)
 
 
-State 11
+State 12
 
     5 decl: var_decl . tSEMICOLON
 
     tSEMICOLON  shift, and go to state 20
 
 
-State 12
+State 13
 
     6 decl: type_decl . tSEMICOLON
 
     tSEMICOLON  shift, and go to state 21
 
 
-State 13
+State 14
 
     7 decl: func_decl . tSEMICOLON
 
     tSEMICOLON  shift, and go to state 22
 
 
-State 14
+State 15
 
-   12 func_decl: tFUNC tIDENTIFIER . tLPAREN paramspe tRPAREN blockstmt
-   13          | tFUNC tIDENTIFIER . tLPAREN paramspe tRPAREN type blockstmt
+   12 func_decl: tFUNC id_exp . tLPAREN paramspe tRPAREN blockstmt
+   13          | tFUNC id_exp . tLPAREN paramspe tRPAREN type blockstmt
 
     tLPAREN  shift, and go to state 23
 
 
-State 15
+State 16
 
-   11 type_decl: tTYPE tIDENTIFIER . type
+   11 type_decl: tTYPE id_exp . type
 
     tLPAREN      shift, and go to state 24
     tLBRACKET    shift, and go to state 25
     tIDENTIFIER  shift, and go to state 26
 
     type  go to state 27
-
-
-State 16
-
-   79 id_exp: tIDENTIFIER .
-
-    $default  reduce using rule 79 (id_exp)
 
 
 State 17
@@ -565,16 +571,17 @@ State 22
 
 State 23
 
-   12 func_decl: tFUNC tIDENTIFIER tLPAREN . paramspe tRPAREN blockstmt
-   13          | tFUNC tIDENTIFIER tLPAREN . paramspe tRPAREN type blockstmt
+   12 func_decl: tFUNC id_exp tLPAREN . paramspe tRPAREN blockstmt
+   13          | tFUNC id_exp tLPAREN . paramspe tRPAREN type blockstmt
 
-    tIDENTIFIER  shift, and go to state 31
+    tIDENTIFIER  shift, and go to state 3
 
     $default  reduce using rule 29 (paramspe)
 
-    param     go to state 32
-    paramsne  go to state 33
-    paramspe  go to state 34
+    param     go to state 31
+    paramsne  go to state 32
+    paramspe  go to state 33
+    id_exp    go to state 34
 
 
 State 24
@@ -604,7 +611,7 @@ State 26
 
 State 27
 
-   11 type_decl: tTYPE tIDENTIFIER type .
+   11 type_decl: tTYPE id_exp type .
 
     $default  reduce using rule 11 (type_decl)
 
@@ -620,7 +627,7 @@ State 28
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -629,8 +636,8 @@ State 28
 
     exp_list     go to state 49
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 53
 
 
@@ -638,7 +645,7 @@ State 29
 
    20 id_listne: id_listne tCOMMA . id_exp
 
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
 
     id_exp  go to state 54
 
@@ -655,38 +662,38 @@ State 30
 
 State 31
 
-   25 param: tIDENTIFIER . type
-
-    tLPAREN      shift, and go to state 24
-    tLBRACKET    shift, and go to state 25
-    tIDENTIFIER  shift, and go to state 26
-
-    type  go to state 56
-
-
-State 32
-
    26 paramsne: param .
 
     $default  reduce using rule 26 (paramsne)
 
 
-State 33
+State 32
 
    27 paramsne: paramsne . tCOMMA param
    28 paramspe: paramsne .
 
-    tCOMMA  shift, and go to state 57
+    tCOMMA  shift, and go to state 56
 
     $default  reduce using rule 28 (paramspe)
 
 
+State 33
+
+   12 func_decl: tFUNC id_exp tLPAREN paramspe . tRPAREN blockstmt
+   13          | tFUNC id_exp tLPAREN paramspe . tRPAREN type blockstmt
+
+    tRPAREN  shift, and go to state 57
+
+
 State 34
 
-   12 func_decl: tFUNC tIDENTIFIER tLPAREN paramspe . tRPAREN blockstmt
-   13          | tFUNC tIDENTIFIER tLPAREN paramspe . tRPAREN type blockstmt
+   25 param: id_exp . type
 
-    tRPAREN  shift, and go to state 58
+    tLPAREN      shift, and go to state 24
+    tLBRACKET    shift, and go to state 25
+    tIDENTIFIER  shift, and go to state 26
+
+    type  go to state 58
 
 
 State 35
@@ -728,7 +735,7 @@ State 39
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -736,8 +743,8 @@ State 39
     tSTRINGVAL   shift, and go to state 48
 
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 63
 
 
@@ -752,7 +759,7 @@ State 40
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -760,8 +767,8 @@ State 40
     tSTRINGVAL   shift, and go to state 48
 
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 64
 
 
@@ -776,7 +783,7 @@ State 41
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -784,8 +791,8 @@ State 41
     tSTRINGVAL   shift, and go to state 48
 
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 65
 
 
@@ -800,7 +807,7 @@ State 42
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -808,14 +815,14 @@ State 42
     tSTRINGVAL   shift, and go to state 48
 
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 66
 
 
 State 43
 
-   78 primary_exp: tLPAREN . exp tRPAREN
+   77 primary_exp: tLPAREN . exp tRPAREN
 
     tLEN         shift, and go to state 37
     tCAP         shift, and go to state 38
@@ -824,7 +831,7 @@ State 43
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -832,8 +839,8 @@ State 43
     tSTRINGVAL   shift, and go to state 48
 
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 67
 
 
@@ -884,30 +891,31 @@ State 49
 
 State 50
 
-   76 primary_exp: func_call .
+   79 exp: func_call .
 
-    $default  reduce using rule 76 (primary_exp)
+    $default  reduce using rule 79 (exp)
 
 
 State 51
 
-   80 exp: primary_exp .
+   76 primary_exp: id_exp .
+   80 exp: id_exp . index
 
-    $default  reduce using rule 80 (exp)
+    tLBRACKET  shift, and go to state 69
+
+    $default  reduce using rule 76 (primary_exp)
+
+    index  go to state 70
 
 
 State 52
 
-   72 func_call: id_exp . tLPAREN exp_listpe tRPAREN
-   75 primary_exp: id_exp .
-   77            | id_exp . index
+   72 func_call: primary_exp . tLPAREN exp_listpe tRPAREN
+   78 exp: primary_exp .
 
-    tLPAREN    shift, and go to state 69
-    tLBRACKET  shift, and go to state 70
+    tLPAREN  shift, and go to state 71
 
-    $default  reduce using rule 75 (primary_exp)
-
-    index  go to state 71
+    $default  reduce using rule 78 (exp)
 
 
 State 53
@@ -974,7 +982,7 @@ State 55
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -983,31 +991,25 @@ State 55
 
     exp_list     go to state 91
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 53
 
 
 State 56
 
-   25 param: tIDENTIFIER type .
+   27 paramsne: paramsne tCOMMA . param
 
-    $default  reduce using rule 25 (param)
+    tIDENTIFIER  shift, and go to state 3
+
+    param   go to state 92
+    id_exp  go to state 34
 
 
 State 57
 
-   27 paramsne: paramsne tCOMMA . param
-
-    tIDENTIFIER  shift, and go to state 31
-
-    param  go to state 92
-
-
-State 58
-
-   12 func_decl: tFUNC tIDENTIFIER tLPAREN paramspe tRPAREN . blockstmt
-   13          | tFUNC tIDENTIFIER tLPAREN paramspe tRPAREN . type blockstmt
+   12 func_decl: tFUNC id_exp tLPAREN paramspe tRPAREN . blockstmt
+   13          | tFUNC id_exp tLPAREN paramspe tRPAREN . type blockstmt
 
     tLBRACE      shift, and go to state 93
     tLPAREN      shift, and go to state 24
@@ -1016,6 +1018,13 @@ State 58
 
     type       go to state 94
     blockstmt  go to state 95
+
+
+State 58
+
+   25 param: id_exp type .
+
+    $default  reduce using rule 25 (param)
 
 
 State 59
@@ -1047,7 +1056,7 @@ State 61
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1055,8 +1064,8 @@ State 61
     tSTRINGVAL   shift, and go to state 48
 
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 97
 
 
@@ -1071,7 +1080,7 @@ State 62
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1079,8 +1088,8 @@ State 62
     tSTRINGVAL   shift, and go to state 48
 
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 98
 
 
@@ -1190,7 +1199,7 @@ State 66
 
 State 67
 
-   78 primary_exp: tLPAREN exp . tRPAREN
+   77 primary_exp: tLPAREN exp . tRPAREN
    83 exp: exp . tPLUS exp
    84    | exp . tMINUS exp
    85    | exp . tTIMES exp
@@ -1244,7 +1253,7 @@ State 68
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1252,40 +1261,12 @@ State 68
     tSTRINGVAL   shift, and go to state 48
 
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 100
 
 
 State 69
-
-   72 func_call: id_exp tLPAREN . exp_listpe tRPAREN
-
-    tLEN         shift, and go to state 37
-    tCAP         shift, and go to state 38
-    tPLUS        shift, and go to state 39
-    tMINUS       shift, and go to state 40
-    tBWXOR       shift, and go to state 41
-    tBANG        shift, and go to state 42
-    tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
-    tINTVAL      shift, and go to state 44
-    tFLOATVAL    shift, and go to state 45
-    tBOOLVAL     shift, and go to state 46
-    tRUNEVAL     shift, and go to state 47
-    tSTRINGVAL   shift, and go to state 48
-
-    $default  reduce using rule 24 (exp_listpe)
-
-    exp_list     go to state 101
-    exp_listpe   go to state 102
-    func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
-    exp          go to state 53
-
-
-State 70
 
    73 index: tLBRACKET . exp tRBRACKET
    74      | tLBRACKET . exp tRBRACKET index
@@ -1297,7 +1278,7 @@ State 70
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1305,16 +1286,44 @@ State 70
     tSTRINGVAL   shift, and go to state 48
 
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
-    exp          go to state 103
+    id_exp       go to state 51
+    primary_exp  go to state 52
+    exp          go to state 101
+
+
+State 70
+
+   80 exp: id_exp index .
+
+    $default  reduce using rule 80 (exp)
 
 
 State 71
 
-   77 primary_exp: id_exp index .
+   72 func_call: primary_exp tLPAREN . exp_listpe tRPAREN
 
-    $default  reduce using rule 77 (primary_exp)
+    tLEN         shift, and go to state 37
+    tCAP         shift, and go to state 38
+    tPLUS        shift, and go to state 39
+    tMINUS       shift, and go to state 40
+    tBWXOR       shift, and go to state 41
+    tBANG        shift, and go to state 42
+    tLPAREN      shift, and go to state 43
+    tIDENTIFIER  shift, and go to state 3
+    tINTVAL      shift, and go to state 44
+    tFLOATVAL    shift, and go to state 45
+    tBOOLVAL     shift, and go to state 46
+    tRUNEVAL     shift, and go to state 47
+    tSTRINGVAL   shift, and go to state 48
+
+    $default  reduce using rule 24 (exp_listpe)
+
+    exp_list     go to state 102
+    exp_listpe   go to state 103
+    func_call    go to state 50
+    id_exp       go to state 51
+    primary_exp  go to state 52
+    exp          go to state 53
 
 
 State 72
@@ -1328,7 +1337,7 @@ State 72
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1336,8 +1345,8 @@ State 72
     tSTRINGVAL   shift, and go to state 48
 
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 104
 
 
@@ -1352,7 +1361,7 @@ State 73
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1360,8 +1369,8 @@ State 73
     tSTRINGVAL   shift, and go to state 48
 
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 105
 
 
@@ -1376,7 +1385,7 @@ State 74
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1384,8 +1393,8 @@ State 74
     tSTRINGVAL   shift, and go to state 48
 
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 106
 
 
@@ -1400,7 +1409,7 @@ State 75
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1408,8 +1417,8 @@ State 75
     tSTRINGVAL   shift, and go to state 48
 
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 107
 
 
@@ -1424,7 +1433,7 @@ State 76
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1432,8 +1441,8 @@ State 76
     tSTRINGVAL   shift, and go to state 48
 
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 108
 
 
@@ -1448,7 +1457,7 @@ State 77
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1456,8 +1465,8 @@ State 77
     tSTRINGVAL   shift, and go to state 48
 
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 109
 
 
@@ -1472,7 +1481,7 @@ State 78
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1480,8 +1489,8 @@ State 78
     tSTRINGVAL   shift, and go to state 48
 
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 110
 
 
@@ -1496,7 +1505,7 @@ State 79
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1504,8 +1513,8 @@ State 79
     tSTRINGVAL   shift, and go to state 48
 
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 111
 
 
@@ -1520,7 +1529,7 @@ State 80
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1528,8 +1537,8 @@ State 80
     tSTRINGVAL   shift, and go to state 48
 
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 112
 
 
@@ -1544,7 +1553,7 @@ State 81
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1552,8 +1561,8 @@ State 81
     tSTRINGVAL   shift, and go to state 48
 
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 113
 
 
@@ -1568,7 +1577,7 @@ State 82
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1576,8 +1585,8 @@ State 82
     tSTRINGVAL   shift, and go to state 48
 
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 114
 
 
@@ -1592,7 +1601,7 @@ State 83
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1600,8 +1609,8 @@ State 83
     tSTRINGVAL   shift, and go to state 48
 
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 115
 
 
@@ -1616,7 +1625,7 @@ State 84
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1624,8 +1633,8 @@ State 84
     tSTRINGVAL   shift, and go to state 48
 
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 116
 
 
@@ -1640,7 +1649,7 @@ State 85
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1648,8 +1657,8 @@ State 85
     tSTRINGVAL   shift, and go to state 48
 
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 117
 
 
@@ -1664,7 +1673,7 @@ State 86
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1672,8 +1681,8 @@ State 86
     tSTRINGVAL   shift, and go to state 48
 
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 118
 
 
@@ -1688,7 +1697,7 @@ State 87
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1696,8 +1705,8 @@ State 87
     tSTRINGVAL   shift, and go to state 48
 
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 119
 
 
@@ -1712,7 +1721,7 @@ State 88
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1720,8 +1729,8 @@ State 88
     tSTRINGVAL   shift, and go to state 48
 
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 120
 
 
@@ -1736,7 +1745,7 @@ State 89
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1744,8 +1753,8 @@ State 89
     tSTRINGVAL   shift, and go to state 48
 
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 121
 
 
@@ -1760,7 +1769,7 @@ State 90
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1768,8 +1777,8 @@ State 90
     tSTRINGVAL   shift, and go to state 48
 
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 122
 
 
@@ -1801,8 +1810,8 @@ State 93
     tIF          shift, and go to state 126
     tRETURN      shift, and go to state 127
     tSWITCH      shift, and go to state 128
-    tTYPE        shift, and go to state 7
-    tVAR         shift, and go to state 8
+    tTYPE        shift, and go to state 8
+    tVAR         shift, and go to state 9
     tPRINT       shift, and go to state 129
     tPRINTLN     shift, and go to state 130
     tLEN         shift, and go to state 37
@@ -1814,7 +1823,7 @@ State 93
     tLBRACE      shift, and go to state 93
     tLPAREN      shift, and go to state 43
     tRBRACE      shift, and go to state 131
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -1840,14 +1849,14 @@ State 93
     printstmt    go to state 146
     blockstmt    go to state 147
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 148
 
 
 State 94
 
-   13 func_decl: tFUNC tIDENTIFIER tLPAREN paramspe tRPAREN type . blockstmt
+   13 func_decl: tFUNC id_exp tLPAREN paramspe tRPAREN type . blockstmt
 
     tLBRACE  shift, and go to state 93
 
@@ -1856,7 +1865,7 @@ State 94
 
 State 95
 
-   12 func_decl: tFUNC tIDENTIFIER tLPAREN paramspe tRPAREN blockstmt .
+   12 func_decl: tFUNC id_exp tLPAREN paramspe tRPAREN blockstmt .
 
     $default  reduce using rule 12 (func_decl)
 
@@ -1960,9 +1969,9 @@ State 98
 
 State 99
 
-   78 primary_exp: tLPAREN exp tRPAREN .
+   77 primary_exp: tLPAREN exp tRPAREN .
 
-    $default  reduce using rule 78 (primary_exp)
+    $default  reduce using rule 77 (primary_exp)
 
 
 State 100
@@ -2013,23 +2022,6 @@ State 100
 
 State 101
 
-   22 exp_list: exp_list . tCOMMA exp
-   23 exp_listpe: exp_list .
-
-    tCOMMA  shift, and go to state 68
-
-    $default  reduce using rule 23 (exp_listpe)
-
-
-State 102
-
-   72 func_call: id_exp tLPAREN exp_listpe . tRPAREN
-
-    tRPAREN  shift, and go to state 152
-
-
-State 103
-
    73 index: tLBRACKET exp . tRBRACKET
    74      | tLBRACKET exp . tRBRACKET index
    83 exp: exp . tPLUS exp
@@ -2071,7 +2063,24 @@ State 103
     tNOTEQ       shift, and go to state 88
     tLESSEQ      shift, and go to state 89
     tGREATEREQ   shift, and go to state 90
-    tRBRACKET    shift, and go to state 153
+    tRBRACKET    shift, and go to state 152
+
+
+State 102
+
+   22 exp_list: exp_list . tCOMMA exp
+   23 exp_listpe: exp_list .
+
+    tCOMMA  shift, and go to state 68
+
+    $default  reduce using rule 23 (exp_listpe)
+
+
+State 103
+
+   72 func_call: primary_exp tLPAREN exp_listpe . tRPAREN
+
+    tRPAREN  shift, and go to state 153
 
 
 State 104
@@ -2741,7 +2750,7 @@ State 125
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -2758,8 +2767,8 @@ State 125
     assignstmt   go to state 142
     incdecstmt   go to state 145
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 158
 
 
@@ -2776,7 +2785,7 @@ State 126
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -2784,8 +2793,8 @@ State 126
     tSTRINGVAL   shift, and go to state 48
 
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 159
 
 
@@ -2801,7 +2810,7 @@ State 127
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -2811,8 +2820,8 @@ State 127
     $default  reduce using rule 45 (returnstmt)
 
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 160
 
 
@@ -2829,7 +2838,7 @@ State 128
     tBANG        shift, and go to state 42
     tLBRACE      shift, and go to state 161
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -2837,8 +2846,8 @@ State 128
     tSTRINGVAL   shift, and go to state 48
 
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 162
 
 
@@ -2888,8 +2897,8 @@ State 134
     tIF          shift, and go to state 126
     tRETURN      shift, and go to state 127
     tSWITCH      shift, and go to state 128
-    tTYPE        shift, and go to state 7
-    tVAR         shift, and go to state 8
+    tTYPE        shift, and go to state 8
+    tVAR         shift, and go to state 9
     tPRINT       shift, and go to state 129
     tPRINTLN     shift, and go to state 130
     tLEN         shift, and go to state 37
@@ -2901,7 +2910,7 @@ State 134
     tLBRACE      shift, and go to state 93
     tLPAREN      shift, and go to state 43
     tRBRACE      shift, and go to state 165
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -2926,8 +2935,8 @@ State 134
     printstmt    go to state 146
     blockstmt    go to state 147
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 148
 
 
@@ -3079,7 +3088,7 @@ State 148
 
 State 149
 
-   13 func_decl: tFUNC tIDENTIFIER tLPAREN paramspe tRPAREN type blockstmt .
+   13 func_decl: tFUNC id_exp tLPAREN paramspe tRPAREN type blockstmt .
 
     $default  reduce using rule 13 (func_decl)
 
@@ -3100,21 +3109,21 @@ State 151
 
 State 152
 
-   72 func_call: id_exp tLPAREN exp_listpe tRPAREN .
-
-    $default  reduce using rule 72 (func_call)
-
-
-State 153
-
    73 index: tLBRACKET exp tRBRACKET .
    74      | tLBRACKET exp tRBRACKET . index
 
-    tLBRACKET  shift, and go to state 70
+    tLBRACKET  shift, and go to state 69
 
     $default  reduce using rule 73 (index)
 
     index  go to state 178
+
+
+State 153
+
+   72 func_call: primary_exp tLPAREN exp_listpe tRPAREN .
+
+    $default  reduce using rule 72 (func_call)
 
 
 State 154
@@ -3366,7 +3375,7 @@ State 163
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -3375,11 +3384,11 @@ State 163
 
     $default  reduce using rule 24 (exp_listpe)
 
-    exp_list     go to state 101
+    exp_list     go to state 102
     exp_listpe   go to state 188
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 53
 
 
@@ -3394,7 +3403,7 @@ State 164
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -3403,11 +3412,11 @@ State 164
 
     $default  reduce using rule 24 (exp_listpe)
 
-    exp_list     go to state 101
+    exp_list     go to state 102
     exp_listpe   go to state 189
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 53
 
 
@@ -3436,7 +3445,7 @@ State 167
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -3445,8 +3454,8 @@ State 167
 
     exp_list     go to state 190
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 53
 
 
@@ -3545,7 +3554,7 @@ State 180
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -3556,8 +3565,8 @@ State 180
 
     expstmt      go to state 191
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 192
 
 
@@ -3583,7 +3592,7 @@ State 182
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -3592,8 +3601,8 @@ State 182
 
     exp_list     go to state 194
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 53
 
 
@@ -3754,8 +3763,8 @@ State 195
     tIF          shift, and go to state 126
     tRETURN      shift, and go to state 127
     tSWITCH      shift, and go to state 128
-    tTYPE        shift, and go to state 7
-    tVAR         shift, and go to state 8
+    tTYPE        shift, and go to state 8
+    tVAR         shift, and go to state 9
     tPRINT       shift, and go to state 129
     tPRINTLN     shift, and go to state 130
     tLEN         shift, and go to state 37
@@ -3766,7 +3775,7 @@ State 195
     tBANG        shift, and go to state 42
     tLBRACE      shift, and go to state 93
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -3794,8 +3803,8 @@ State 195
     printstmt     go to state 146
     blockstmt     go to state 147
     func_call     go to state 50
-    primary_exp   go to state 51
-    id_exp        go to state 52
+    id_exp        go to state 51
+    primary_exp   go to state 52
     exp           go to state 148
 
 
@@ -3845,7 +3854,7 @@ State 201
     tBWXOR       shift, and go to state 41
     tBANG        shift, and go to state 42
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -3860,8 +3869,8 @@ State 201
     assignstmt   go to state 142
     incdecstmt   go to state 145
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 148
 
 
@@ -3889,8 +3898,8 @@ State 204
     tIF          shift, and go to state 126
     tRETURN      shift, and go to state 127
     tSWITCH      shift, and go to state 128
-    tTYPE        shift, and go to state 7
-    tVAR         shift, and go to state 8
+    tTYPE        shift, and go to state 8
+    tVAR         shift, and go to state 9
     tPRINT       shift, and go to state 129
     tPRINTLN     shift, and go to state 130
     tLEN         shift, and go to state 37
@@ -3901,7 +3910,7 @@ State 204
     tBANG        shift, and go to state 42
     tLBRACE      shift, and go to state 93
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -3929,8 +3938,8 @@ State 204
     printstmt     go to state 146
     blockstmt     go to state 147
     func_call     go to state 50
-    primary_exp   go to state 51
-    id_exp        go to state 52
+    id_exp        go to state 51
+    primary_exp   go to state 52
     exp           go to state 148
 
 
@@ -3945,8 +3954,8 @@ State 205
     tIF          shift, and go to state 126
     tRETURN      shift, and go to state 127
     tSWITCH      shift, and go to state 128
-    tTYPE        shift, and go to state 7
-    tVAR         shift, and go to state 8
+    tTYPE        shift, and go to state 8
+    tVAR         shift, and go to state 9
     tPRINT       shift, and go to state 129
     tPRINTLN     shift, and go to state 130
     tLEN         shift, and go to state 37
@@ -3957,7 +3966,7 @@ State 205
     tBANG        shift, and go to state 42
     tLBRACE      shift, and go to state 93
     tLPAREN      shift, and go to state 43
-    tIDENTIFIER  shift, and go to state 16
+    tIDENTIFIER  shift, and go to state 3
     tINTVAL      shift, and go to state 44
     tFLOATVAL    shift, and go to state 45
     tBOOLVAL     shift, and go to state 46
@@ -3983,8 +3992,8 @@ State 205
     printstmt    go to state 146
     blockstmt    go to state 147
     func_call    go to state 50
-    primary_exp  go to state 51
-    id_exp       go to state 52
+    id_exp       go to state 51
+    primary_exp  go to state 52
     exp          go to state 148
 
 
