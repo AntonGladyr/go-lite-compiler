@@ -189,6 +189,15 @@ ESCAPE [abfnrtv\\'"]
 			}
 		}
 
+<<EOF>>		{
+			if (insertSemicolon()) {
+				cout << (g_tokens ? "tSEMICOLON\n" : "");
+				RETURN(tSEMICOLON);	
+			}
+
+			yyterminate();
+		}
+
 ([a-zA-Z]|"_")([a-zA-Z]|[0-9]|"_")* {
     	yylval.identifier = new std::string(yytext, yyleng);
     	if (g_tokens) cout << "tIDENTIFIER(" << yytext << ")" << endl;
