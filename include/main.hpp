@@ -5,6 +5,7 @@
 #include "AST/Node.hpp"
 #include "Services/Visitor.hpp"
 #include "AST/ASTTraversal.hpp"
+#include "Services/Weeder.hpp"
 #include "Services/PrettyPrinter.hpp"
 #include "Services/CodeGenerator.hpp"
 #include "SymbolTable/SymbolTable.hpp"
@@ -14,6 +15,5 @@ int yylex();
 int g_tokens;
 
 Program *program = NULL;
-SymbolTable *symbolTable = NULL;
 
 #endif /* !MAIN_HPP */

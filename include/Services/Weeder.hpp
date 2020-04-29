@@ -32,6 +32,11 @@ class Weeder : public Visitor {
 		
 		void terminate();
 		void weedOut(Program *prg);
+		void checkAssignEquality(
+			int lhsSize,
+			int rhsSize,
+			Node *node
+		);
 		
 		virtual void visit(Program *prg) override;
 		virtual void visit(VariableDeclaration *varDecl) override;

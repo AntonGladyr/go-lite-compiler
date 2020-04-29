@@ -7,7 +7,9 @@
 class FunctionDeclaration;
 
 class Statement : public Node {
-	public:	
+	public:
+		Node *parentNode = NULL;
+		
 		virtual void accept(Visitor& v) { };
 		virtual std::string toString() { };
 

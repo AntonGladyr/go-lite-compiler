@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include "Services/SymbolTableBuilder.hpp"
+#include "Services/Weeder.hpp"
 #include "SymbolTable/SymbolTable.hpp"
 #include "SymbolTable/Symbol.hpp"
 #include "AST/ASTTraversal.hpp"
@@ -12,7 +13,11 @@ SymbolTable *SymbolTableBuilder::build(Program *prg, bool _isSymbolMode) {
 	//copy program pointer for deallocation
 	program = prg;
 	isSymbolMode = _isSymbolMode;
-
+	
+	// weed out the program
+	Weeder weeder;
+	weeder.weedOut(program);
+	
 	ss << "{" << std::endl;
 	numTabs++;
 	symbolTable = new SymbolTable();	
@@ -153,27 +158,6 @@ void SymbolTableBuilder::checkIdName(Node *node) {
 			<< idExp->name << " must be a function" << std::endl;
 		terminate();
 	}
-}
-
-// check if the number of ids is equal to the number of expressions
-void SymbolTableBuilder::checkAssignEquality(
-		int lhsSize,
-		int rhsSize,
-		Node *node
-		) {
-	if (rhsSize == 0) return;
-
-	if (lhsSize != rhsSize) {
-		if (isSymbolMode) std::cerr << ss.str();
-		std::cerr << "Error: (line " << node->lineno << ") ";
-		if (typeid(VariableDeclaration) == typeid(*node))
-			std::cerr << "variable declaration ";
-		if (typeid(AssignStatement) == typeid(*node))
-			std::cerr << "assignment ";
-		std::cerr << "lhs(" << lhsSize << ")"
-			<< " != rhs(" << rhsSize << ")" << std::endl;
-		terminate();
-	}	
 }
 
 // throws an error if call of an init function occurs
@@ -438,8 +422,21 @@ void SymbolTableBuilder::checkReturnAtEndOfFunc(Statement *stmt) {
 	if ( typeid(ReturnStatement) == typeid(*stmt) ) return;
 	
 	if ( typeid(ForStatement) == typeid(*stmt) ) {
+		bool hasBreakStmt = false;
+		
 		ForStatement *forStmt = (ForStatement*)stmt;
-		return;
+		
+		for(auto const& s : *(forStmt->blockStmt->stmtList)) {
+			if ( typeid(BreakStatement) == typeid(*s) ) {
+				hasBreakStmt = true;
+			}
+			
+			if ( typeid(IfElseStatement) == typeid(*s) ) {
+				hasBreakStmt = hasBreakInIfStmt(s);
+			}
+		}
+		
+		if (!hasBreakStmt) return;
 		/*if (forStmt->exp == NULL && forStmt->postStmt == NULL) {
 			bool hasBreakStmt = false;
 			
@@ -525,6 +522,65 @@ void SymbolTableBuilder::checkIsFuncType(FunctionCallExp *funcCallExp) {
 				             << " is not a function type" << std::endl;
 		terminate();
 	}
+}
+
+bool SymbolTableBuilder::hasBreakInIfStmt(Statement *ifStmt) {
+	if ( typeid(IfElseStatement) == typeid(*ifStmt) ) {
+		IfElseStatement *ifElseStmt = (IfElseStatement*)ifStmt;
+		
+		// check IF block
+		if ( ifElseStmt->blockStmt != NULL ) {
+			for(auto const& statement : *(ifElseStmt->blockStmt->stmtList)) {
+				if (typeid(BreakStatement) == typeid(*statement)) return true;
+
+				if ( typeid(IfElseStatement) == typeid(*statement) &&
+				     hasBreakInIfStmt(statement)
+				) return true;
+			}
+		}
+
+		
+		Statement *ifStmt = ifElseStmt->ifStmt;	
+		// check ELSE IF blocks and nested ELSE block
+		while(ifStmt) {
+			IfElseStatement *ifBlock = (IfElseStatement*)ifStmt;
+			
+			for(auto const& statement : *(ifBlock->blockStmt->stmtList)) {
+				if (typeid(BreakStatement) == typeid(*statement)) return true;
+
+				if ( typeid(IfElseStatement) == typeid(*statement) && 
+				     hasBreakInIfStmt(statement)
+				) return true;
+			}
+
+			
+			if (ifBlock->elseBlockStmt) {
+				for(auto const& statement : *(ifBlock->elseBlockStmt->stmtList)) {
+					if (typeid(BreakStatement) == typeid(*statement)) return true;
+
+					if ( typeid(IfElseStatement) == typeid(*statement) && 
+					     	hasBreakInIfStmt(statement)
+					) return true;
+				}
+
+			}
+			
+			ifStmt = ifBlock->ifStmt;
+		}
+		
+		// check ELSE block if there is no ELSE IF blocks
+		if (ifStmt == NULL && ifElseStmt->elseBlockStmt) {	
+			for(auto const& statement : *(ifElseStmt->elseBlockStmt->stmtList)) {
+				if (typeid(BreakStatement) == typeid(*statement)) return true;
+
+				if ( typeid(IfElseStatement) == typeid(*statement) && 
+				     hasBreakInIfStmt(statement)
+				) return true;
+			}
+
+		}	
+	}
+
 }
 
 // throws an error if the given expression is not an array
@@ -653,10 +709,6 @@ void SymbolTableBuilder::visit(VariableDeclaration *varDecl) {
 			ASTTraversal::traverse(exp, *this);	
 		}	
 	}
-
-	//check if number of ids equals to the number of the expressions
-	if (varDecl->expList)
-		checkAssignEquality(varDecl->idList->size(), varDecl->expList->size(), varDecl);
 	
 	std::vector<IdentifierExp*>::reverse_iterator varIter = varDecl->idList->rbegin();
 	std::vector<Expression*>::reverse_iterator expIter; 
@@ -838,14 +890,7 @@ void SymbolTableBuilder::visit(FunctionDeclaration *funcDecl) {
 	if (funcDecl->typeName) {
 		checkTypeName(funcDecl->typeName);
 		
-		// terminate if missing return at end of function
-		//if ( funcDecl->blockStmt->stmtList != NULL && 
-		   //  funcDecl->blockStmt->stmtList->size() != 0
-		//) {
-			//checkReturnAtEndOfFunc(funcDecl->blockStmt->stmtList->back());
-			checkReturnAtEndOfFunc(funcDecl->blockStmt);
-
-		//}
+		checkReturnAtEndOfFunc(funcDecl->blockStmt);
 		
 		indexes = funcDecl->typeName->indexes;
 	}
@@ -888,17 +933,15 @@ void SymbolTableBuilder::visit(BlockStatement *blockStmt) {
 		) {	
 			insertFuncParams(blockStmt->parentNode);
 			FunctionDeclaration *funcDecl = (FunctionDeclaration*)blockStmt->parentNode;
-			blockStmt->functionNode = funcDecl;
+			blockStmt->functionNode = funcDecl;	
 		}
 		
 		// save pointer to the base (function) block in each statement
-		if (blockStmt->stmtList) {	
+		if (blockStmt->stmtList) {
 			for(auto &stmt : *(blockStmt->stmtList)) {	
-				stmt->functionNode = blockStmt->functionNode;
-			}	
+				stmt->functionNode = blockStmt->functionNode;	
+			}
 		}
-
-		// save pointer to the function in block and return statements
 		
 	} else {
 		// close scope
@@ -942,9 +985,7 @@ void SymbolTableBuilder::visit(AssignStatement *assignStmt) {
 			// check if a variable assigns to main() function call throw an error
 			checkVoidFunc(exp);
 		}
-	}
-	
-	checkAssignEquality(assignStmt->lhs->size(), assignStmt->rhs->size(), assignStmt);
+	}	
 
 	std::vector<Expression*>::iterator lhsIter = assignStmt->lhs->begin();
 	std::vector<Expression*>::iterator rhsIter = assignStmt->rhs->begin();
@@ -977,35 +1018,27 @@ void SymbolTableBuilder::visit(ExpressionStatement *expStmt) {
 	   expressions are allowed to be used as statements, i.e. foo(x, y) can be used as a statement, but x-1 cannot.
 	*/
 	
-	// if a given expression is not a function call, throw an error	
-	if (typeid(FunctionCallExp) != typeid(*(expStmt->exp))) {
+	FunctionCallExp *funcCall = (FunctionCallExp*)expStmt->exp;
+		
+	checkIsFuncType(funcCall);
+	
+	// save function id to idExp, so it has IdentifierExp type instead of Expression
+	funcCall->idExp = (IdentifierExp*)funcCall->_identifierExp;
+	expStmt->exp = funcCall;
+			
+	Symbol *s = symbolTable->getSymbol(symbolTable, funcCall->idExp->name);
+		
+	if (s == NULL) {
+		std::cerr << "Error: (line " << funcCall->idExp->lineno << ") "
+			  << "function " << funcCall->idExp->name << " is not declared" << std::endl;
+		terminate();
+	}
+		
+	if (hasTypeName(funcCall->idExp)) {
 		if (isSymbolMode) std::cerr << ss.str();
 		std::cerr << "Error: (line " << expStmt->exp->lineno << ") "
 			  << "expression statement must be a function call" << std::endl;
 		terminate();
-	} else {	
-		FunctionCallExp *funcCall = (FunctionCallExp*)expStmt->exp;
-		
-		checkIsFuncType(funcCall);
-	
-		// save function id to idExp, so it has IdentifierExp type instead of Expression
-		funcCall->idExp = (IdentifierExp*)funcCall->_identifierExp;
-		expStmt->exp = funcCall;
-		
-		Symbol *s = symbolTable->getSymbol(symbolTable, funcCall->idExp->name);
-		
-		if (s == NULL) {
-			std::cerr << "Error: (line " << funcCall->idExp->lineno << ") "
-				  << "function " << funcCall->idExp->name << " is not declared" << std::endl;
-			terminate();
-		}
-		
-		if (hasTypeName(funcCall->idExp)) {
-			if (isSymbolMode) std::cerr << ss.str();
-			std::cerr << "Error: (line " << expStmt->exp->lineno << ") "
-			  	  << "expression statement must be a function call" << std::endl;
-			terminate();
-		}
 	}
 	
 	ASTTraversal::traverse(expStmt->exp, *this);

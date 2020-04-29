@@ -8,8 +8,7 @@
 
 class BlockStatement : public Statement {
 	public:
-		std::vector<Statement*> *stmtList = NULL;
-		Node *parentNode = NULL;
+		std::vector<Statement*> *stmtList = NULL;	
 		
 		virtual void accept(Visitor& v) override;
 		virtual std::string toString();

@@ -234,7 +234,7 @@ ESCAPE [abfnrtv\\'"]
 	RETURN(tRUNEVAL);
 }
 
-\"([^"]|\\\")*\" {
+\"([^"\n\\]|\\\"|\\{ESCAPE})*\" {
 	yylval.stringval = new string(yytext, yyleng);
     	if (g_tokens) cout << "tSTRINGVAL(" << yytext << ")" << endl;
     	RETURN(tSTRINGVAL);

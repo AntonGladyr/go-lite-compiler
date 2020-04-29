@@ -1,7 +1,9 @@
 package test
 
 func t1() int {
-	return (5)(5)
+	for ;; {
+		break
+	}
 }
 
 func t2() int {

@@ -32,10 +32,10 @@ int main(int argc, char *argv[]){
         	return 0;
     	}
     	else if (!strcmp(argv[1], "parse")) {
-        	yyparse();
-		
-		//TODO: Weeder; split SymbolTable class into Weeder and SymbolTable	
-		
+        	yyparse();	
+	
+		Weeder weeder;
+		weeder.weedOut(program);	
         	std::cout << "OK" << std::endl;	
 		
 		delete program;
