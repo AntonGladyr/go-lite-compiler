@@ -4,6 +4,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include "SymbolTable/Symbol.hpp"
 #include "AST/Node.hpp"
 
 const std::string BASETYPE_UNDEFINED = "<infer>";
@@ -38,6 +39,7 @@ class TypeDescriptor {
 		std::string category;	 // there are 4 basic categories: type, constant, variable, function		
 		std::string baseType;    // there are 5 base types: bool, int, float64, rune, string
 		std::vector<int> *indexes = NULL; // array indexes
+		Symbol *symbol = NULL;	 // pointer to the symbol table
 		Node *node = NULL;	 // pointer to node in the AST
 
 		// there are 6 type groups: bool, comparable, ordered, numeric, string, integer

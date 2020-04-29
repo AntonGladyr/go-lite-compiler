@@ -437,26 +437,6 @@ void SymbolTableBuilder::checkReturnAtEndOfFunc(Statement *stmt) {
 		}
 		
 		if (!hasBreakStmt) return;
-		/*if (forStmt->exp == NULL && forStmt->postStmt == NULL) {
-			bool hasBreakStmt = false;
-			
-			if ( forStmt->blockStmt->stmtList == NULL ||
-			     ( forStmt->blockStmt->stmtList != NULL && 
-			       forStmt->blockStmt->stmtList->size() == 0 )
-			) return;
-			
-			for(auto const& s : *(forStmt->blockStmt->stmtList)) {
-				if ( typeid(BreakStatement) == typeid(*s) )
-					hasBreakStmt = true;
-			}
-			
-			if (!hasBreakStmt) return;
-		}*/
-		
-		/*if (forStmt->initStmt && forStmt->exp && forStmt->postStmt) {
-			checkReturnAtEndOfFunc(forStmt->blockStmt);
-			return;
-		}*/
 	}
 	
 	if ( typeid(IfElseStatement) == typeid(*stmt) ) {	
@@ -521,6 +501,37 @@ void SymbolTableBuilder::checkIsFuncType(FunctionCallExp *funcCallExp) {
 					     << funcCallExp->_identifierExp->toString()
 				             << " is not a function type" << std::endl;
 		terminate();
+	}
+}
+
+void SymbolTableBuilder::checkLvalues(std::vector<Expression*> *lhs) {	
+	if (lhs == NULL) return;
+	
+	bool isLvalue = true;
+	
+	for(auto const& exp : *(lhs)) {
+		if ( typeid(IdentifierExp) == typeid(*exp) ) {
+			IdentifierExp *id = (IdentifierExp*)exp;
+			Symbol *s = symbolTable->getSymbol(symbolTable, id->name);
+			
+			if (s->category.compare(CATEGORY_VAR) == 0) continue;
+		}
+	  
+		if ( typeid(ArrayExp) == typeid(*exp) ) {
+			ArrayExp *arr = (ArrayExp*)exp;
+			Symbol *s = symbolTable->getSymbol(symbolTable, arr->idExp->name);
+
+			if (s->category.compare(CATEGORY_VAR) == 0) continue;
+		}
+
+		isLvalue = false;
+		break;
+	}
+
+	if (!isLvalue) { 
+		std::cerr << "Error: (line " << lhs->front()->lineno << ") "
+			  << "assignment expected lvalue" << std::endl;
+		terminate(); 
 	}
 }
 
@@ -789,6 +800,9 @@ void SymbolTableBuilder::visit(VariableDeclaration *varDecl) {
 				  << (*varIter)->type.name << " in variable declaration" << std::endl;
 			terminate();
 		}
+
+		// save pointer to the symbol in symbolTable into type descriptor
+		(*varIter)->type.symbol = symbol;
 		
 		varIter++;
 		if (varDecl->expList) expIter++;
@@ -978,6 +992,8 @@ void SymbolTableBuilder::visit(AssignStatement *assignStmt) {
 		}
 	}
 
+	checkLvalues(assignStmt->lhs);
+
 	if (assignStmt->rhs) {
 		for(auto const& exp : *(assignStmt->rhs)) {
 			ASTTraversal::traverse(exp, *this);
@@ -989,11 +1005,24 @@ void SymbolTableBuilder::visit(AssignStatement *assignStmt) {
 
 	std::vector<Expression*>::iterator lhsIter = assignStmt->lhs->begin();
 	std::vector<Expression*>::iterator rhsIter = assignStmt->rhs->begin();
+	
+	/*std::cout << "symbol lhs: " << &(*lhsIter)->symbol << std::endl;
+	std::cout << "symbol rhs: " << &(*rhsIter)->symbol << std::endl;
+	std::cout << "node lhs: " << &(*lhsIter)->symbol->node << std::endl;
+	std::cout << "node rhs: " << &(*rhsIter)->symbol->node << std::endl;
+	std::cout << "lhs type: " << &(*lhsIter)->type.symbol << std::endl;
+	std::cout << "rhs type: " << &(*rhsIter)->type.symbol << std::endl;
+	std::cout << "lhs type: " << (*lhsIter)->type.symbol->baseType << std::endl;
+	std::cout << "rhs type: " << (*rhsIter)->type.symbol->baseType << std::endl;*/
+
+
 		
 	while ( lhsIter != assignStmt->lhs->end() && rhsIter != assignStmt->rhs->end() ) {	
 		if ( hasTypeName(*lhsIter) ||
 		     hasTypeName(*rhsIter) ||
-		     (*lhsIter)->type.name.compare((*rhsIter)->type.name) != 0
+		     (*lhsIter)->type.name.compare((*rhsIter)->type.name) != 0 /*||
+		     ( (*lhsIter)->type.name.compare((*rhsIter)->type.name) == 0 && // type name == typename
+		      &(*lhsIter)->type != &(*rhsIter)->type )*/
 		) {
 			std::cerr << "Error: (line " << (*lhsIter)->lineno << ") "
 			  	  << getReceivedTypeName(*rhsIter) << " is not assignment compatible with "
@@ -1394,7 +1423,8 @@ void SymbolTableBuilder::visit(BinaryOperatorExp *binOpExp) {
 	
 	else if ( binOpExp->lhs->type.isBoolType() && // bool
                   binOpExp->isBoolOperator() &&       // { ||, && }
-		  binOpExp->rhs->type.isBoolType()    // bool
+		  binOpExp->rhs->type.isBoolType() &&   // bool
+		  binOpExp->lhs->type.name.compare(binOpExp->rhs->type.name) == 0 // lhs type equals to the rhs type
 	) binOpExp->type = TypeDescriptor(
 				binOpExp->lhs->type.name,
 				BASETYPE_BOOL,
@@ -1405,7 +1435,7 @@ void SymbolTableBuilder::visit(BinaryOperatorExp *binOpExp) {
 	else if ( !isFuncLhs && // anything except func type
 		  binOpExp->isComparableOperator() && // { ==, != }
 		  !isFuncRhs && // anything except func type
-		  binOpExp->lhs->type.baseType.compare(binOpExp->rhs->type.baseType) == 0 // lhs type equals to the rhs type
+		  binOpExp->lhs->type.name.compare(binOpExp->rhs->type.name) == 0 // lhs type equals to the rhs type
 	) binOpExp->type = TypeDescriptor(
 				BASETYPE_BOOL,
 				BASETYPE_BOOL,
@@ -1415,7 +1445,8 @@ void SymbolTableBuilder::visit(BinaryOperatorExp *binOpExp) {
 	
 	else if ( binOpExp->lhs->type.isOrderedType() && // { int, float64, string }
 		  binOpExp->isOrderedOperator() &&       // { < , > , <= , >= }
-		  binOpExp->rhs->type.isOrderedType()    // { int, float64, string }
+		  binOpExp->rhs->type.isOrderedType() &&    // { int, float64, string }
+		  binOpExp->lhs->type.name.compare(binOpExp->rhs->type.name) == 0 // lhs type equals to the rhs type
 	) binOpExp->type = TypeDescriptor(
 				BASETYPE_BOOL,
 				BASETYPE_BOOL,
@@ -1425,7 +1456,8 @@ void SymbolTableBuilder::visit(BinaryOperatorExp *binOpExp) {
 		
 	else if ( binOpExp->lhs->type.isNumericType() && // { int, float64, rune }
 		  binOpExp->isNumericOperator() &&       // { + , - , * , / }
-		  binOpExp->rhs->type.isNumericType()    // { int, float64, rune }
+		  binOpExp->rhs->type.isNumericType() &&   // { int, float64, rune }
+		  binOpExp->lhs->type.name.compare(binOpExp->rhs->type.name) == 0 // lhs type equals to the rhs type
 	) binOpExp->type = TypeDescriptor(
 				binOpExp->lhs->type.name,
 				TypeDescriptor::resolveNumericType( binOpExp->lhs->type.baseType,
@@ -1436,7 +1468,8 @@ void SymbolTableBuilder::visit(BinaryOperatorExp *binOpExp) {
 	
 	else if ( binOpExp->lhs->type.isIntegerType() && // { int, rune }
 		  binOpExp->isIntegerOperator() &&       // { % , | , & , << , >> , &^ , ^ }
-		  binOpExp->rhs->type.isIntegerType()    // { int, rune }
+		  binOpExp->rhs->type.isIntegerType() &&   // { int, rune }
+		  binOpExp->lhs->type.name.compare(binOpExp->rhs->type.name) == 0 // lhs type equals to the rhs type
 	) binOpExp->type = TypeDescriptor(
 				binOpExp->lhs->type.name,
 				BASETYPE_INT,

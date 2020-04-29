@@ -164,6 +164,20 @@ void Weeder::visit(PrintStatement *printStmt) {
 
 void Weeder::visit(BreakStatement *breakStmt) {
 	if (breakStmt == NULL) return;
+	
+	Statement *stmt = (Statement*)breakStmt->parentNode;
+	
+	while(stmt) {
+		if ( typeid(SwitchStatement) == typeid(*stmt) ||
+		     typeid(ForStatement) == typeid(*stmt)
+		) return;
+		
+		stmt = (Statement*)stmt->parentNode;
+	}
+
+	std::cerr << "Error: (line " << breakStmt->lineno << ") "
+		  << "break must occur within a loop or switch context" << std::endl;;
+	terminate();
 }
 
 void Weeder::visit(ContinueStatement *continueStmt) {
