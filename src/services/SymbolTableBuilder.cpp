@@ -98,6 +98,9 @@ void SymbolTableBuilder::insertFuncParams(Node *node) {
 				// terminate if id already declared
 				if (symbol == NULL) terminate();
 
+				// save pointer to the symbol of the type into id symbol	
+				symbol->symbType = symbolTable->getSymbol(symbolTable, paramType.str());
+
 				// pass to stream for printing
 				ss << getTabs() << param->idExp->name << " [" << CATEGORY_VAR << "]"
 					<< " = " << paramType.str() << std::endl;
@@ -535,6 +538,39 @@ void SymbolTableBuilder::checkLvalues(std::vector<Expression*> *lhs) {
 	}
 }
 
+
+void SymbolTableBuilder::checkAssignTypes(Expression *lhs, Expression *rhs) {	
+	if ( hasTypeName(lhs) ||
+	     hasTypeName(rhs) ||
+	     lhs->type.name.compare(rhs->type.name) != 0
+	) {
+		std::cerr << "Error: (line " << lhs->lineno << ") "
+			  << getReceivedTypeName(rhs) << " is not assignment compatible with "
+			  << getReceivedTypeName(lhs) << " in assign statement" << std::endl;
+		terminate();
+	}
+	
+	if ( typeid(IdentifierExp) == typeid(*lhs) && 
+	     typeid(IdentifierExp) == typeid(*rhs)
+	) {
+		IdentifierExp *lhsExp = (IdentifierExp*)lhs;
+		IdentifierExp *rhsExp = (IdentifierExp*)rhs;
+		
+		Symbol *symbolLhs = symbolTable->getSymbol(symbolTable, lhsExp->name);
+		Symbol *symbolRhs = symbolTable->getSymbol(symbolTable, rhsExp->name);
+
+		/*std::cout << symbolLhs->symbType->name << " " << symbolLhs->symbType << std::endl;
+		std::cout << symbolRhs->symbType->name << " " << symbolRhs->symbType << std::endl;*/
+
+		if ( symbolLhs->symbType != symbolRhs->symbType ) {
+			std::cerr << "Error: (line " << lhs->lineno << ") "
+			  << getReceivedTypeName(rhs) << " is not assignment compatible with "
+			  << getReceivedTypeName(lhs) << " in assign statement" << std::endl;
+			terminate();
+		}
+	}	
+}
+
 bool SymbolTableBuilder::hasBreakInIfStmt(Statement *ifStmt) {
 	if ( typeid(IfElseStatement) == typeid(*ifStmt) ) {
 		IfElseStatement *ifElseStmt = (IfElseStatement*)ifStmt;
@@ -609,8 +645,8 @@ TypeDescriptor SymbolTableBuilder::resolveArrayExpType(ArrayExp *arrExp) {
 	VariableDeclaration *varDecl = NULL;
 	FunctionDeclaration *funcDecl = NULL;
 
-	Symbol *s = symbolTable->getSymbol(symbolTable, arrExp->idExp->name);	
-
+	Symbol *s = symbolTable->getSymbol(symbolTable, arrExp->idExp->name);
+	
 	// if the given node is not an identifier thow an error
 	if (typeid(IdentifierExp) != typeid(*(s->node)))
 		arrayIndexingError(arrExp);
@@ -801,8 +837,8 @@ void SymbolTableBuilder::visit(VariableDeclaration *varDecl) {
 			terminate();
 		}
 
-		// save pointer to the symbol in symbolTable into type descriptor
-		(*varIter)->type.symbol = symbol;
+		// save pointer to the symbol of the type into id symbol	
+		symbol->symbType = symbolTable->getSymbol(symbolTable, (*varIter)->type.name);
 		
 		varIter++;
 		if (varDecl->expList) expIter++;
@@ -1007,16 +1043,10 @@ void SymbolTableBuilder::visit(AssignStatement *assignStmt) {
 	std::vector<Expression*>::iterator rhsIter = assignStmt->rhs->begin();
 		
 	while ( lhsIter != assignStmt->lhs->end() && rhsIter != assignStmt->rhs->end() ) {
-		if ( hasTypeName(*lhsIter) ||
-		     hasTypeName(*rhsIter) ||
-		     (*lhsIter)->type.name.compare((*rhsIter)->type.name) != 0
-		) {
-			std::cerr << "Error: (line " << (*lhsIter)->lineno << ") "
-			  	  << getReceivedTypeName(*rhsIter) << " is not assignment compatible with "
-				  << getReceivedTypeName(*lhsIter) << " in assign statement" << std::endl;
-			terminate();
-		}
 		
+		// compare types
+		checkAssignTypes(*lhsIter, *rhsIter);
+			
 		// check if function name used as an identifier
 		checkIfFuncName(*lhsIter, *rhsIter);
 		

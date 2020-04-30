@@ -11,6 +11,7 @@ class IdentifierExp : public Expression {
 		std::string name;
 		Symbol *symbol = NULL;
 		Node *parentNode = NULL;
+		Symbol *typeSymbol = NULL; // pointer to the type in symbol table
 
 		virtual void accept(Visitor& v) override;
 		virtual std::string toString();

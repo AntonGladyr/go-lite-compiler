@@ -56,6 +56,7 @@ class SymbolTableBuilder : public Visitor {
 		void checkReturnAtEndOfFunc(Statement *stmt);
 		void checkIsFuncType(FunctionCallExp *funcCallExp);
 		void checkLvalues(std::vector<Expression*> *lhs);
+		void checkAssignTypes(Expression *lhs, Expression *rhs);
 		bool hasBreakInIfStmt(Statement *ifStmt);
 		void typeCompatibilityError(
 			int lineno,
