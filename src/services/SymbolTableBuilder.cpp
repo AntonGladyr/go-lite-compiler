@@ -1005,31 +1005,18 @@ void SymbolTableBuilder::visit(AssignStatement *assignStmt) {
 
 	std::vector<Expression*>::iterator lhsIter = assignStmt->lhs->begin();
 	std::vector<Expression*>::iterator rhsIter = assignStmt->rhs->begin();
-	
-	/*std::cout << "symbol lhs: " << &(*lhsIter)->symbol << std::endl;
-	std::cout << "symbol rhs: " << &(*rhsIter)->symbol << std::endl;
-	std::cout << "node lhs: " << &(*lhsIter)->symbol->node << std::endl;
-	std::cout << "node rhs: " << &(*rhsIter)->symbol->node << std::endl;
-	std::cout << "lhs type: " << &(*lhsIter)->type.symbol << std::endl;
-	std::cout << "rhs type: " << &(*rhsIter)->type.symbol << std::endl;
-	std::cout << "lhs type: " << (*lhsIter)->type.symbol->baseType << std::endl;
-	std::cout << "rhs type: " << (*rhsIter)->type.symbol->baseType << std::endl;*/
-
-
 		
-	while ( lhsIter != assignStmt->lhs->end() && rhsIter != assignStmt->rhs->end() ) {	
+	while ( lhsIter != assignStmt->lhs->end() && rhsIter != assignStmt->rhs->end() ) {
 		if ( hasTypeName(*lhsIter) ||
 		     hasTypeName(*rhsIter) ||
-		     (*lhsIter)->type.name.compare((*rhsIter)->type.name) != 0 /*||
-		     ( (*lhsIter)->type.name.compare((*rhsIter)->type.name) == 0 && // type name == typename
-		      &(*lhsIter)->type != &(*rhsIter)->type )*/
+		     (*lhsIter)->type.name.compare((*rhsIter)->type.name) != 0
 		) {
 			std::cerr << "Error: (line " << (*lhsIter)->lineno << ") "
 			  	  << getReceivedTypeName(*rhsIter) << " is not assignment compatible with "
 				  << getReceivedTypeName(*lhsIter) << " in assign statement" << std::endl;
 			terminate();
 		}
-	
+		
 		// check if function name used as an identifier
 		checkIfFuncName(*lhsIter, *rhsIter);
 		
@@ -1609,7 +1596,7 @@ void SymbolTableBuilder::visit(IdentifierExp *idExp) {
 				symbol->node
 			);
 
-	// save symbol pointer to the identifier expression
+	// save symbol pointer to the identifier expression	
 	idExp->symbol = symbol;
 }
 

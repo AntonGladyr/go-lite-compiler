@@ -19,7 +19,9 @@ std::string Program::toString() {
 std::string Program::preambleToCcode() {
 	std::stringstream ss;
 	ss << "#include <stdio.h>" << std::endl
-	   << "#include <string.h>" << std::endl << std::endl;
+	   << "#include <string.h>" << std::endl << std::endl
+	   << "_Bool true = 1;" << std::endl
+	   << "_Bool false = 0;" << std::endl << std::endl;
 	
 	return ss.str();
 }

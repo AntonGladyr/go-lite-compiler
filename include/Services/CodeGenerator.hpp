@@ -34,6 +34,7 @@ class CodeGenerator : public Visitor {
 		std::stringstream mainFuncCall;
 		std::stringstream initFuncCalls;
 		std::stringstream outCode; // for storing generated code
+		int tmpVarCounter = 0;
 		
 		void terminate();
 		void saveToFile(
@@ -43,7 +44,10 @@ class CodeGenerator : public Visitor {
 		);
 	
 	public:		
-		void emit(Program *prg, SymbolTable *st);
+		void emit(Program *prg, SymbolTable *st);	
+		void createTmpVar(VariableDeclaration *varDecl);
+		void assignTmpToVarDecl(VariableDeclaration *varDecl);
+		
 		virtual void visit(Program *prg) override;
 		virtual void visit(VariableDeclaration *varDecl) override;
 		virtual void visit(TypeDeclaration *typeDecl) override;

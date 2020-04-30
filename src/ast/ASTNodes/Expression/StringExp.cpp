@@ -29,9 +29,12 @@ void StringExp::findAndReplaceAll(std::string & data, std::string toSearch, std:
 }
 
 StringExp::StringExp(const std::string &_stringValue, int _lineno) : value(_stringValue), Expression(_lineno) {
-	if (value.front() == '\"' && value.back() == '\"')
+	if (value.front() == '\"' && value.back() == '\"') {
 		// interpreted string ("string")
-		value.erase(remove(value.begin(), value.end(), '\"'), value.end());
+		//value.erase(remove(value.begin(), value.end(), '\"'), value.end());
+		value.erase(0, 1);
+		value.erase(value.length() - 1, 1);
+	}
 	else {
 		// raw string  (`string`)
 		value.erase(remove(value.begin(), value.end(), '`'), value.end());

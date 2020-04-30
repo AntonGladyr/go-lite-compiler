@@ -46,6 +46,86 @@ void CodeGenerator::saveToFile(
 }
 
 
+void CodeGenerator::createTmpVar(VariableDeclaration *varDecl) {	
+	std::vector<IdentifierExp*>::reverse_iterator varIter = varDecl->idList->rbegin();
+	std::vector<Expression*>::reverse_iterator expIter;
+	
+	if (varDecl->expList)
+		expIter = varDecl->expList->rbegin();	
+		
+	while (varIter != varDecl->idList->rend()) {
+			
+		outCode << getTabs();
+		if (varDecl->typeName) {
+			//outCode << TypeDescriptorTable::getInstance().getTypeDescriptor((*varIter)->symbol->baseType);
+			outCode << TypeDescriptorTable::getInstance().getTypeDescriptor(varDecl->typeName->name);	
+		}
+		else {
+			if ((*expIter)->symbol)
+				outCode << (*expIter)->symbol->baseType;
+			else
+				outCode << TypeDescriptorTable::getInstance().getTypeDescriptor((*expIter)->type.baseType);	
+		}
+		
+		outCode << " " << kPrefix << (*varIter)->name << "_" << kTmpVar << "_" << tmpVarCounter;
+		// save counter to symbol
+		(*varIter)->symbol->tmpCounterNum = tmpVarCounter;
+		//increment counter
+		tmpVarCounter++;
+		
+		if (varDecl->typeName && varDecl->typeName->indexes) {
+			for(auto const& index : *(varDecl->typeName->indexes)) {
+					outCode << "[" << std::to_string(index) << "]";
+			}
+		}
+	
+		if (varDecl->expList) {
+			outCode << " = ";
+			
+			/*if (typeid(IdentifierExp) == typeid(*expIter)) {
+				outCode << kPrefix << (*expIter)->toString();
+			}
+			else {*/
+				ASTTraversal::traverse(*expIter, *this);
+			//}
+		}
+		
+		outCode << ";" << std::endl;
+		varIter++;
+		if (varDecl->expList) expIter++;
+	}
+}
+
+void CodeGenerator::assignTmpToVarDecl(VariableDeclaration *varDecl) {
+	std::vector<IdentifierExp*>::reverse_iterator varIter = varDecl->idList->rbegin();	
+	
+	while (varIter != varDecl->idList->rend()) {
+			
+		outCode << getTabs();
+		if (varDecl->typeName) {
+			//outCode << TypeDescriptorTable::getInstance().getTypeDescriptor((*varIter)->symbol->baseType);
+			outCode << TypeDescriptorTable::getInstance().getTypeDescriptor(varDecl->typeName->name);	
+		}
+		
+		outCode << " " << kPrefix << (*varIter)->name;	
+		
+		if (varDecl->typeName && varDecl->typeName->indexes) {
+			for(auto const& index : *(varDecl->typeName->indexes)) {
+					outCode << "[" << std::to_string(index) << "]";
+			}
+		}
+
+		//TODO: memcpy for arrays
+		
+		outCode << " = ";
+		outCode << kPrefix << (*varIter)->name << "_" << kTmpVar << "_" << (*varIter)->symbol->tmpCounterNum;
+		
+		outCode << ";" << std::endl;
+		varIter++;	
+	}
+
+}
+
 //=====================END OF HELPER FUNCTIONS=====================
 //=================================================================
 
@@ -65,49 +145,16 @@ void CodeGenerator::visit(Program *prg) {
 					mainFuncCall.str(), 
 					initFuncCalls.str()
 		);
-		//std::cout << outCode.str() << std::endl;
 		saveToFile(FILE_PATH, FILE_NAME, EXTENSION);
 	} 
 }
 
 void CodeGenerator::visit(VariableDeclaration *varDecl) {
 	if (varDecl == NULL) return;
-	
-	std::vector<IdentifierExp*>::reverse_iterator varIter = varDecl->idList->rbegin();
-	std::vector<Expression*>::reverse_iterator expIter;
-	if (varDecl->expList)
-		expIter = varDecl->expList->rbegin();
-	
-	while (varIter != varDecl->idList->rend()) {
-		
-		outCode << getTabs();
-		if (varDecl->typeName) {	
-			outCode << TypeDescriptorTable::getInstance().getTypeDescriptor((*varIter)->symbol->baseType);
-			
-			if (varDecl->typeName->indexes) {
-				for(auto const& index : *(varDecl->typeName->indexes)) {
-					outCode << "[" << std::to_string(index) << "]";
-				}
-			}
-		}
-		else {
-			if ((*expIter)->symbol)
-				outCode << (*expIter)->symbol->baseType;
-			else
-				outCode << TypeDescriptorTable::getInstance().getTypeDescriptor((*expIter)->type.baseType);
-		}
-		
-		outCode << " " << (*varIter)->name;
-	
-		if (varDecl->expList) {
-			outCode << " = ";
-			ASTTraversal::traverse(*expIter, *this);
-		}
-		
-		outCode << ";" << std::endl;
-		varIter++;
-		if (varDecl->expList) expIter++;
-	}	
+
+	createTmpVar(varDecl);
+	assignTmpToVarDecl(varDecl);
+	outCode << std::endl;
 }
 
 void CodeGenerator::visit(TypeDeclaration *typeDecl) {
@@ -241,42 +288,64 @@ void CodeGenerator::visit(SwitchStatement *switchStmt) {
 void CodeGenerator::visit(PrintStatement *printStmt) {
 	if (printStmt == NULL) return;
 	
-	std::string space;
+	std::stringstream ss;
+	ss << ", "; // expressions to print
 	
-	if (printStmt->isPrintln) space = " ";
-	else space = "";
-
 	outCode << getTabs() << "printf(\"";
 
 	for(auto const& exp: *(printStmt->expList)) {
 		if (exp->symbol) {
 			if (exp->symbol->baseType.compare(BASETYPE_STRING) == 0)
-				outCode << "%s" << space;
+				outCode << "%s";
 			else if (exp->symbol->baseType.compare(BASETYPE_INT) == 0)
-				outCode << "%d" << space;
+				outCode << "%d";
 			else if (exp->symbol->baseType.compare(BASETYPE_RUNE) == 0)
-				outCode << "%c" << space; 
+				outCode << "%c";
 			else if (exp->symbol->baseType.compare(BASETYPE_FLOAT) == 0)
-				outCode << "%f" << space;
-			else if (exp->symbol->baseType.compare(BASETYPE_BOOL) == 0) //TODO:fix for bool
-				outCode << "%d" << space;
+				outCode << "%f";
+			else if (exp->symbol->baseType.compare(BASETYPE_BOOL) == 0) {
+				outCode << "%s";
+				BoolExp *boolExp = (BoolExp*)boolExp;
+				ss << "(" << kPrefix << exp->toString() << " ? \"true\" : \"false\")";
+			}
 		}
 		else {
 			if (exp->type.baseType.compare(BASETYPE_STRING) == 0)
-				outCode << "%s" << space;
+				outCode << "%s";
 			else if (exp->type.baseType.compare(BASETYPE_INT) == 0)
-				outCode << "%d" << space;
+				outCode << "%d";
 			else if (exp->type.baseType.compare(BASETYPE_RUNE) == 0)
-				outCode << "%c" << space;
+				outCode << "%c";
 			else if (exp->type.baseType.compare(BASETYPE_FLOAT) == 0)
-				outCode << "%f" << space;
-			else if (exp->type.baseType.compare(BASETYPE_BOOL) == 0) //TODO:fix for bool
-				outCode << "%d" << space;
+				outCode << "%f";
+			else if (exp->type.baseType.compare(BASETYPE_BOOL) == 0) {
+				outCode << "%s";
+				//BoolExp *boolExp = (BoolExp*)boolExp;
+				ss << "(" << kPrefix << exp->toString() << " ? \"true\" : \"false\")";
+			}
+		}
+		
+		//if not bool expression, copy the value
+		if (exp->type.baseType.compare(BASETYPE_BOOL) != 0 && typeid(IdentifierExp) == typeid(*exp))
+			ss << kPrefix << exp->toString();
+		else if (exp->type.baseType.compare(BASETYPE_BOOL) != 0 && typeid(IdentifierExp) != typeid(*exp))
+			ss << exp->toString();
+		
+		if (exp != printStmt->expList->back()) ss << ", ";
+		
+		if (printStmt->isPrintln && exp != printStmt->expList->back()) {
+			outCode << " ";
+		}
+	
+		if (printStmt->isPrintln && exp == printStmt->expList->back()) {
+			outCode << "\\n";
 		}
 	}
 
 	outCode << "\"";
-	if (printStmt->expList) outCode << ", " << *(printStmt->expList);
+	outCode << ss.str();
+	//if (printStmt->expList) outCode << ", " << *(printStmt->expList);
+	
 	outCode << ");" << std::endl;	
 }
 
@@ -380,7 +449,7 @@ void CodeGenerator::visit(FunctionCallExp *funcCallExp) {
 
 void CodeGenerator::visit(IdentifierExp *idExp) {
 	if (idExp == NULL) return;
-	outCode << idExp->name;
+	outCode << kPrefix << idExp->name;
 }
 
 void CodeGenerator::visit(IntegerExp *intExp) {
@@ -394,8 +463,8 @@ void CodeGenerator::visit(RuneExp *runeExp) {
 }
 
 void CodeGenerator::visit(StringExp *strExp) {
-	if (strExp == NULL) return;
-	outCode << strExp->value;
+	if (strExp == NULL) return;	
+	outCode << "\"" << strExp->value << "\"";
 }
 
 void CodeGenerator::visit(UnaryExp *unaryExp) {
