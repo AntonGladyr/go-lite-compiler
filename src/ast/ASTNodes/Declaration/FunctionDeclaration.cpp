@@ -117,7 +117,7 @@ std::string FunctionDeclaration::symbolSignatureToStr() {
 
 std::string FunctionDeclaration::initCallToCcode(unsigned int initFuncNum) {
 	std::stringstream ss;
-	ss << "\t" << kPrefix << "init_" << initFuncNum << "();" << std::endl;
+	ss << "\t" << kPrefix << "init__" << initFuncNum << "();" << std::endl;
 	return ss.str();
 }
 

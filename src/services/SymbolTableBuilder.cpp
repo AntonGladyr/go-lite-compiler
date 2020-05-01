@@ -562,7 +562,10 @@ void SymbolTableBuilder::checkAssignTypes(Expression *lhs, Expression *rhs) {
 		/*std::cout << symbolLhs->symbType->name << " " << symbolLhs->symbType << std::endl;
 		std::cout << symbolRhs->symbType->name << " " << symbolRhs->symbType << std::endl;*/
 
-		if ( symbolLhs->symbType != symbolRhs->symbType ) {
+		if ( symbolLhs->symbType != symbolRhs->symbType && 
+		     (lhsExp->name.compare(CONSTANT_TRUE) != 0 || lhsExp->name.compare(CONSTANT_FALSE) != 0) &&
+		     (rhsExp->name.compare(CONSTANT_TRUE) != 0 || rhsExp->name.compare(CONSTANT_FALSE) != 0)
+		) {
 			std::cerr << "Error: (line " << lhs->lineno << ") "
 			  << getReceivedTypeName(rhs) << " is not assignment compatible with "
 			  << getReceivedTypeName(lhs) << " in assign statement" << std::endl;

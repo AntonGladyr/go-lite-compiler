@@ -90,8 +90,17 @@ void CodeGenerator::createTmpVar(VariableDeclaration *varDecl) {
 		
 		outCode << " = ";
 		// if expression
-		if (varDecl->expList) {	
+		if (varDecl->expList) {
 			ASTTraversal::traverse(*expIter, *this);
+			/*// if binary expression
+			if (typeid(BinaryOperatorExp) == typeid(*expIter))
+				ASTTraversal::traverse(*expIter, *this);
+			// if identifier expression
+			else if (typeid(IdentifierExp) == typeid(*expIter)) {
+				outCode << kPrefix << (*expIter)->toString();
+			}
+			else
+				outCode << (*expIter)->toString();*/
 		} else { // if no expression, set init value
 			setVarInitValue(varDecl->typeName->name);
 		}
@@ -292,7 +301,10 @@ void CodeGenerator::visit(VariableDeclaration *varDecl) {
 			outCode << " = ";
 			// if expression
 			if (varDecl->expList) {
-				ASTTraversal::traverse(*expIter, *this);
+				if (typeid(BinaryOperatorExp) == typeid(*expIter) || typeid(IdentifierExp) == typeid(*expIter))
+					ASTTraversal::traverse(*expIter, *this);
+				else
+					outCode << (*expIter)->toString();	
 			} else { // if no expression, set init value
 				setVarInitValue(varDecl->typeName->name);
 			}
@@ -444,11 +456,13 @@ void CodeGenerator::visit(SwitchStatement *switchStmt) {
 void CodeGenerator::visit(PrintStatement *printStmt) {
 	if (printStmt == NULL) return;
 	
-	std::stringstream ss;
-	ss << ", "; // expressions to print
+	//std::stringstream ss;
+	//ss << ", "; // expressions to print
 	
-	outCode << getTabs() << "printf(\"";
-
+	outCode << getTabs() << "printf(";
+	outCode << "\"";
+	
+	//specifiers
 	for(auto const& exp: *(printStmt->expList)) {
 		if (exp->symbol) {
 			if (exp->symbol->baseType.compare(BASETYPE_STRING) == 0)
@@ -460,9 +474,8 @@ void CodeGenerator::visit(PrintStatement *printStmt) {
 			else if (exp->symbol->baseType.compare(BASETYPE_FLOAT) == 0)
 				outCode << "%+e";
 			else if (exp->symbol->baseType.compare(BASETYPE_BOOL) == 0) {
-				outCode << "%s";
-				BoolExp *boolExp = (BoolExp*)boolExp;
-				ss << "(" << kPrefix << exp->toString() << " ? \"true\" : \"false\")";
+				outCode << "%s";	
+				//ss << "(" << kPrefix << exp->toString() << " ? \"true\" : \"false\")";
 			}
 		}
 		else {
@@ -475,22 +488,11 @@ void CodeGenerator::visit(PrintStatement *printStmt) {
 			else if (exp->type.baseType.compare(BASETYPE_FLOAT) == 0)
 				outCode << "%+e";
 			else if (exp->type.baseType.compare(BASETYPE_BOOL) == 0) {
-				outCode << "%s";
-				//BoolExp *boolExp = (BoolExp*)boolExp;
-				ss << "(" << kPrefix << exp->toString() << " ? \"true\" : \"false\")";
+				outCode << "%s";	
+				//ss << "(" << kPrefix << exp->toString() << " ? \"true\" : \"false\")";
 			}
 		}
-		
-		//if not bool expression, copy the value
-		if (exp->type.baseType.compare(BASETYPE_BOOL) != 0 && typeid(IdentifierExp) == typeid(*exp))
-			ss << kPrefix << exp->toString();
-		else if (exp->type.baseType.compare(BASETYPE_BOOL) != 0 && typeid(ArrayExp) == typeid(*exp))
-			ss << kPrefix << exp->toString();
-		else if (exp->type.baseType.compare(BASETYPE_BOOL) != 0 && typeid(IdentifierExp) != typeid(*exp))
-			ss << exp->toString();
-		
-		if (exp != printStmt->expList->back()) ss << ", ";
-		
+			
 		if (printStmt->isPrintln && exp != printStmt->expList->back()) {
 			outCode << " ";
 		}
@@ -499,9 +501,30 @@ void CodeGenerator::visit(PrintStatement *printStmt) {
 			outCode << "\\n";
 		}
 	}
-
+	
 	outCode << "\"";
-	outCode << ss.str();
+	outCode << ", "; // expressions to print
+	
+	//values
+	for(auto const& exp: *(printStmt->expList)) {	
+		//if not bool expression, copy the value
+		if (exp->type.baseType.compare(BASETYPE_BOOL) == 0) {
+			outCode << "(" << kPrefix << exp->toString() << " ? \"true\" : \"false\")";
+		}
+		else if (exp->type.baseType.compare(BASETYPE_BOOL) != 0 && typeid(IdentifierExp) == typeid(*exp))
+			//ss << kPrefix << exp->toString();
+			ASTTraversal::traverse(exp, *this);
+		else if (exp->type.baseType.compare(BASETYPE_BOOL) != 0 && typeid(BinaryOperatorExp) == typeid(*exp))
+			ASTTraversal::traverse(exp, *this);
+		else if (exp->type.baseType.compare(BASETYPE_BOOL) != 0 && typeid(ArrayExp) == typeid(*exp))
+			outCode << kPrefix << exp->toString();
+		else if (exp->type.baseType.compare(BASETYPE_BOOL) != 0 && typeid(IdentifierExp) != typeid(*exp))
+			outCode << exp->toString();
+		
+		if (exp != printStmt->expList->back()) outCode << ", ";
+	}
+	
+	//outCode << ss.str();
 	//if (printStmt->expList) outCode << ", " << *(printStmt->expList);
 	
 	outCode << ");" << std::endl;	
@@ -554,17 +577,17 @@ void CodeGenerator::visit(ArrayExp *arrExp) {
 
 void CodeGenerator::visit(BinaryOperatorExp *binOpExp) {
 	if (binOpExp == NULL) return;
-	outCode << "(";
+	//outCode << "(";
 	/*if (typeid(IdentifierExp) == typeid(binOpExp->lhs))
-		outCode << kPrefix << binOpExp->lhs;
-	else outCode << binOpExp->lhs;*/
+		outCode << kPrefix << binOpExp->lhs->toString();
+	else outCode << binOpExp->lhs->toString();*/
 	ASTTraversal::traverse(binOpExp->lhs, *this);
 	outCode << " " << binOpExp->op << " ";
 	ASTTraversal::traverse(binOpExp->rhs, *this);
 	/*if (typeid(IdentifierExp) == typeid(binOpExp->rhs))
-		outCode << kPrefix << binOpExp->rhs;
-	else outCode << binOpExp->rhs;*/
-	outCode << ")";
+		outCode << kPrefix << binOpExp->rhs->toString();
+	else outCode << binOpExp->rhs->toString();*/
+	//outCode << ")";
 }
 
 void CodeGenerator::visit(BoolExp *boolExp) {
@@ -607,10 +630,14 @@ void CodeGenerator::visit(FunctionCallExp *funcCallExp) {
 		outCode << "(";
 
 		for(auto const& exp : *(funcCallExp->expList)) {
-			if (typeid(IdentifierExp) == typeid(*exp))
+			/*if (typeid(IdentifierExp) == typeid(*exp))
 				outCode << kPrefix << exp->toString();
-			else outCode << exp->toString();
+			else outCode << exp->toString();*/
 			
+			if (typeid(BinaryOperatorExp) == typeid(*exp) || typeid(IdentifierExp) == typeid(*exp))
+				ASTTraversal::traverse(exp, *this);
+			else
+				outCode << exp->toString();
 			if (&exp != &funcCallExp->expList->back())
 				outCode << ", ";
 		}
@@ -626,9 +653,13 @@ void CodeGenerator::visit(FunctionCallExp *funcCallExp) {
 	outCode << "(";
 	
 	for(auto const& exp : *(funcCallExp->expList)) {
-		if (typeid(IdentifierExp) == typeid(*exp))
+		/*if (typeid(IdentifierExp) == typeid(*exp))
 			outCode << kPrefix << exp->toString();
-		else outCode << exp->toString();
+		else outCode << exp->toString();*/
+		if (typeid(BinaryOperatorExp) == typeid(*exp) || typeid(IdentifierExp) == typeid(*exp))
+			ASTTraversal::traverse(exp, *this);
+		else 
+			outCode << exp->toString();
 		
 		if (&exp != &funcCallExp->expList->back())
 			outCode << ", ";
@@ -649,7 +680,7 @@ void CodeGenerator::visit(IntegerExp *intExp) {
 
 void CodeGenerator::visit(RuneExp *runeExp) {
 	if (runeExp == NULL) return;
-	outCode << runeExp->value;
+	outCode << "'" << runeExp->value << "'";
 }
 
 void CodeGenerator::visit(StringExp *strExp) {
