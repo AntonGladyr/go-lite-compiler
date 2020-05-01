@@ -509,7 +509,11 @@ void CodeGenerator::visit(PrintStatement *printStmt) {
 	for(auto const& exp: *(printStmt->expList)) {	
 		//if not bool expression, copy the value
 		if (exp->type.baseType.compare(BASETYPE_BOOL) == 0) {
-			outCode << "(" << kPrefix << exp->toString() << " ? \"true\" : \"false\")";
+			if ( exp->toString().compare(CONSTANT_TRUE) == 0 ||
+			     exp->toString().compare(CONSTANT_FALSE) == 0
+			) outCode << "(" << exp->toString() << " ? \"true\" : \"false\")";
+			else
+				outCode << "(" << kPrefix << exp->toString() << " ? \"true\" : \"false\")";
 		}
 		else if (exp->type.baseType.compare(BASETYPE_BOOL) != 0 && typeid(IdentifierExp) == typeid(*exp))
 			//ss << kPrefix << exp->toString();
