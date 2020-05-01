@@ -259,11 +259,11 @@ void yyerror(const char *s) {
  * denote left-associative and right-associative respectively.
  */
 
-%left tPLUS tMINUS tBWOR tBWXOR
-%left tTIMES tDIV tREM tBWAND tBWANDNOT tLEFTSHIFT tRIGHTSHIFT
 %left tAND
 %left tOR
 %left tEQUAL tNOTEQ tLESS tLESSEQ tGREATER tGREATEREQ
+%left tPLUS tMINUS tBWOR tBWXOR
+%left tTIMES tDIV tREM tBWAND tBWANDNOT tLEFTSHIFT tRIGHTSHIFT
 %left pMINUS pBANG pPLUS pBWXOR
 
 /* Start token (by default if this is missing it takes the first production */
