@@ -148,7 +148,7 @@ std::string FunctionDeclaration::toCcode(unsigned int initFuncNum) {
 	ss << "(";
 	if (params) {
 		for(auto const& param : *params) {
-			// for each id print type
+			// for each id print type	
 			if (param->idExp->symbol)
 				ss << TypeDescriptorTable::getInstance().getTypeDescriptor(
 					param->idExp->symbol->baseType) << " ";
@@ -161,7 +161,7 @@ std::string FunctionDeclaration::toCcode(unsigned int initFuncNum) {
 			/*else ss << TypeDescriptorTable::getInstance().getTypeDescriptor(
 					param->idExp->type.name << " "); // derived type*/
 			
-			ss << param->idExp->name << " "; // id
+			ss << param->idExp->name; // id
 
 			if (param->typeName->indexes) {
 				for(auto const& index : *(param->typeName->indexes)) {

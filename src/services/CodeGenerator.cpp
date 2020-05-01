@@ -68,29 +68,40 @@ void CodeGenerator::createTmpVar(VariableDeclaration *varDecl) {
 		}
 		
 		outCode << " " << kPrefix << (*varIter)->name << "_" << kTmpVar << "_" << tmpVarCounter;
-		// save counter to symbol
-		(*varIter)->symbol->tmpCounterNum = tmpVarCounter;
-		//increment counter
-		tmpVarCounter++;
 		
+		// if array
 		if (varDecl->typeName && varDecl->typeName->indexes) {
 			for(auto const& index : *(varDecl->typeName->indexes)) {
 					outCode << "[" << std::to_string(index) << "]";
 			}
-		}
-	
-		if (varDecl->expList) {
-			outCode << " = ";
+				
+			outCode << ";" << std::endl;	
+			outCode << getTabs() << "memset(" << kPrefix << (*varIter)->name
+					     << "_" << kTmpVar << "_" << tmpVarCounter
+					     << ", " << "0, " << "sizeof("
+					     << kPrefix << (*varIter)->name
+					     << "_" << kTmpVar << "_" << tmpVarCounter
+					     << "));" << std::endl;
 			
-			/*if (typeid(IdentifierExp) == typeid(*expIter)) {
-				outCode << kPrefix << (*expIter)->toString();
-			}
-			else {*/
-				ASTTraversal::traverse(*expIter, *this);
-			//}
+			(*varIter)->symbol->tmpCounterNum = tmpVarCounter;
+			tmpVarCounter++;
+			return;
 		}
 		
-		outCode << ";" << std::endl;
+		outCode << " = ";
+		// if expression
+		if (varDecl->expList) {	
+			ASTTraversal::traverse(*expIter, *this);
+		} else { // if no expression, set init value
+			setVarInitValue(varDecl->typeName->name);
+		}
+		
+		outCode << ";" << std::endl;	
+		// save counter to symbol
+	 	(*varIter)->symbol->tmpCounterNum = tmpVarCounter;
+		//increment counter
+		tmpVarCounter++;
+		
 		varIter++;
 		if (varDecl->expList) expIter++;
 	}
@@ -109,13 +120,22 @@ void CodeGenerator::assignTmpToVarDecl(VariableDeclaration *varDecl) {
 		
 		outCode << " " << kPrefix << (*varIter)->name;	
 		
+		// if array
 		if (varDecl->typeName && varDecl->typeName->indexes) {
 			for(auto const& index : *(varDecl->typeName->indexes)) {
 					outCode << "[" << std::to_string(index) << "]";
 			}
-		}
+			
+			outCode << ";" << std::endl;
 
-		//TODO: memcpy for arrays
+			outCode << getTabs() << "memcpy(" << kPrefix << (*varIter)->name
+					     << ", " << kPrefix << (*varIter)->name << "_" << kTmpVar << "_"
+					     << (*varIter)->symbol->tmpCounterNum
+					     //<< tmpVarCounter
+					     << ", NELEMS(" << kPrefix << (*varIter)->name
+					     << "));" << std::endl;
+			return;
+		}
 		
 		outCode << " = ";
 		outCode << kPrefix << (*varIter)->name << "_" << kTmpVar << "_" << (*varIter)->symbol->tmpCounterNum;
@@ -124,6 +144,73 @@ void CodeGenerator::assignTmpToVarDecl(VariableDeclaration *varDecl) {
 		varIter++;	
 	}
 
+}
+
+void CodeGenerator::setVarInitValue(std::string type) {
+	std::string baseType = symbolTable->findBaseType(symbolTable, type);
+	std::string targetType = TypeDescriptorTable::getInstance().getTypeDescriptor(baseType);
+	std::stringstream initValue;
+	
+	if (targetType.compare(C_INT) == 0) initValue << "0";
+	else if (targetType.compare(C_DOUBLE) == 0) initValue << "0.0";
+	else if (targetType.compare(C_STRING) == 0) initValue << "\"\"";
+	else if (targetType.compare(C_CHAR) == 0) initValue << "0";
+	else if (targetType.compare(C_BOOL) == 0) initValue << "0";
+	outCode << initValue.str();
+}
+
+void CodeGenerator::funcDeclToCcode(FunctionDeclaration *funcDecl) {
+	std::stringstream ss;
+	
+	if (funcDecl->idExp->name.compare(SPECIALFUNC_INIT) == 0)
+		ss << C_VOID << " " << kPrefix << funcDecl->idExp->name
+		   << "__" << initFuncNum;
+	else if (funcDecl->idExp->type.baseType.compare(BASETYPE_STRING) == 0)
+		ss << "const " << TypeDescriptorTable::getInstance().getTypeDescriptor(funcDecl->idExp->type.baseType)
+		   << " " << kPrefix << funcDecl->idExp->name;
+	else if (funcDecl->idExp->type.isBaseType())
+		ss << TypeDescriptorTable::getInstance().getTypeDescriptor(funcDecl->idExp->type.baseType)
+	           << " " << kPrefix << funcDecl->idExp->name;
+	else if (funcDecl->idExp->type.indexes) {
+		ss << funcDecl->idExp->type.name << "* " << kPrefix << funcDecl->idExp->name; //TODO: multidemensional array
+	}
+	else	
+		ss << funcDecl->idExp->type.name << " " << kPrefix << funcDecl->idExp->name;
+	
+	ss << "(";
+	if (funcDecl->params) {
+		for(auto const& param : *(funcDecl->params)) {
+			// for each id print type
+			std::string baseType = symbolTable->findBaseType(symbolTable, param->typeName->name);
+			ss << TypeDescriptorTable::getInstance().getTypeDescriptor(baseType);
+			/*if (param->idExp->symbol)
+				ss << TypeDescriptorTable::getInstance().getTypeDescriptor(
+					param->idExp->symbol->baseType) << " ";
+			else if (param->idExp->type.isBaseType())
+				ss << TypeDescriptorTable::getInstance().getTypeDescriptor(
+					param->idExp->type.baseType) << " "; // base type*/
+			//TODO: multidemensional array
+			/*else (param->idExp->type->indexes)
+				ss << */
+			/*else ss << TypeDescriptorTable::getInstance().getTypeDescriptor(
+					param->idExp->type.name << " "); // derived type*/
+			
+			ss << " " << kPrefix << param->idExp->name; // id
+
+			if (param->typeName->indexes) {
+				for(auto const& index : *(param->typeName->indexes)) {
+					ss << "[" << std::to_string(index) << "]";
+				}	
+			}
+				
+			if (&param != &funcDecl->params->back())
+				ss << ", ";
+		}
+
+	}
+	ss << ") ";
+
+	outCode << ss.str();
 }
 
 //=====================END OF HELPER FUNCTIONS=====================
@@ -152,8 +239,75 @@ void CodeGenerator::visit(Program *prg) {
 void CodeGenerator::visit(VariableDeclaration *varDecl) {
 	if (varDecl == NULL) return;
 
-	createTmpVar(varDecl);
-	assignTmpToVarDecl(varDecl);
+	if (numTabs == 0) { // if global scope
+		std::vector<IdentifierExp*>::reverse_iterator varIter = varDecl->idList->rbegin();
+		std::vector<Expression*>::reverse_iterator expIter;
+	
+		if (varDecl->expList)
+			expIter = varDecl->expList->rbegin();	
+		
+		while (varIter != varDecl->idList->rend()) {
+			
+			outCode << getTabs();
+			
+			/*
+			// if true or false
+			if ( (*varIter)->name.compare(CONSTANT_TRUE) &&
+			     
+			) {
+				outCode << CONSTANT_TRUE
+			}
+
+			if ((*varIter)->name.compare(CONSTANT_FALSE)) {
+				outCode << 
+			}*/
+			
+			if (varDecl->typeName) {
+				//outCode << TypeDescriptorTable::getInstance().getTypeDescriptor((*varIter)->symbol->baseType);
+				outCode << TypeDescriptorTable::getInstance().getTypeDescriptor(varDecl->typeName->name);	
+			}
+			else {
+				if ((*expIter)->symbol)
+					outCode << (*expIter)->symbol->baseType;
+				else
+					outCode << TypeDescriptorTable::getInstance().getTypeDescriptor((*expIter)->type.baseType);	
+			}
+		
+			outCode << " " << kPrefix << (*varIter)->name;
+		
+			// if array
+			if (varDecl->typeName && varDecl->typeName->indexes) {
+				for(auto const& index : *(varDecl->typeName->indexes)) {
+						outCode << "[" << std::to_string(index) << "]";
+				}
+				
+				outCode << ";" << std::endl;
+				outCode << getTabs() << "memset(" << kPrefix << (*varIter)->name
+						     << ", " << "0, " << "sizeof("
+						     << kPrefix << (*varIter)->name
+						     << "));" << std::endl;
+				return;
+			}
+		
+			outCode << " = ";
+			// if expression
+			if (varDecl->expList) {
+				ASTTraversal::traverse(*expIter, *this);
+			} else { // if no expression, set init value
+				setVarInitValue(varDecl->typeName->name);
+			}
+		
+			outCode << ";" << std::endl;	
+			
+			varIter++;
+			if (varDecl->expList) expIter++;
+		}
+
+	} else {
+		createTmpVar(varDecl);
+		assignTmpToVarDecl(varDecl);
+	}
+
 	outCode << std::endl;
 }
 
@@ -164,7 +318,7 @@ void CodeGenerator::visit(TypeDeclaration *typeDecl) {
 void CodeGenerator::visit(FunctionDeclaration *funcDecl) {
 	if (funcDecl == NULL) return;
 
-	outCode << funcDecl->toCcode(initFuncNum);
+	funcDeclToCcode(funcDecl);
 
 	if (funcDecl->idExp->name.compare(SPECIALFUNC_INIT) == 0) {
 		initFuncCalls << funcDecl->initCallToCcode(initFuncNum);
@@ -179,12 +333,19 @@ void CodeGenerator::visit(BlockStatement *blockStmt) {
 	if (blockStmt == NULL) return;
 	
 	if (isScopeOpened) {
-		outCode << getTabs() << "{" << std::endl;
+		outCode << "{" << std::endl;
 		numTabs++;
 	} else {
 		numTabs--;
 		outCode << getTabs() << "}" << std::endl << std::endl;
 	}
+}
+
+void CodeGenerator::visit(ExpressionStatement *expStmt) {
+	if (expStmt == NULL) return;
+	
+	ASTTraversal::traverse(expStmt->exp, *this);
+	outCode << std::endl;
 }
 
 void CodeGenerator::visit(DeclarationStatement *declStmt) {	
@@ -209,11 +370,6 @@ void CodeGenerator::visit(AssignStatement *assignStmt) {
 		lhsIter++;
 		rhsIter++;
 	}	
-}
-
-void CodeGenerator::visit(ExpressionStatement *expStmt) {
-	if (expStmt == NULL) return;
-	
 }
 
 void CodeGenerator::visit(ForStatement *forStmt) {
@@ -300,9 +456,9 @@ void CodeGenerator::visit(PrintStatement *printStmt) {
 			else if (exp->symbol->baseType.compare(BASETYPE_INT) == 0)
 				outCode << "%d";
 			else if (exp->symbol->baseType.compare(BASETYPE_RUNE) == 0)
-				outCode << "%c";
+				outCode << "%d";
 			else if (exp->symbol->baseType.compare(BASETYPE_FLOAT) == 0)
-				outCode << "%f";
+				outCode << "%+e";
 			else if (exp->symbol->baseType.compare(BASETYPE_BOOL) == 0) {
 				outCode << "%s";
 				BoolExp *boolExp = (BoolExp*)boolExp;
@@ -315,9 +471,9 @@ void CodeGenerator::visit(PrintStatement *printStmt) {
 			else if (exp->type.baseType.compare(BASETYPE_INT) == 0)
 				outCode << "%d";
 			else if (exp->type.baseType.compare(BASETYPE_RUNE) == 0)
-				outCode << "%c";
+				outCode << "%d";
 			else if (exp->type.baseType.compare(BASETYPE_FLOAT) == 0)
-				outCode << "%f";
+				outCode << "%+e";
 			else if (exp->type.baseType.compare(BASETYPE_BOOL) == 0) {
 				outCode << "%s";
 				//BoolExp *boolExp = (BoolExp*)boolExp;
@@ -327,6 +483,8 @@ void CodeGenerator::visit(PrintStatement *printStmt) {
 		
 		//if not bool expression, copy the value
 		if (exp->type.baseType.compare(BASETYPE_BOOL) != 0 && typeid(IdentifierExp) == typeid(*exp))
+			ss << kPrefix << exp->toString();
+		else if (exp->type.baseType.compare(BASETYPE_BOOL) != 0 && typeid(ArrayExp) == typeid(*exp))
 			ss << kPrefix << exp->toString();
 		else if (exp->type.baseType.compare(BASETYPE_BOOL) != 0 && typeid(IdentifierExp) != typeid(*exp))
 			ss << exp->toString();
@@ -367,10 +525,10 @@ void CodeGenerator::visit(IncDecStatement *incDecStmt) {
 	ASTTraversal::traverse(incDecStmt->exp, *this);
 	
 	if (incDecStmt->op == INC_DEC_OP::INC)
-		outCode << "++;";
+		outCode << "++";
 
 	if (incDecStmt->op == INC_DEC_OP::DEC)
-		outCode << "--;";
+		outCode << "--";
 
 	outCode << ";" << std::endl;
 }
@@ -388,7 +546,7 @@ void CodeGenerator::visit(EmptyStatement *emptyStmt) {
 
 void CodeGenerator::visit(ArrayExp *arrExp) {
 	if (arrExp == NULL) return;
-	outCode << arrExp->idExp->name;
+	outCode << kPrefix << arrExp->idExp->name;
 	for(auto const& exp: *(arrExp->expList)) {
 		outCode << "[" << exp->toString() << "]";
 	}
@@ -397,9 +555,15 @@ void CodeGenerator::visit(ArrayExp *arrExp) {
 void CodeGenerator::visit(BinaryOperatorExp *binOpExp) {
 	if (binOpExp == NULL) return;
 	outCode << "(";
+	/*if (typeid(IdentifierExp) == typeid(binOpExp->lhs))
+		outCode << kPrefix << binOpExp->lhs;
+	else outCode << binOpExp->lhs;*/
 	ASTTraversal::traverse(binOpExp->lhs, *this);
 	outCode << " " << binOpExp->op << " ";
 	ASTTraversal::traverse(binOpExp->rhs, *this);
+	/*if (typeid(IdentifierExp) == typeid(binOpExp->rhs))
+		outCode << kPrefix << binOpExp->rhs;
+	else outCode << binOpExp->rhs;*/
 	outCode << ")";
 }
 
@@ -435,16 +599,42 @@ void CodeGenerator::visit(FloatExp *floatExp) {
 
 void CodeGenerator::visit(FunctionCallExp *funcCallExp) {
 	if (funcCallExp == NULL) return;
-		
+	
 	// if typecasting call
-	if ( funcCallExp->idExp->symbol->category.compare(CATEGORY_TYPE) == 0 ) {	
-		outCode << funcCallExp->idExp->symbol->baseType << "("
-		    << *(funcCallExp->expList) << ")";
+	if ( funcCallExp->idExp->symbol->category.compare(CATEGORY_TYPE) == 0 ) {
+		std::string baseType = symbolTable->findBaseType(symbolTable, funcCallExp->idExp->symbol->type);
+		outCode << TypeDescriptorTable::getInstance().getTypeDescriptor(baseType); //type
+		outCode << "(";
+
+		for(auto const& exp : *(funcCallExp->expList)) {
+			if (typeid(IdentifierExp) == typeid(*exp))
+				outCode << kPrefix << exp->toString();
+			else outCode << exp->toString();
+			
+			if (&exp != &funcCallExp->expList->back())
+				outCode << ", ";
+		}
+
+		outCode << ");";
+		/*outCode << funcCallExp->idExp->symbol->baseType << "("
+		    << *(funcCallExp->expList) << ")";*/
 		return;
 	}
 	
-	outCode << funcCallExp->idExp->name << "("
-		<< *(funcCallExp->expList) << ")";
+	outCode << getTabs() << kPrefix << funcCallExp->idExp->name;
+	
+	outCode << "(";
+	
+	for(auto const& exp : *(funcCallExp->expList)) {
+		if (typeid(IdentifierExp) == typeid(*exp))
+			outCode << kPrefix << exp->toString();
+		else outCode << exp->toString();
+		
+		if (&exp != &funcCallExp->expList->back())
+			outCode << ", ";
+	}
+	
+	outCode << ");";
 }
 
 void CodeGenerator::visit(IdentifierExp *idExp) {

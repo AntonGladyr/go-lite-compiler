@@ -42,11 +42,14 @@ class CodeGenerator : public Visitor {
 			const std::string &name,
 			const std::string &ext	// extension
 		);
+		
+		void createTmpVar(VariableDeclaration *varDecl);
+		void assignTmpToVarDecl(VariableDeclaration *varDecl);
+		void setVarInitValue(std::string type);
+		void funcDeclToCcode(FunctionDeclaration *funcDecl);
 	
 	public:		
 		void emit(Program *prg, SymbolTable *st);	
-		void createTmpVar(VariableDeclaration *varDecl);
-		void assignTmpToVarDecl(VariableDeclaration *varDecl);
 		
 		virtual void visit(Program *prg) override;
 		virtual void visit(VariableDeclaration *varDecl) override;
