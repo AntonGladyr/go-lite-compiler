@@ -2519,7 +2519,13 @@ State 115
   100    | exp . tGREATEREQ exp
   101    | exp . tLESSEQ exp
 
-    tOR  shift, and go to state 84
+    tOR         shift, and go to state 84
+    tEQUAL      shift, and go to state 85
+    tLESS       shift, and go to state 86
+    tGREATER    shift, and go to state 87
+    tNOTEQ      shift, and go to state 88
+    tLESSEQ     shift, and go to state 89
+    tGREATEREQ  shift, and go to state 90
 
     $default  reduce using rule 94 (exp)
 
@@ -2547,6 +2553,13 @@ State 116
   100    | exp . tGREATEREQ exp
   101    | exp . tLESSEQ exp
 
+    tEQUAL      shift, and go to state 85
+    tLESS       shift, and go to state 86
+    tGREATER    shift, and go to state 87
+    tNOTEQ      shift, and go to state 88
+    tLESSEQ     shift, and go to state 89
+    tGREATEREQ  shift, and go to state 90
+
     $default  reduce using rule 95 (exp)
 
 
@@ -2572,9 +2585,6 @@ State 117
    99    | exp . tLESS exp
   100    | exp . tGREATEREQ exp
   101    | exp . tLESSEQ exp
-
-    tAND  shift, and go to state 83
-    tOR   shift, and go to state 84
 
     $default  reduce using rule 96 (exp)
 
@@ -2602,9 +2612,6 @@ State 118
   100    | exp . tGREATEREQ exp
   101    | exp . tLESSEQ exp
 
-    tAND  shift, and go to state 83
-    tOR   shift, and go to state 84
-
     $default  reduce using rule 99 (exp)
 
 
@@ -2630,9 +2637,6 @@ State 119
    99    | exp . tLESS exp
   100    | exp . tGREATEREQ exp
   101    | exp . tLESSEQ exp
-
-    tAND  shift, and go to state 83
-    tOR   shift, and go to state 84
 
     $default  reduce using rule 98 (exp)
 
@@ -2660,9 +2664,6 @@ State 120
   100    | exp . tGREATEREQ exp
   101    | exp . tLESSEQ exp
 
-    tAND  shift, and go to state 83
-    tOR   shift, and go to state 84
-
     $default  reduce using rule 97 (exp)
 
 
@@ -2689,9 +2690,6 @@ State 121
   101    | exp . tLESSEQ exp
   101    | exp tLESSEQ exp .
 
-    tAND  shift, and go to state 83
-    tOR   shift, and go to state 84
-
     $default  reduce using rule 101 (exp)
 
 
@@ -2717,9 +2715,6 @@ State 122
   100    | exp . tGREATEREQ exp
   100    | exp tGREATEREQ exp .
   101    | exp . tLESSEQ exp
-
-    tAND  shift, and go to state 83
-    tOR   shift, and go to state 84
 
     $default  reduce using rule 100 (exp)
 

@@ -1416,7 +1416,7 @@ void SymbolTableBuilder::visit(BinaryOperatorExp *binOpExp) {
 			getReceivedTypeName(binOpExp->rhs),	
 			binOpExp->lineno
 		);
-
+	
 	// for comparable operators
 	bool isFuncLhs = false;
 	bool isFuncRhs = false;	

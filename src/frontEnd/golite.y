@@ -261,9 +261,9 @@ void yyerror(const char *s) {
 
 %left tPLUS tMINUS tBWOR tBWXOR
 %left tTIMES tDIV tREM tBWAND tBWANDNOT tLEFTSHIFT tRIGHTSHIFT
-%left tEQUAL tNOTEQ tLESS tLESSEQ tGREATER tGREATEREQ
 %left tAND
 %left tOR
+%left tEQUAL tNOTEQ tLESS tLESSEQ tGREATER tGREATEREQ
 %left pMINUS pBANG pPLUS pBWXOR
 
 /* Start token (by default if this is missing it takes the first production */
