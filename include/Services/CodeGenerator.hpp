@@ -47,6 +47,8 @@ class CodeGenerator : public Visitor {
 		void assignTmpToVarDecl(VariableDeclaration *varDecl);
 		void setVarInitValue(std::string type);
 		void funcDeclToCcode(FunctionDeclaration *funcDecl);
+		void printForInitStmt(Statement *initStmt);
+		void printForPostStmt(Statement *postStmt);
 	
 	public:		
 		void emit(Program *prg, SymbolTable *st);	

@@ -76,12 +76,12 @@ void CodeGenerator::createTmpVar(VariableDeclaration *varDecl) {
 			}
 				
 			outCode << ";" << std::endl;	
-			outCode << getTabs() << "memset(" << kPrefix << (*varIter)->name
+			/*outCode << getTabs() << "memset(" << kPrefix << (*varIter)->name
 					     << "_" << kTmpVar << "_" << tmpVarCounter
 					     << ", " << "0, " << "sizeof("
 					     << kPrefix << (*varIter)->name
 					     << "_" << kTmpVar << "_" << tmpVarCounter
-					     << "));" << std::endl;
+					     << "));" << std::endl;*/
 			
 			(*varIter)->symbol->tmpCounterNum = tmpVarCounter;
 			tmpVarCounter++;
@@ -122,9 +122,10 @@ void CodeGenerator::assignTmpToVarDecl(VariableDeclaration *varDecl) {
 	while (varIter != varDecl->idList->rend()) {
 			
 		outCode << getTabs();
-		if (varDecl->typeName) {
-			//outCode << TypeDescriptorTable::getInstance().getTypeDescriptor((*varIter)->symbol->baseType);
+		if (varDecl->typeName) {	
 			outCode << TypeDescriptorTable::getInstance().getTypeDescriptor(varDecl->typeName->name);	
+		} else {
+			outCode << TypeDescriptorTable::getInstance().getTypeDescriptor((*varIter)->symbol->baseType);
 		}
 		
 		outCode << " " << kPrefix << (*varIter)->name;	
@@ -222,6 +223,41 @@ void CodeGenerator::funcDeclToCcode(FunctionDeclaration *funcDecl) {
 	outCode << ss.str();
 }
 
+void CodeGenerator::printForInitStmt(Statement *initStmt) {
+	if (initStmt == NULL) return;
+
+	if (typeid(AssignStatement) == typeid(*initStmt)) {
+		AssignStatement *assignStmt = (AssignStatement*)initStmt;
+		
+		std::vector<Expression*>::iterator lhsIter = assignStmt->lhs->begin();
+		std::vector<Expression*>::iterator rhsIter = assignStmt->rhs->begin();
+	
+		while ( lhsIter != assignStmt->lhs->end() && rhsIter != assignStmt->rhs->end() ) {
+			ASTTraversal::traverse(*lhsIter, *this);
+			outCode << " = ";
+			ASTTraversal::traverse(*rhsIter, *this);	
+			lhsIter++;
+			rhsIter++;
+		}
+	}
+}
+
+void CodeGenerator::printForPostStmt(Statement *postStmt) {
+	if (postStmt == NULL) return;
+
+	if (typeid(IncDecStatement) == typeid(*postStmt)) {
+		IncDecStatement *incDecStmt = (IncDecStatement*)postStmt;
+		
+		ASTTraversal::traverse(incDecStmt->exp, *this);
+	
+		if (incDecStmt->op == INC_DEC_OP::INC)
+			outCode << "++";
+
+		if (incDecStmt->op == INC_DEC_OP::DEC)
+			outCode << "--";
+	}
+}
+
 //=====================END OF HELPER FUNCTIONS=====================
 //=================================================================
 
@@ -291,10 +327,10 @@ void CodeGenerator::visit(VariableDeclaration *varDecl) {
 				}
 				
 				outCode << ";" << std::endl;
-				outCode << getTabs() << "memset(" << kPrefix << (*varIter)->name
+				/*outCode << getTabs() << "memset(" << kPrefix << (*varIter)->name
 						     << ", " << "0, " << "sizeof("
 						     << kPrefix << (*varIter)->name
-						     << "));" << std::endl;
+						     << "));" << std::endl;*/
 				return;
 			}
 		
@@ -371,6 +407,7 @@ void CodeGenerator::visit(TypeDeclarationStatement *typeDeclStmt) {
 
 void CodeGenerator::visit(AssignStatement *assignStmt) {
 	if (assignStmt == NULL) return;
+	
 	std::vector<Expression*>::iterator lhsIter = assignStmt->lhs->begin();
 	std::vector<Expression*>::iterator rhsIter = assignStmt->rhs->begin();
 	
@@ -381,36 +418,42 @@ void CodeGenerator::visit(AssignStatement *assignStmt) {
 		outCode << ";" << std::endl;
 		lhsIter++;
 		rhsIter++;
-	}	
+	}
 }
 
 void CodeGenerator::visit(ForStatement *forStmt) {
 	if (forStmt == NULL) return;
-		
-	if ( forStmt->initStmt == NULL &&
-	     forStmt->exp == NULL &&
-	     forStmt->postStmt == NULL 
-	) {
-		outCode << getTabs() << "for(;;) ";
-	}
-	else if ( forStmt->initStmt == NULL &&
-		  forStmt->exp &&
-		  forStmt->postStmt == NULL
-	) {
-		outCode << getTabs() << "while(";
-		ASTTraversal::traverse(forStmt->exp, *this);
-		outCode << ") ";
-	}
-	else if ( forStmt->initStmt &&
-		  forStmt->exp &&
-		  forStmt->postStmt
-	) {
-		//TODO: fix new line
-		outCode << getTabs() << "for (";
-		ASTTraversal::traverse(forStmt->initStmt, *this);
-		ASTTraversal::traverse(forStmt->exp, *this);
-		ASTTraversal::traverse(forStmt->postStmt, *this);
-		outCode << getTabs() << ") ";
+	
+	if (isScopeOpened) {	
+	
+		if ( forStmt->initStmt == NULL &&
+		     forStmt->exp == NULL &&
+		     forStmt->postStmt == NULL 
+		) {
+			outCode << getTabs() << "for(;;) ";
+		}
+		else if ( forStmt->initStmt == NULL &&
+			  forStmt->exp &&
+			  forStmt->postStmt == NULL
+		) {
+			outCode << getTabs() << "while(";
+			ASTTraversal::traverse(forStmt->exp, *this);
+			outCode << ") ";
+		}
+		else if ( forStmt->initStmt &&
+			  forStmt->exp &&
+			  forStmt->postStmt
+		) {	
+			outCode << getTabs() << "for (";
+			printForInitStmt(forStmt->initStmt);
+			outCode << "; ";
+			//ASTTraversal::traverse(forStmt->initStmt, *this);
+			ASTTraversal::traverse(forStmt->exp, *this);
+			outCode << "; ";
+			printForPostStmt(forStmt->postStmt);
+			//ASTTraversal::traverse(forStmt->postStmt, *this);
+			outCode << ") ";
+		}
 	}
 }
 
@@ -521,6 +564,8 @@ void CodeGenerator::visit(PrintStatement *printStmt) {
 		else if (exp->type.baseType.compare(BASETYPE_BOOL) != 0 && typeid(BinaryOperatorExp) == typeid(*exp))
 			ASTTraversal::traverse(exp, *this);
 		else if (exp->type.baseType.compare(BASETYPE_BOOL) != 0 && typeid(ArrayExp) == typeid(*exp))
+			ASTTraversal::traverse(exp, *this);
+		else if (exp->type.baseType.compare(BASETYPE_BOOL) != 0 && typeid(ArrayExp) == typeid(*exp))
 			outCode << kPrefix << exp->toString();
 		else if (exp->type.baseType.compare(BASETYPE_BOOL) != 0 && typeid(IdentifierExp) != typeid(*exp))
 			outCode << exp->toString();
@@ -575,7 +620,14 @@ void CodeGenerator::visit(ArrayExp *arrExp) {
 	if (arrExp == NULL) return;
 	outCode << kPrefix << arrExp->idExp->name;
 	for(auto const& exp: *(arrExp->expList)) {
-		outCode << "[" << exp->toString() << "]";
+		if ( typeid(IdentifierExp) == typeid(*exp) ||
+		     typeid(BinaryOperatorExp) == typeid(*exp)
+		) {
+			outCode << "[";
+			ASTTraversal::traverse(exp, *this);
+			outCode << "]";
+		}
+		else outCode << "[" << exp->toString() << "]";
 	}
 }
 
