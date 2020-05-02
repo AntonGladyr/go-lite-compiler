@@ -1319,6 +1319,14 @@ void SymbolTableBuilder::visit(IncDecStatement *incDecStmt) {
 
 	ASTTraversal::traverse(incDecStmt->exp, *this);
 
+	if ( typeid(ArrayExp) == typeid(*(incDecStmt->exp)) && 
+	     incDecStmt->exp->type.isNumericType()
+	) {
+		//ArrayExp *arr = (ArrayExp*)incDecStmt->exp;
+		//if (arr->type.isNumericType())
+		return;
+	}
+
 	if ( !incDecStmt->exp->type.isNumericType() ||
 	     typeid(IdentifierExp) != typeid(*(incDecStmt->exp)) || 
 	     hasTypeName(incDecStmt->exp)

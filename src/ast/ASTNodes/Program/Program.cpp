@@ -20,7 +20,8 @@ std::string Program::preambleToCcode() {
 	std::stringstream ss;
 	ss << "#include <stdio.h>" << std::endl
 	   << "#include <string.h>" << std::endl << std::endl
-	   << "#define NELEMS(x) (sizeof(x) / sizeof((x)[0]))" << std::endl << std::endl
+	   << "#define NELEMS(x) (sizeof(x) / sizeof((x)[0]))" << std::endl
+	   << "#define ARRAY_CMP(x, y) memcmp(x, y, sizeof(x))" << std::endl << std::endl
 	   << "_Bool true = 1;" << std::endl
 	   << "_Bool false = 0;" << std::endl << std::endl;
 	

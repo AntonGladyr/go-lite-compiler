@@ -76,12 +76,12 @@ void CodeGenerator::createTmpVar(VariableDeclaration *varDecl) {
 			}
 				
 			outCode << ";" << std::endl;	
-			/*outCode << getTabs() << "memset(" << kPrefix << (*varIter)->name
+			outCode << getTabs() << "memset(" << kPrefix << (*varIter)->name
 					     << "_" << kTmpVar << "_" << tmpVarCounter
 					     << ", " << "0, " << "sizeof("
 					     << kPrefix << (*varIter)->name
 					     << "_" << kTmpVar << "_" << tmpVarCounter
-					     << "));" << std::endl;*/
+					     << "));" << std::endl;
 			
 			(*varIter)->symbol->tmpCounterNum = tmpVarCounter;
 			tmpVarCounter++;
@@ -91,6 +91,7 @@ void CodeGenerator::createTmpVar(VariableDeclaration *varDecl) {
 		outCode << " = ";
 		// if expression
 		if (varDecl->expList) {
+			// if constant true or false
 			ASTTraversal::traverse(*expIter, *this);
 			/*// if binary expression
 			if (typeid(BinaryOperatorExp) == typeid(*expIter))
@@ -336,11 +337,13 @@ void CodeGenerator::visit(VariableDeclaration *varDecl) {
 		
 			outCode << " = ";
 			// if expression
-			if (varDecl->expList) {
-				if (typeid(BinaryOperatorExp) == typeid(*expIter) || typeid(IdentifierExp) == typeid(*expIter))
+			if (varDecl->expList) {	
+				if (typeid(BinaryOperatorExp) == typeid(*expIter) || typeid(IdentifierExp) == typeid(*expIter)){	
 					ASTTraversal::traverse(*expIter, *this);
-				else
-					outCode << (*expIter)->toString();	
+				}
+				else {	
+					outCode << (*expIter)->toString();
+				}
 			} else { // if no expression, set init value
 				setVarInitValue(varDecl->typeName->name);
 			}
@@ -555,6 +558,12 @@ void CodeGenerator::visit(PrintStatement *printStmt) {
 			if ( exp->toString().compare(CONSTANT_TRUE) == 0 ||
 			     exp->toString().compare(CONSTANT_FALSE) == 0
 			) outCode << "(" << exp->toString() << " ? \"true\" : \"false\")";
+			else if (typeid(BinaryOperatorExp) == typeid(*exp) && exp->type.baseType.compare(BASETYPE_BOOL) == 0) {
+				outCode << "(";
+				ASTTraversal::traverse(exp, *this);
+				outCode << " ? \"true\" : \"false\"";
+				outCode << ")";
+			}
 			else
 				outCode << "(" << kPrefix << exp->toString() << " ? \"true\" : \"false\")";
 		}
@@ -618,7 +627,7 @@ void CodeGenerator::visit(EmptyStatement *emptyStmt) {
 
 void CodeGenerator::visit(ArrayExp *arrExp) {
 	if (arrExp == NULL) return;
-	outCode << kPrefix << arrExp->idExp->name;
+	outCode << getTabs() << kPrefix << arrExp->idExp->name;
 	for(auto const& exp: *(arrExp->expList)) {
 		if ( typeid(IdentifierExp) == typeid(*exp) ||
 		     typeid(BinaryOperatorExp) == typeid(*exp)
@@ -637,6 +646,27 @@ void CodeGenerator::visit(BinaryOperatorExp *binOpExp) {
 	/*if (typeid(IdentifierExp) == typeid(binOpExp->lhs))
 		outCode << kPrefix << binOpExp->lhs->toString();
 	else outCode << binOpExp->lhs->toString();*/
+		
+	//get id declaration
+	
+	/*if ( binOpExp->lhs->symbol && binOpExp->rhs->symbol &&
+	     typeid(IdentifierExp) == typeid(binOpExp->lhs->symbol->node) &&
+	     typeid(IdentifierExp) == typeid(binOpExp->rhs->symbol->node) &&
+	     binOpExp->op.compare(BINARY_EQUAL) == 0
+	) {	
+		std::cout << "test" << std::endl;
+		Symbol *symbLhs = symbolTable->getSymbol(symbolTable, lhs->name);
+		Symbol *symbRhs = symbolTable->getSymbol(symbolTable, rhs->name);
+		IdentifierExp *lhs = (IdentifierExp*)binOpExp->lhs;
+		IdentifierExp *rhs = (IdentifierExp*)binOpExp->rhs;
+		VariableDeclaration *varLhs = (VariableDeclaration*)s1->node;
+		VariableDeclaration *varRhs = (VariableDeclaration*)s2->node;	
+		if (varLhs->typeName->indexes && varRhs->typeName->indexes) {
+			outCode << "ARRAY_CMP(" << lhs->name << ", " << rhs->name << ") == 0"; 
+			return;
+		}
+	}*/
+	
 	ASTTraversal::traverse(binOpExp->lhs, *this);
 	outCode << " " << binOpExp->op << " ";
 	ASTTraversal::traverse(binOpExp->rhs, *this);
@@ -725,8 +755,14 @@ void CodeGenerator::visit(FunctionCallExp *funcCallExp) {
 }
 
 void CodeGenerator::visit(IdentifierExp *idExp) {
-	if (idExp == NULL) return;
-	outCode << kPrefix << idExp->name;
+	if (idExp == NULL) return;	
+	
+	//if constant false or true
+	if ( idExp->name.compare(CONSTANT_TRUE) == 0 ||
+	     idExp->name.compare(CONSTANT_FALSE) == 0
+	) outCode << idExp->name;
+	else
+		outCode << kPrefix << idExp->name;
 }
 
 void CodeGenerator::visit(IntegerExp *intExp) {

@@ -1,16 +1,17 @@
-//~2
-//~3
+//~blank
 
 package main
 
-func id(a int) int {
+/*func id(a int) int {
 	println(2)
 	return a
-}
+}*/
 
 func main() {
-	var a int
+	/*var a int
 	_, a = id(2), 3
 
-	println(a)
+	println(a)*/
+
+	print("blank")
 }
