@@ -14,8 +14,8 @@ class Symbol {
 		std::string category;
 		std::string type;
 		std::string baseType;
-		int tmpCounterNum;
 		Symbol *symbType = NULL;
+		int tmpCounterNum;	
 		Symbol *next = NULL;
 		Node *node = NULL;
 		

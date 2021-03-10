@@ -4,3 +4,5 @@ build/
 #ignore code generated c files except those in src
 *.c
 !src/#.c
+
+programs-solution/
