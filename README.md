@@ -9,6 +9,7 @@ The goal of the project is to master modern techniques and tools for building a 
 ## Resources
 
 * Charles N. Fischer, Richard Joseph LeBlanc, Ronald Kaplan Cytron (2010). _Crafting a Compiler._ Pearson Education, Inc.: Addison-Wesley.
+* <https://golang.org/ref/spec>
 * <https://cmake.org/cmake/help/v2.8.8/cmake.html#module:FindBISON>
 * <http://www.jonathanbeard.io/tutorials/FlexBisonC++>
 * <http://westes.github.io/flex/manual/Start-Conditions.html>
